@@ -10,7 +10,10 @@ import com.tienda.faltantes.entity.EstadoCaja;
 import com.tienda.faltantes.dto.response.CajaDetalleResponseDTO;
 import java.math.BigDecimal;
 import java.util.List;
-
+import com.tienda.faltantes.repository.DevolucionVentaRepository;
+import com.tienda.faltantes.repository.DevolucionCompraRepository;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 public class DashboardService {
@@ -21,6 +24,8 @@ public class DashboardService {
     private final FiadoRepository fiadoRepository;
     private final CajaService cajaService;
     private final CajaRepository cajaRepository;
+    private final DevolucionVentaRepository devolucionVentaRepository;
+    private final DevolucionCompraRepository devolucionCompraRepository;
 
     public DashboardService(
             ProductoRepository productoRepository,
@@ -28,7 +33,7 @@ public class DashboardService {
             VentaRepository ventaRepository,
             FiadoRepository fiadoRepository,
             CajaService cajaService,
-            CajaRepository cajaRepository) {
+            CajaRepository cajaRepository, DevolucionVentaRepository devolucionVentaRepository, DevolucionCompraRepository devolucionCompraRepository) {
 
         this.productoRepository = productoRepository;
         this.compraRepository = compraRepository;
@@ -36,6 +41,8 @@ public class DashboardService {
         this.fiadoRepository = fiadoRepository;
         this.cajaService = cajaService;
         this.cajaRepository = cajaRepository;
+        this.devolucionVentaRepository = devolucionVentaRepository;
+        this.devolucionCompraRepository = devolucionCompraRepository;
     }
 
     public DashboardResponseDTO obtenerDashboard() {
@@ -61,6 +68,62 @@ public class DashboardService {
         dto.setVentasHoy(ventaRepository.calcularTotalVentasHoy());
         dto.setVentasContadoHoy(ventaRepository.calcularTotalContadoHoy());
         dto.setVentasFiadoHoy(ventaRepository.calcularTotalFiadoHoy());
+
+        LocalDateTime inicioHoy = LocalDate.now().atStartOfDay();
+        LocalDateTime finHoy = LocalDate.now().plusDays(1).atStartOfDay().minusNanos(1);
+
+        Double costoVentasHoy =
+                ventaRepository.calcularCostoVentasEntre(inicioHoy, finHoy);
+
+        Double utilidadBrutaHoy =
+                ventaRepository.calcularUtilidadEntre(inicioHoy, finHoy);
+
+        Double margenUtilidadHoy = 0.0;
+
+        Double ventasHoy = dto.getVentasHoy();
+
+        if (ventasHoy != null && ventasHoy > 0) {
+            margenUtilidadHoy = (utilidadBrutaHoy / ventasHoy) * 100;
+        }
+
+        dto.setCostoVentasHoy(costoVentasHoy);
+        dto.setUtilidadBrutaHoy(utilidadBrutaHoy);
+        dto.setMargenUtilidadHoy(margenUtilidadHoy);
+
+
+        // Devoluciones de venta y compra
+        dto.setDevolucionesVentaHoy(
+                devolucionVentaRepository.findAll().stream()
+                        .filter(d -> d.getFecha().toLocalDate()
+                                .equals(java.time.LocalDate.now()))
+                        .mapToLong(d -> d.getCantidad())
+                        .sum()
+        );
+
+        dto.setDevolucionesCompraHoy(
+                devolucionCompraRepository.findAll().stream()
+                        .filter(d -> d.getFecha().toLocalDate()
+                                .equals(java.time.LocalDate.now()))
+                        .mapToLong(d -> d.getCantidad())
+                        .sum()
+        );
+
+        dto.setValorDevolucionesVentaHoy(
+                devolucionVentaRepository.findAll().stream()
+                        .filter(d -> d.getFecha().toLocalDate()
+                                .equals(java.time.LocalDate.now()))
+                        .mapToDouble(d -> d.getValor())
+                        .sum()
+        );
+
+        dto.setValorDevolucionesCompraHoy(
+                devolucionCompraRepository.findAll().stream()
+                        .filter(d -> d.getFecha().toLocalDate()
+                                .equals(java.time.LocalDate.now()))
+                        .mapToDouble(d -> d.getValor())
+                        .sum()
+        );
+
         dto.setCuentasPorCobrar(
                 fiadoRepository.calcularSaldoTotal(EstadoFiado.PENDIENTE)
                         .doubleValue()

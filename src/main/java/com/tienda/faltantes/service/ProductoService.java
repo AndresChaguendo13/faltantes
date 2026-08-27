@@ -109,6 +109,7 @@ public class ProductoService {
         existente.setCodigoBarras(producto.getCodigoBarras());
         existente.setCantidad(producto.getCantidad());
         existente.setPrecio(producto.getPrecio());
+        existente.setPrecioVenta(producto.getPrecioVenta());
 
         return repository.save(existente);
     }

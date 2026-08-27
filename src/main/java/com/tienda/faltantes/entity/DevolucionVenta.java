@@ -1,30 +1,39 @@
 package com.tienda.faltantes.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "detalle_ventas")
-public class DetalleVenta {
+@Table(name = "devoluciones_venta")
+public class DevolucionVenta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "venta_id")
+    @JoinColumn(name = "venta_id", nullable = false)
     private Venta venta;
 
     @ManyToOne
-    @JoinColumn(name = "producto_id")
+    @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    @Column(nullable = false)
     private Integer cantidad;
 
-    private Double precioUnitario;
+    @Column(nullable = false)
+    private Double valor;
 
-    private Double subtotal;
+    private String motivo;
 
-    private Double costoUnitario;
+    @Column(nullable = false)
+    private LocalDateTime fecha;
+
+    @PrePersist
+    public void prePersist() {
+        fecha = LocalDateTime.now();
+    }
 
     public Long getId() {
         return id;
@@ -32,18 +41,6 @@ public class DetalleVenta {
 
     public Venta getVenta() {
         return venta;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Double getCostoUnitario() {
-        return costoUnitario;
-    }
-
-    public void setCostoUnitario(Double costoUnitario) {
-        this.costoUnitario = costoUnitario;
     }
 
     public void setVenta(Venta venta) {
@@ -66,19 +63,23 @@ public class DetalleVenta {
         this.cantidad = cantidad;
     }
 
-    public Double getPrecioUnitario() {
-        return precioUnitario;
+    public Double getValor() {
+        return valor;
     }
 
-    public void setPrecioUnitario(Double precioUnitario) {
-        this.precioUnitario = precioUnitario;
+    public void setValor(Double valor) {
+        this.valor = valor;
     }
 
-    public Double getSubtotal() {
-        return subtotal;
+    public String getMotivo() {
+        return motivo;
     }
 
-    public void setSubtotal(Double subtotal) {
-        this.subtotal = subtotal;
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
     }
 }

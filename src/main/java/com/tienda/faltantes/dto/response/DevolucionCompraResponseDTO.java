@@ -1,0 +1,79 @@
+package com.tienda.faltantes.dto.response;
+
+import java.time.LocalDateTime;
+
+public class DevolucionCompraResponseDTO {
+
+    private Long id;
+    private Long compraId;
+    private Long productoId;
+    private String nombreProducto;
+    private Integer cantidad;
+    private Double valor;
+    private String motivo;
+    private LocalDateTime fecha;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getCompraId() {
+        return compraId;
+    }
+
+    public void setCompraId(Long compraId) {
+        this.compraId = compraId;
+    }
+
+    public Long getProductoId() {
+        return productoId;
+    }
+
+    public void setProductoId(Long productoId) {
+        this.productoId = productoId;
+    }
+
+    public String getNombreProducto() {
+        return nombreProducto;
+    }
+
+    public void setNombreProducto(String nombreProducto) {
+        this.nombreProducto = nombreProducto;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
+    }
+
+    public Double getValor() {
+        return valor;
+    }
+
+    public void setValor(Double valor) {
+        this.valor = valor;
+    }
+
+    public String getMotivo() {
+        return motivo;
+    }
+
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+}

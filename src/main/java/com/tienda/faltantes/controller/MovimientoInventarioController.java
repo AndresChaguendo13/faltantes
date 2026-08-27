@@ -1,5 +1,6 @@
 package com.tienda.faltantes.controller;
 
+import com.tienda.faltantes.dto.request.AjusteInventarioRequestDTO;
 import com.tienda.faltantes.entity.MovimientoInventario;
 import com.tienda.faltantes.service.MovimientoInventarioService;
 import org.springframework.web.bind.annotation.*;
@@ -21,4 +22,10 @@ public class MovimientoInventarioController {
         return service.listar();
     }
 
+    @PostMapping("/ajuste")
+    public MovimientoInventario ajustarStock(
+            @RequestBody AjusteInventarioRequestDTO dto) {
+
+        return service.ajustarStock(dto);
+    }
 }

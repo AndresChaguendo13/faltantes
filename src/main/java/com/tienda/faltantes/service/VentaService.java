@@ -249,6 +249,7 @@ public class VentaService {
             detalle.setCantidad(detalleDTO.getCantidad());
 
             detalle.setPrecioUnitario(producto.getPrecioVenta());
+            detalle.setCostoUnitario(producto.getCostoCompra());
 
             detalle.setSubtotal(
                     detalleDTO.getCantidad() * producto.getPrecioVenta());

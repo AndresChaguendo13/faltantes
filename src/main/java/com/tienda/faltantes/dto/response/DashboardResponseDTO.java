@@ -17,6 +17,69 @@ public class DashboardResponseDTO {
     private String estadoCaja;
     private BigDecimal montoInicialCaja;
     private BigDecimal ventasContadoCaja;
+    private Long devolucionesVentaHoy;
+    private Long devolucionesCompraHoy;
+    private Double valorDevolucionesVentaHoy;
+    private Double valorDevolucionesCompraHoy;
+    private Double costoVentasHoy;
+    private Double utilidadBrutaHoy;
+    private Double margenUtilidadHoy;
+
+    public Double getCostoVentasHoy() {
+        return costoVentasHoy;
+    }
+
+    public void setCostoVentasHoy(Double costoVentasHoy) {
+        this.costoVentasHoy = costoVentasHoy;
+    }
+
+    public Double getUtilidadBrutaHoy() {
+        return utilidadBrutaHoy;
+    }
+
+    public void setUtilidadBrutaHoy(Double utilidadBrutaHoy) {
+        this.utilidadBrutaHoy = utilidadBrutaHoy;
+    }
+
+    public Double getMargenUtilidadHoy() {
+        return margenUtilidadHoy;
+    }
+
+    public void setMargenUtilidadHoy(Double margenUtilidadHoy) {
+        this.margenUtilidadHoy = margenUtilidadHoy;
+    }
+
+    public Long getDevolucionesVentaHoy() {
+        return devolucionesVentaHoy;
+    }
+
+    public void setDevolucionesVentaHoy(Long devolucionesVentaHoy) {
+        this.devolucionesVentaHoy = devolucionesVentaHoy;
+    }
+
+    public Long getDevolucionesCompraHoy() {
+        return devolucionesCompraHoy;
+    }
+
+    public void setDevolucionesCompraHoy(Long devolucionesCompraHoy) {
+        this.devolucionesCompraHoy = devolucionesCompraHoy;
+    }
+
+    public Double getValorDevolucionesVentaHoy() {
+        return valorDevolucionesVentaHoy;
+    }
+
+    public void setValorDevolucionesVentaHoy(Double valorDevolucionesVentaHoy) {
+        this.valorDevolucionesVentaHoy = valorDevolucionesVentaHoy;
+    }
+
+    public Double getValorDevolucionesCompraHoy() {
+        return valorDevolucionesCompraHoy;
+    }
+
+    public void setValorDevolucionesCompraHoy(Double valorDevolucionesCompraHoy) {
+        this.valorDevolucionesCompraHoy = valorDevolucionesCompraHoy;
+    }
 
     public String getEstadoCaja() {
         return estadoCaja;
