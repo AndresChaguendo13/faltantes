@@ -12,9 +12,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import com.tienda.faltantes.dto.request.CajaCierreRequestDTO;
 import java.math.BigDecimal;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.tienda.faltantes.repository.DevolucionVentaRepository;
 
 @Service
 public class CajaService {
@@ -22,31 +22,50 @@ public class CajaService {
     private final VentaRepository ventaRepository;
     private final AbonoRepository abonoRepository;
     private final CajaRepository cajaRepository;
+    private final DevolucionVentaRepository devolucionVentaRepository;
 
     public CajaService(
             VentaRepository ventaRepository,
             CajaRepository cajaRepository,
-            AbonoRepository abonoRepository) {
+            AbonoRepository abonoRepository,
+            DevolucionVentaRepository devolucionVentaRepository) {
 
         this.ventaRepository = ventaRepository;
         this.cajaRepository = cajaRepository;
         this.abonoRepository = abonoRepository;
+        this.devolucionVentaRepository = devolucionVentaRepository;
     }
 
     public CajaResponseDTO obtenerResumenHoy() {
 
+        Caja caja = cajaRepository.findByEstado(EstadoCaja.ABIERTA)
+                .orElseThrow(() ->
+                        new IllegalStateException("No hay ninguna caja abierta"));
+
+        LocalDateTime fechaInicio = caja.getFechaApertura();
+        LocalDateTime fechaFin = LocalDateTime.now();
+
         CajaResponseDTO dto = new CajaResponseDTO();
 
         BigDecimal ventasContado = BigDecimal.valueOf(
-                ventaRepository.calcularTotalContadoHoy()
+                ventaRepository.calcularTotalContadoEntre(
+                        fechaInicio,
+                        fechaFin
+                )
         );
 
         BigDecimal ventasFiado = BigDecimal.valueOf(
-                ventaRepository.calcularTotalFiadoHoy()
+                ventaRepository.calcularTotalFiadoEntre(
+                        fechaInicio,
+                        fechaFin
+                )
         );
 
         BigDecimal abonosFiados =
-                abonoRepository.calcularTotalAbonosHoy();
+                abonoRepository.calcularTotalAbonosEntre(
+                        fechaInicio,
+                        fechaFin
+                );
 
         BigDecimal totalRecibido =
                 ventasContado.add(abonosFiados);
@@ -97,6 +116,12 @@ public class CajaService {
                         fechaCierre
                 ));
 
+        BigDecimal devolucionesVenta =
+                devolucionVentaRepository.calcularTotalEntre(
+                        caja.getFechaApertura(),
+                        fechaCierre
+                );
+
         BigDecimal abonosFiados = abonoRepository.calcularTotalAbonosEntre(
                 caja.getFechaApertura(),
                 fechaCierre
@@ -104,7 +129,8 @@ public class CajaService {
 
         BigDecimal montoEsperado = caja.getMontoInicial()
                 .add(ventasContado)
-                .add(abonosFiados);
+                .add(abonosFiados)
+                .subtract(devolucionesVenta);
 
         BigDecimal montoFinal = request.getMontoFinal();
 
@@ -155,9 +181,16 @@ public class CajaService {
                 fechaFin
         );
 
+        BigDecimal devolucionesVenta =
+                devolucionVentaRepository.calcularTotalEntre(
+                        caja.getFechaApertura(),
+                        fechaFin
+                );
+
         BigDecimal montoEsperado = caja.getMontoInicial()
                 .add(ventasContado)
-                .add(abonosFiados);
+                .add(abonosFiados)
+                .subtract(devolucionesVenta);
 
         CajaDetalleResponseDTO dto = new CajaDetalleResponseDTO();
 

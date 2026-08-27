@@ -51,6 +51,19 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
     @Query(value = """
     SELECT COALESCE(SUM(total), 0)
     FROM ventas
+    WHERE tipo_pago = 'FIADO'
+    AND fecha >= :fechaInicio
+    AND fecha <= :fechaFin
+    """, nativeQuery = true)
+    Double calcularTotalFiadoEntre(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin
+    );
+
+
+    @Query(value = """
+    SELECT COALESCE(SUM(total), 0)
+    FROM ventas
     WHERE fecha >= :fechaInicio
     AND fecha <= :fechaFin
     """, nativeQuery = true)

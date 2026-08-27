@@ -21,6 +21,7 @@ import com.tienda.faltantes.entity.EstadoFiado;
 import com.tienda.faltantes.entity.TipoPago;
 import com.tienda.faltantes.repository.ClienteRepository;
 import com.tienda.faltantes.repository.FiadoRepository;
+import com.tienda.faltantes.repository.DevolucionVentaRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,19 +35,23 @@ public class VentaService {
     private final ProductoRepository productoRepository;
     private final ClienteRepository clienteRepository;
     private final FiadoRepository fiadoRepository;
+    private final DevolucionVentaRepository devolucionVentaRepository;
+
 
     public VentaService(
             VentaRepository ventaRepository,
             ProductoRepository productoRepository,
             MovimientoInventarioRepository movimientoRepository,
             ClienteRepository clienteRepository,
-            FiadoRepository fiadoRepository) {
+            FiadoRepository fiadoRepository,
+            DevolucionVentaRepository devolucionVentaRepository) {
 
         this.ventaRepository = ventaRepository;
         this.productoRepository = productoRepository;
         this.movimientoRepository = movimientoRepository;
         this.clienteRepository = clienteRepository;
         this.fiadoRepository = fiadoRepository;
+        this.devolucionVentaRepository = devolucionVentaRepository;
     }
 
     public VentaResponseDTO buscarPorId(Long id) {
