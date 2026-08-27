@@ -263,8 +263,9 @@ public class VentaService {
 
         Venta guardada = ventaRepository.save(venta);
 
-        if ("FIADO".equalsIgnoreCase(dto.getTipoPago()))  {
+        Fiado fiado = null;
 
+        if ("FIADO".equalsIgnoreCase(dto.getTipoPago())) {
 
             Cliente cliente = clienteRepository.findById(dto.getClienteId())
                     .orElseThrow(() ->
@@ -272,7 +273,7 @@ public class VentaService {
                                     "Cliente no encontrado"
                             ));
 
-            Fiado fiado = new Fiado();
+            fiado = new Fiado();
 
             fiado.setCliente(cliente);
             fiado.setVenta(guardada);
@@ -285,9 +286,8 @@ public class VentaService {
             );
             fiado.setEstado(EstadoFiado.PENDIENTE);
 
-            fiadoRepository.save(fiado);
+            fiado = fiadoRepository.save(fiado);
         }
-
         VentaResponseDTO response = new VentaResponseDTO();
 
         response.setId(guardada.getId());
@@ -303,6 +303,9 @@ public class VentaService {
         if (guardada.getCliente() != null) {
             response.setClienteId(guardada.getCliente().getId());
             response.setNombreCliente(guardada.getCliente().getNombre());
+        }
+        if (fiado != null) {
+            response.setFiadoId(fiado.getId());
         }
 
         List<DetalleVentaResponseDTO> detallesResponse = guardada.getDetalles()
