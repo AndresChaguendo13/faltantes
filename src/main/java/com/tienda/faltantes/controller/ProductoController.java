@@ -26,6 +26,7 @@ public class ProductoController {
     }
 
     @GetMapping("/stock-bajo")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public List<Producto> stockBajo() {
         return service.productosConStockBajo();
     }
@@ -49,6 +50,7 @@ public class ProductoController {
 
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     @GetMapping("/codigo/{codigo}")
     public ResponseEntity<Producto> buscarPorCodigo(@PathVariable String codigo){
 
@@ -58,6 +60,7 @@ public class ProductoController {
 
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     @GetMapping("/{id}")
     public Optional<Producto> buscar(@PathVariable Long id) {
         return service.buscarPorId(id);
@@ -73,6 +76,7 @@ public class ProductoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public Producto actualizar(@PathVariable Long id,
                                @RequestBody Producto producto) {

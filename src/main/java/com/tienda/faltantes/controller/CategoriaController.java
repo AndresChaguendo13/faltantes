@@ -5,6 +5,7 @@ import com.tienda.faltantes.service.CategoriaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -19,11 +20,13 @@ public class CategoriaController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public List<Categoria> listar() {
         return service.listar();
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Categoria> guardar(@RequestBody Categoria categoria) {
         System.out.println("Entró al controlador");
         Categoria nueva = service.guardar(categoria);

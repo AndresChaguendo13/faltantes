@@ -4,6 +4,7 @@ import com.tienda.faltantes.dto.request.DevolucionCompraRequestDTO;
 import com.tienda.faltantes.dto.response.DevolucionCompraResponseDTO;
 import com.tienda.faltantes.entity.DevolucionCompra;
 import com.tienda.faltantes.service.DevolucionCompraService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,7 +17,9 @@ public class DevolucionCompraController {
         this.service = service;
     }
 
+
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public DevolucionCompraResponseDTO devolverProducto(
             @RequestBody DevolucionCompraRequestDTO dto) {
 
@@ -39,6 +42,8 @@ public class DevolucionCompraController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
+
     public java.util.List<DevolucionCompraResponseDTO> listar() {
 
         java.util.List<DevolucionCompra> devoluciones =

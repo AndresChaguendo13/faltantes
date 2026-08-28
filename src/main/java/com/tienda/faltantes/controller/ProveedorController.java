@@ -8,7 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,16 +23,19 @@ public class ProveedorController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public List<ProveedorResponseDTO> listar() {
         return service.listar();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public Optional<Proveedor> buscar(@PathVariable Long id) {
         return service.buscarPorId(id);
     }
 
     @GetMapping("/nit/{nit}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public ResponseEntity<Proveedor> buscarPorNit(@PathVariable String nit) {
 
         return service.buscarPorNit(nit)
@@ -41,6 +44,7 @@ public class ProveedorController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProveedorResponseDTO> guardar(
             @Valid @RequestBody ProveedorRequestDTO dto) {
 
@@ -50,6 +54,7 @@ public class ProveedorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void eliminar(@PathVariable Long id) {
         service.eliminar(id);
     }
