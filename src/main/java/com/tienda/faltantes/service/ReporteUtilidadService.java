@@ -38,8 +38,7 @@ public class ReporteUtilidadService {
 
         Double costoVentas = costoVentasBruto - costoDevoluciones;
 
-        Double utilidadBruta =
-                ventaRepository.calcularUtilidadEntre(fechaInicio, fechaFin);
+        Double utilidadBruta = totalVentas - costoVentas;
 
         Double margenUtilidad = 0.0;
 

@@ -7,6 +7,24 @@ public class ReporteComprasResponseDTO {
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaFin;
     private Double totalCompras;
+    private Double totalDevoluciones;
+    private Double comprasNetas;
+
+    public Double getTotalDevoluciones() {
+        return totalDevoluciones;
+    }
+
+    public void setTotalDevoluciones(Double totalDevoluciones) {
+        this.totalDevoluciones = totalDevoluciones;
+    }
+
+    public Double getComprasNetas() {
+        return comprasNetas;
+    }
+
+    public void setComprasNetas(Double comprasNetas) {
+        this.comprasNetas = comprasNetas;
+    }
 
     public LocalDateTime getFechaInicio() {
         return fechaInicio;
