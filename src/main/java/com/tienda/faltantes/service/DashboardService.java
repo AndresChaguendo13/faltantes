@@ -72,20 +72,40 @@ public class DashboardService {
         LocalDateTime inicioHoy = LocalDate.now().atStartOfDay();
         LocalDateTime finHoy = LocalDate.now().plusDays(1).atStartOfDay().minusNanos(1);
 
-        Double costoVentasHoy =
+        Double costoVentasBrutoHoy =
                 ventaRepository.calcularCostoVentasEntre(inicioHoy, finHoy);
 
+        Double costoDevolucionesHoy =
+                devolucionVentaRepository.calcularCostoDevolucionesEntre(
+                        inicioHoy,
+                        finHoy
+                );
+
+        Double costoVentasHoy =
+                costoVentasBrutoHoy - costoDevolucionesHoy;
+
+        Double ventasBrutasHoy = dto.getVentasHoy();
+
+        Double devolucionesVentaValorHoy =
+                devolucionVentaRepository.calcularTotalEntre(
+                        inicioHoy,
+                        finHoy
+                ).doubleValue();
+
+        Double ventasNetasHoy =
+                ventasBrutasHoy - devolucionesVentaValorHoy;
+
         Double utilidadBrutaHoy =
-                ventaRepository.calcularUtilidadEntre(inicioHoy, finHoy);
+                ventasNetasHoy - costoVentasHoy;
 
         Double margenUtilidadHoy = 0.0;
 
-        Double ventasHoy = dto.getVentasHoy();
-
-        if (ventasHoy != null && ventasHoy > 0) {
-            margenUtilidadHoy = (utilidadBrutaHoy / ventasHoy) * 100;
+        if (ventasNetasHoy > 0) {
+            margenUtilidadHoy =
+                    (utilidadBrutaHoy / ventasNetasHoy) * 100;
         }
 
+        dto.setVentasHoy(ventasNetasHoy);
         dto.setCostoVentasHoy(costoVentasHoy);
         dto.setUtilidadBrutaHoy(utilidadBrutaHoy);
         dto.setMargenUtilidadHoy(margenUtilidadHoy);
