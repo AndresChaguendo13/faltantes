@@ -3,16 +3,21 @@ package com.tienda.faltantes.service;
 import com.tienda.faltantes.dto.response.ReporteVentasResponseDTO;
 import com.tienda.faltantes.repository.VentaRepository;
 import org.springframework.stereotype.Service;
+import com.tienda.faltantes.repository.DevolucionVentaRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
 public class ReporteVentasService {
 
     private final VentaRepository ventaRepository;
+    private final DevolucionVentaRepository devolucionVentaRepository;
 
-    public ReporteVentasService(VentaRepository ventaRepository) {
+    public ReporteVentasService(VentaRepository ventaRepository,
+                                DevolucionVentaRepository devolucionVentaRepository) {
         this.ventaRepository = ventaRepository;
+        this.devolucionVentaRepository = devolucionVentaRepository;
     }
 
     public ReporteVentasResponseDTO obtenerReporte(
@@ -27,6 +32,19 @@ public class ReporteVentasService {
                         fechaInicio,
                         fechaFin);
 
+        BigDecimal totalDevolucionesDecimal =
+                devolucionVentaRepository.calcularTotalEntre(
+                        fechaInicio,
+                        fechaFin);
+
+        Double totalDevoluciones =
+                totalDevolucionesDecimal.doubleValue();
+
+        Double ventasNetas =
+                totalVentas - totalDevoluciones;
+
+
+
         Double totalContado =
                 ventaRepository.calcularTotalContadoEntre(
                         fechaInicio,
@@ -39,6 +57,9 @@ public class ReporteVentasService {
         dto.setTotalVentas(totalVentas);
         dto.setTotalVentasContado(totalContado);
         dto.setTotalVentasFiado(totalFiado);
+        dto.setTotalDevoluciones(totalDevoluciones);
+        dto.setVentasNetas(ventasNetas);
+
 
         return dto;
     }

@@ -9,6 +9,24 @@ public class ReporteVentasResponseDTO {
     private Double totalVentas;
     private Double totalVentasContado;
     private Double totalVentasFiado;
+    private Double totalDevoluciones;
+    private Double ventasNetas;
+
+    public Double getTotalDevoluciones() {
+        return totalDevoluciones;
+    }
+
+    public void setTotalDevoluciones(Double totalDevoluciones) {
+        this.totalDevoluciones = totalDevoluciones;
+    }
+
+    public Double getVentasNetas() {
+        return ventasNetas;
+    }
+
+    public void setVentasNetas(Double ventasNetas) {
+        this.ventasNetas = ventasNetas;
+    }
 
     public LocalDateTime getFechaInicio() {
         return fechaInicio;
