@@ -7,7 +7,7 @@ import com.tienda.faltantes.exception.RecursoDuplicadoException;
 import com.tienda.faltantes.mapper.ProveedorMapper;
 import com.tienda.faltantes.repository.ProveedorRepository;
 import org.springframework.stereotype.Service;
-
+import com.tienda.faltantes.exception.RecursoNoEncontradoException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,6 +50,28 @@ public class ProveedorService {
         Proveedor guardado = repository.save(proveedor);
 
         return mapper.toResponseDTO(guardado);
+    }
+
+    public ProveedorResponseDTO actualizar(Long id, ProveedorRequestDTO dto) {
+
+        Proveedor proveedor = repository.findById(id)
+                .orElseThrow(() ->
+                        new RecursoNoEncontradoException("Proveedor no encontrado"));
+
+        if (!proveedor.getNit().equals(dto.getNit())
+                && repository.existsByNit(dto.getNit())) {
+            throw new RecursoDuplicadoException(
+                    "Ya existe un proveedor con ese NIT");
+        }
+
+        proveedor.setNombre(dto.getNombre());
+        proveedor.setNit(dto.getNit());
+        proveedor.setTelefono(dto.getTelefono());
+        proveedor.setDireccion(dto.getDireccion());
+
+        Proveedor actualizado = repository.save(proveedor);
+
+        return mapper.toResponseDTO(actualizado);
     }
 
     public void eliminar(Long id) {
