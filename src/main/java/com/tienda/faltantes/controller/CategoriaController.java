@@ -25,11 +25,28 @@ public class CategoriaController {
         return service.listar();
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
+    public ResponseEntity<Categoria> buscarPorId(@PathVariable Long id) {
+
+        return service.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Categoria> guardar(@RequestBody Categoria categoria) {
         System.out.println("Entró al controlador");
         Categoria nueva = service.guardar(categoria);
         return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        service.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
