@@ -8,6 +8,8 @@ import com.tienda.faltantes.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @Transactional
 public class DevolucionVentaService {
@@ -16,17 +18,20 @@ public class DevolucionVentaService {
     private final VentaRepository ventaRepository;
     private final ProductoRepository productoRepository;
     private final MovimientoInventarioRepository movimientoRepository;
+    private final FiadoRepository fiadoRepository;
 
     public DevolucionVentaService(
             DevolucionVentaRepository devolucionRepository,
             VentaRepository ventaRepository,
             ProductoRepository productoRepository,
-            MovimientoInventarioRepository movimientoRepository) {
+            MovimientoInventarioRepository movimientoRepository,
+            FiadoRepository fiadoRepository) {
 
         this.devolucionRepository = devolucionRepository;
         this.ventaRepository = ventaRepository;
         this.productoRepository = productoRepository;
         this.movimientoRepository = movimientoRepository;
+        this.fiadoRepository = fiadoRepository;
     }
 
     public DevolucionVenta devolverProducto(DevolucionVentaRequestDTO dto) {
@@ -84,6 +89,34 @@ public class DevolucionVentaService {
 
         double valor = detalleEncontrado.getPrecioUnitario()
                 * dto.getCantidad();
+
+        if (venta.getTipoPago() == TipoPago.FIADO) {
+
+            Fiado fiado = fiadoRepository.findByVentaId(venta.getId())
+                    .orElseThrow(() ->
+                            new IllegalStateException(
+                                    "La venta fiada no tiene un fiado asociado"));
+
+            BigDecimal valorDevolucion =
+                    BigDecimal.valueOf(valor);
+
+            BigDecimal nuevoSaldo =
+                    fiado.getSaldoPendiente()
+                            .subtract(valorDevolucion);
+
+            if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) {
+                nuevoSaldo = BigDecimal.ZERO;
+            }
+
+            fiado.setSaldoPendiente(nuevoSaldo);
+
+            if (nuevoSaldo.compareTo(BigDecimal.ZERO) == 0) {
+                fiado.setEstado(EstadoFiado.PAGADO);
+            }
+
+            fiadoRepository.save(fiado);
+
+        }
 
         DevolucionVenta devolucion = new DevolucionVenta();
 

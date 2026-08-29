@@ -66,9 +66,16 @@ public class CajaService {
                         fechaInicio,
                         fechaFin
                 );
+        BigDecimal devolucionesVenta =
+                devolucionVentaRepository.calcularTotalEntre(
+                        fechaInicio,
+                        fechaFin
+                );
 
         BigDecimal totalRecibido =
-                ventasContado.add(abonosFiados);
+                ventasContado
+                        .add(abonosFiados)
+                        .subtract(devolucionesVenta);
 
         dto.setVentasContado(ventasContado);
         dto.setVentasFiado(ventasFiado);
