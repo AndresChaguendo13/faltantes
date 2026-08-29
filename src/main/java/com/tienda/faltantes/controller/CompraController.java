@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import com.tienda.faltantes.dto.response.CompraResponseDTO;
 
 @RestController
 @RequestMapping("/compras")
@@ -26,6 +28,18 @@ public class CompraController {
         Compra compra = service.guardarCompra(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(compra);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO')")
+    public ResponseEntity<List<CompraResponseDTO>> listar() {
+        return ResponseEntity.ok(service.listarCompras());
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO')")
+    public ResponseEntity<CompraResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarPorId(id));
     }
 
 }
