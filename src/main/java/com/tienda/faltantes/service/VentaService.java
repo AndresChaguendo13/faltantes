@@ -225,7 +225,7 @@ public class VentaService {
                             new RecursoNoEncontradoException("Producto no encontrado"));
 
             if (producto.getCantidad() < detalleDTO.getCantidad()) {
-                throw new RuntimeException(
+                throw new IllegalArgumentException(
                         "No hay suficiente inventario de " + producto.getNombre());
             }
 

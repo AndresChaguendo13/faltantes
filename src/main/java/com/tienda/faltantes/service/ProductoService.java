@@ -4,8 +4,6 @@ import com.tienda.faltantes.dto.response.ProductoResponseDTO;
 import com.tienda.faltantes.exception.RecursoDuplicadoException;
 import com.tienda.faltantes.exception.RecursoNoEncontradoException;
 import com.tienda.faltantes.mapper.ProductoMapper;
-import com.tienda.faltantes.mapper.ProductoMapper;
-import com.tienda.faltantes.dto.ProductoDTO;
 import com.tienda.faltantes.entity.Producto;
 import com.tienda.faltantes.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
@@ -51,18 +49,7 @@ public class ProductoService {
                 .map(mapper::toResponseDTO);
 
     }
- //   public ProductoDTO guardar(ProductoDTO dto) {
 
-   //     Producto producto = mapper.toEntity(dto);
-
-     //   if (repository.existsByCodigoBarras(producto.getCodigoBarras())) {
-     //       throw new RuntimeException("Ya existe un producto con ese código de barras");
-     //   }
-
-     //   Producto guardado = repository.save(producto);
-
-     //   return mapper.toDTO(guardado);
-  //  }
      public ProductoResponseDTO guardar(ProductoRequestDTO dto) {
 
          Producto producto = mapper.toEntity(dto);
@@ -82,17 +69,6 @@ public class ProductoService {
      }
 
 
-
-
-
-    public Producto guardar(Producto producto) {
-        if(repository.existsByCodigoBarras(producto.getCodigoBarras())){
-            throw new RecursoDuplicadoException("Ya existe un producto con ese código de barras");
-        }
-
-        return repository.save(producto);
-    }
-
     public Optional<Producto> buscarPorCodigo(String codigo) {
         return repository.findByCodigoBarras(codigo);
     }
@@ -105,9 +81,16 @@ public class ProductoService {
         Producto existente = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
+        if (!existente.getCodigoBarras().equals(producto.getCodigoBarras())
+                && repository.existsByCodigoBarras(producto.getCodigoBarras())) {
+
+            throw new RecursoDuplicadoException(
+                    "Ya existe otro producto con ese código de barras"
+            );
+        }
+
         existente.setNombre(producto.getNombre());
         existente.setCodigoBarras(producto.getCodigoBarras());
-        existente.setCantidad(producto.getCantidad());
         existente.setPrecio(producto.getPrecio());
         existente.setPrecioVenta(producto.getPrecioVenta());
 
@@ -118,6 +101,12 @@ public class ProductoService {
 
 
     public void eliminar(Long id) {
+
+        if (!repository.existsById(id)) {
+            throw new RecursoNoEncontradoException("Producto no encontrado");
+        }
+
         repository.deleteById(id);
     }
+
 }
