@@ -67,6 +67,7 @@ public class ProveedorService {
         proveedor.setNombre(dto.getNombre());
         proveedor.setNit(dto.getNit());
         proveedor.setTelefono(dto.getTelefono());
+        proveedor.setCorreo(dto.getCorreo());
         proveedor.setDireccion(dto.getDireccion());
 
         Proveedor actualizado = repository.save(proveedor);

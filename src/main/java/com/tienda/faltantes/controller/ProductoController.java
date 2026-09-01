@@ -1,5 +1,5 @@
 package com.tienda.faltantes.controller;
-import com.tienda.faltantes.dto.ProductoDTO;
+
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +13,6 @@ import com.tienda.faltantes.dto.request.ProductoRequestDTO;
 import com.tienda.faltantes.dto.response.ProductoResponseDTO;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/productos")
@@ -33,7 +32,7 @@ public class ProductoController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO')")
-    public Page<ProductoResponseDTO> listar(Pageable pageable){
+    public Page<ProductoResponseDTO> listar(Pageable pageable) {
 
         return service.listar(pageable);
 
@@ -44,15 +43,15 @@ public class ProductoController {
     public Page<ProductoResponseDTO> buscar(
 
             @RequestParam String nombre,
-            Pageable pageable){
+            Pageable pageable) {
 
-        return service.buscarPorNombre(nombre,pageable);
+        return service.buscarPorNombre(nombre, pageable);
 
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     @GetMapping("/codigo/{codigo}")
-    public ResponseEntity<Producto> buscarPorCodigo(@PathVariable String codigo){
+    public ResponseEntity<Producto> buscarPorCodigo(@PathVariable String codigo) {
 
         return service.buscarPorCodigo(codigo)
                 .map(ResponseEntity::ok)
@@ -60,10 +59,10 @@ public class ProductoController {
 
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     @GetMapping("/{id}")
-    public Optional<Producto> buscar(@PathVariable Long id) {
-        return service.buscarPorId(id);
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO', 'CAJERO')")
+    public ResponseEntity<Producto> buscar(@PathVariable Long id) {
+        return ResponseEntity.of(service.buscarPorId(id));
     }
 
     @PostMapping

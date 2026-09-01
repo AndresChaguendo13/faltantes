@@ -1,6 +1,7 @@
 package com.tienda.faltantes.service;
 
 import com.tienda.faltantes.dto.request.DevolucionVentaRequestDTO;
+import com.tienda.faltantes.dto.response.DevolucionVentaResponseDTO;
 import com.tienda.faltantes.entity.*;
 import com.tienda.faltantes.enums.TipoMovimiento;
 import com.tienda.faltantes.exception.RecursoNoEncontradoException;
@@ -9,6 +10,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @Transactional
@@ -142,5 +144,26 @@ public class DevolucionVentaService {
         movimientoRepository.save(movimiento);
 
         return devolucion;
+    }
+
+    public List<DevolucionVentaResponseDTO> listar() {
+
+        return devolucionRepository.findAll()
+                .stream()
+                .map(d -> {
+                    DevolucionVentaResponseDTO dto = new DevolucionVentaResponseDTO();
+
+                    dto.setId(d.getId());
+                    dto.setVentaId(d.getVenta().getId());
+                    dto.setProductoId(d.getProducto().getId());
+                    dto.setNombreProducto(d.getProducto().getNombre());
+                    dto.setCantidad(d.getCantidad());
+                    dto.setValor(d.getValor());
+                    dto.setMotivo(d.getMotivo());
+                    dto.setFecha(d.getFecha());
+
+                    return dto;
+                })
+                .toList();
     }
 }

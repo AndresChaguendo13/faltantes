@@ -67,7 +67,7 @@ public class CajaService {
                         fechaFin
                 );
         BigDecimal devolucionesVenta =
-                devolucionVentaRepository.calcularTotalEntre(
+                devolucionVentaRepository.calcularTotalContadoEntre(
                         fechaInicio,
                         fechaFin
                 );
@@ -124,7 +124,7 @@ public class CajaService {
                 ));
 
         BigDecimal devolucionesVenta =
-                devolucionVentaRepository.calcularTotalEntre(
+                devolucionVentaRepository.calcularTotalContadoEntre(
                         caja.getFechaApertura(),
                         fechaCierre
                 );
@@ -189,7 +189,7 @@ public class CajaService {
         );
 
         BigDecimal devolucionesVenta =
-                devolucionVentaRepository.calcularTotalEntre(
+                devolucionVentaRepository.calcularTotalContadoEntre(
                         caja.getFechaApertura(),
                         fechaFin
                 );
@@ -198,6 +198,14 @@ public class CajaService {
                 .add(ventasContado)
                 .add(abonosFiados)
                 .subtract(devolucionesVenta);
+
+        System.out.println("===== DEBUG CAJA =====");
+        System.out.println("Monto inicial: " + caja.getMontoInicial());
+        System.out.println("Ventas contado: " + ventasContado);
+        System.out.println("Abonos fiados: " + abonosFiados);
+        System.out.println("Devoluciones: " + devolucionesVenta);
+        System.out.println("Monto esperado: " + montoEsperado);
+        System.out.println("======================");
 
         CajaDetalleResponseDTO dto = new CajaDetalleResponseDTO();
 

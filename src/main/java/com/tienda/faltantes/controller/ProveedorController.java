@@ -22,16 +22,13 @@ public class ProveedorController {
         this.service = service;
     }
 
-    @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
-    public List<ProveedorResponseDTO> listar() {
-        return service.listar();
-    }
-
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
-    public Optional<Proveedor> buscar(@PathVariable Long id) {
-        return service.buscarPorId(id);
+    public ResponseEntity<Proveedor> buscar(@PathVariable Long id) {
+
+        return service.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/nit/{nit}")

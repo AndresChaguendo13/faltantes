@@ -7,6 +7,8 @@ import com.tienda.faltantes.service.DevolucionVentaService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/devoluciones-venta")
 public class DevolucionVentaController {
@@ -36,5 +38,11 @@ public class DevolucionVentaController {
         response.setFecha(devolucion.getFecha());
 
         return response;
+    }
+
+    @GetMapping
+    public List<DevolucionVentaResponseDTO> listar() {
+
+        return service.listar();
     }
 }
