@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.tienda.faltantes.dto.response.ProductoMasVendidoResponseDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -29,6 +31,18 @@ public class VentaController {
         VentaResponseDTO venta = service.guardar(dto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(venta);
+    }
+
+    //controler prueba mas vendidos
+    @GetMapping("/productos-mas-vendidos")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
+    public ResponseEntity<List<ProductoMasVendidoResponseDTO>> obtenerProductosMasVendidos(
+            @RequestParam LocalDateTime fechaInicio,
+            @RequestParam LocalDateTime fechaFin) {
+
+        return ResponseEntity.ok(
+                service.obtenerProductosMasVendidos(fechaInicio, fechaFin)
+        );
     }
 
     @GetMapping("/{id}")

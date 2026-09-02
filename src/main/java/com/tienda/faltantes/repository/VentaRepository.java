@@ -199,4 +199,49 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
             @Param("fechaFin") LocalDateTime fechaFin
     );
 
+
+    @Query(value = """
+    SELECT
+        p.id AS producto_id,
+        p.nombre AS nombre_producto,
+        SUM(d.cantidad) - COALESCE(
+            (
+                SELECT SUM(dv.cantidad)
+                FROM devoluciones_venta dv
+                WHERE dv.producto_id = p.id
+                  AND dv.fecha >= :fechaInicio
+                  AND dv.fecha <= :fechaFin
+            ), 0
+        ) AS unidades_vendidas
+
+    FROM detalle_ventas d
+    JOIN ventas v ON v.id = d.venta_id
+    JOIN productos p ON p.id = d.producto_id
+
+    WHERE v.fecha >= :fechaInicio
+      AND v.fecha <= :fechaFin
+      AND d.costo_unitario IS NOT NULL
+            GROUP BY p.id, p.nombre
+            HAVING (
+            SUM(d.cantidad) - COALESCE(
+           (
+               SELECT SUM(dv.cantidad)
+               FROM devoluciones_venta dv
+               WHERE dv.producto_id = p.id
+                 AND dv.fecha >= :fechaInicio
+                 AND dv.fecha <= :fechaFin
+           )
+            , 0
+       )
+   ) > 0
+            ORDER BY
+            unidades_vendidas DESC
+            LIMIT 5
+       
+    """, nativeQuery = true)
+    List<Object[]> calcularProductosMasVendidos(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin
+    );
+
 }

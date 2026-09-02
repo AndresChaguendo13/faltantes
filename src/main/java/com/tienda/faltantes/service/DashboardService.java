@@ -6,6 +6,7 @@ import com.tienda.faltantes.repository.*;
 import org.springframework.stereotype.Service;
 import com.tienda.faltantes.entity.EstadoFiado;
 import com.tienda.faltantes.entity.Caja;
+import com.tienda.faltantes.dto.response.ProductoMasVendidoResponseDTO;
 import com.tienda.faltantes.entity.EstadoCaja;
 import com.tienda.faltantes.dto.response.CajaDetalleResponseDTO;
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import com.tienda.faltantes.repository.DevolucionVentaRepository;
 import com.tienda.faltantes.repository.DevolucionCompraRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.tienda.faltantes.service.VentaService;
 
 @Service
 public class DashboardService {
@@ -26,6 +28,7 @@ public class DashboardService {
     private final CajaRepository cajaRepository;
     private final DevolucionVentaRepository devolucionVentaRepository;
     private final DevolucionCompraRepository devolucionCompraRepository;
+    private final VentaService ventaService;
 
     public DashboardService(
             ProductoRepository productoRepository,
@@ -33,7 +36,7 @@ public class DashboardService {
             VentaRepository ventaRepository,
             FiadoRepository fiadoRepository,
             CajaService cajaService,
-            CajaRepository cajaRepository, DevolucionVentaRepository devolucionVentaRepository, DevolucionCompraRepository devolucionCompraRepository) {
+            CajaRepository cajaRepository, DevolucionVentaRepository devolucionVentaRepository, DevolucionCompraRepository devolucionCompraRepository, VentaService ventaService) {
 
         this.productoRepository = productoRepository;
         this.compraRepository = compraRepository;
@@ -43,6 +46,7 @@ public class DashboardService {
         this.cajaRepository = cajaRepository;
         this.devolucionVentaRepository = devolucionVentaRepository;
         this.devolucionCompraRepository = devolucionCompraRepository;
+        this.ventaService = ventaService;
     }
 
     public DashboardResponseDTO obtenerDashboard() {
@@ -64,13 +68,48 @@ public class DashboardService {
             valor += p.getCantidad() * p.getCostoCompra();
         }
 
-        dto.setValorInventario(valor);
-        dto.setVentasHoy(ventaRepository.calcularTotalVentasHoy());
-        dto.setVentasContadoHoy(ventaRepository.calcularTotalContadoHoy());
-        dto.setVentasFiadoHoy(ventaRepository.calcularTotalFiadoHoy());
-
         LocalDateTime inicioHoy = LocalDate.now().atStartOfDay();
         LocalDateTime finHoy = LocalDate.now().plusDays(1).atStartOfDay().minusNanos(1);
+
+        dto.setValorInventario(valor);
+        Double ventasContadoBrutas =
+                ventaRepository.calcularTotalContadoHoy();
+
+        Double ventasFiadoBrutas =
+                ventaRepository.calcularTotalFiadoHoy();
+
+        Double devolucionesContadoHoy =
+                devolucionVentaRepository.calcularTotalContadoEntre(
+                        inicioHoy,
+                        finHoy
+                ).doubleValue();
+
+        Double devolucionesFiadoHoy =
+                devolucionVentaRepository.calcularTotalFiadoEntre(
+                        inicioHoy,
+                        finHoy
+                ).doubleValue();
+
+        Double ventasContadoNetas =
+                ventasContadoBrutas - devolucionesContadoHoy;
+
+        Double ventasFiadoNetas =
+                ventasFiadoBrutas - devolucionesFiadoHoy;
+
+        Double ventasNetas =
+                ventasContadoNetas + ventasFiadoNetas;
+
+        dto.setVentasContadoHoy(ventasContadoNetas);
+        dto.setVentasFiadoHoy(ventasFiadoNetas);
+        dto.setVentasHoy(ventasNetas);
+        dto.setProductosMasVendidos(
+                ventaService.obtenerProductosMasVendidos(
+                        inicioHoy,
+                        finHoy
+                )
+        );
+
+
 
         Double costoVentasBrutoHoy =
                 ventaRepository.calcularCostoVentasEntre(inicioHoy, finHoy);
@@ -84,7 +123,8 @@ public class DashboardService {
         Double costoVentasHoy =
                 costoVentasBrutoHoy - costoDevolucionesHoy;
 
-        Double ventasBrutasHoy = dto.getVentasHoy();
+        Double ventasBrutasHoy =
+                ventaRepository.calcularTotalVentasHoy();
 
         Double devolucionesVentaValorHoy =
                 devolucionVentaRepository.calcularTotalEntre(
@@ -117,12 +157,9 @@ public class DashboardService {
                         .calcularCantidadEntre(inicioHoy, finHoy)
         );
 
-        dto.setDevolucionesCompraHoy(
-                devolucionCompraRepository.findAll().stream()
-                        .filter(d -> d.getFecha().toLocalDate()
-                                .equals(java.time.LocalDate.now()))
-                        .mapToLong(d -> d.getCantidad())
-                        .sum()
+        dto.setValorDevolucionesCompraHoy(
+                devolucionCompraRepository
+                        .calcularTotalEntre(inicioHoy, finHoy)
         );
 
         dto.setDevolucionesVentaHoy(
@@ -136,13 +173,6 @@ public class DashboardService {
                         .doubleValue()
         );
 
-        dto.setValorDevolucionesCompraHoy(
-                devolucionCompraRepository.findAll().stream()
-                        .filter(d -> d.getFecha().toLocalDate()
-                                .equals(java.time.LocalDate.now()))
-                        .mapToDouble(d -> d.getValor())
-                        .sum()
-        );
 
         dto.setCuentasPorCobrar(
                 fiadoRepository.calcularSaldoTotal(EstadoFiado.PENDIENTE)

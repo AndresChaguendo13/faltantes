@@ -22,7 +22,8 @@ import com.tienda.faltantes.entity.TipoPago;
 import com.tienda.faltantes.repository.ClienteRepository;
 import com.tienda.faltantes.repository.FiadoRepository;
 import com.tienda.faltantes.repository.DevolucionVentaRepository;
-
+import com.tienda.faltantes.dto.response.ProductoMasVendidoResponseDTO;
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -437,4 +438,25 @@ public class VentaService {
     public Double obtenerTotalFiadoHoy() {
         return ventaRepository.calcularTotalFiadoHoy();
     }
+
+
+    public List<ProductoMasVendidoResponseDTO> obtenerProductosMasVendidos(
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin) {
+
+        List<Object[]> resultados =
+                ventaRepository.calcularProductosMasVendidos(
+                        fechaInicio,
+                        fechaFin
+                );
+
+        return resultados.stream()
+                .map(resultado -> new ProductoMasVendidoResponseDTO(
+                        ((Number) resultado[0]).longValue(),
+                        (String) resultado[1],
+                        ((Number) resultado[2]).longValue()
+                ))
+                .toList();
+    }
+
 }

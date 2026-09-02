@@ -2,6 +2,8 @@ package com.tienda.faltantes.dto.response;
 
 
 import java.math.BigDecimal;
+import java.util.List;
+import com.tienda.faltantes.dto.response.ProductoMasVendidoResponseDTO;
 
 public class DashboardResponseDTO {
 
@@ -24,6 +26,17 @@ public class DashboardResponseDTO {
     private Double costoVentasHoy;
     private Double utilidadBrutaHoy;
     private Double margenUtilidadHoy;
+    private List<ProductoMasVendidoResponseDTO> productosMasVendidos;
+
+
+    public List<ProductoMasVendidoResponseDTO> getProductosMasVendidos() {
+        return productosMasVendidos;
+    }
+
+    public void setProductosMasVendidos(
+            List<ProductoMasVendidoResponseDTO> productosMasVendidos) {
+        this.productosMasVendidos = productosMasVendidos;
+    }
 
     public Double getCostoVentasHoy() {
         return costoVentasHoy;

@@ -61,4 +61,16 @@ public interface DevolucionVentaRepository
             @Param("fechaFin") LocalDateTime fechaFin
     );
 
+    @Query("""
+    SELECT COALESCE(SUM(d.valor), 0)
+    FROM DevolucionVenta d
+    WHERE d.fecha >= :fechaInicio
+    AND d.fecha <= :fechaFin
+    AND d.venta.tipoPago = 'FIADO'
+""")
+    BigDecimal calcularTotalFiadoEntre(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin
+    );
+
 }
