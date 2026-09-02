@@ -26,5 +26,15 @@ public interface DevolucionCompraRepository
             @Param("fechaFin") LocalDateTime fechaFin
     );
 
+    @Query("""
+    SELECT COALESCE(SUM(d.cantidad), 0)
+    FROM DevolucionCompra d
+    WHERE d.fecha >= :fechaInicio
+    AND d.fecha <= :fechaFin
+""")
+    Long calcularCantidadEntre(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin
+    );
 
 }

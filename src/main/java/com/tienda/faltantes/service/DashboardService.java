@@ -112,12 +112,9 @@ public class DashboardService {
 
 
         // Devoluciones de venta y compra
-        dto.setDevolucionesVentaHoy(
-                devolucionVentaRepository.findAll().stream()
-                        .filter(d -> d.getFecha().toLocalDate()
-                                .equals(java.time.LocalDate.now()))
-                        .mapToLong(d -> d.getCantidad())
-                        .sum()
+        dto.setDevolucionesCompraHoy(
+                devolucionCompraRepository
+                        .calcularCantidadEntre(inicioHoy, finHoy)
         );
 
         dto.setDevolucionesCompraHoy(
@@ -128,12 +125,15 @@ public class DashboardService {
                         .sum()
         );
 
+        dto.setDevolucionesVentaHoy(
+                devolucionVentaRepository
+                        .calcularCantidadEntre(inicioHoy, finHoy)
+        );
+
         dto.setValorDevolucionesVentaHoy(
-                devolucionVentaRepository.findAll().stream()
-                        .filter(d -> d.getFecha().toLocalDate()
-                                .equals(java.time.LocalDate.now()))
-                        .mapToDouble(d -> d.getValor())
-                        .sum()
+                devolucionVentaRepository
+                        .calcularTotalEntre(inicioHoy, finHoy)
+                        .doubleValue()
         );
 
         dto.setValorDevolucionesCompraHoy(
