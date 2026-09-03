@@ -36,7 +36,10 @@ public class DashboardService {
             VentaRepository ventaRepository,
             FiadoRepository fiadoRepository,
             CajaService cajaService,
-            CajaRepository cajaRepository, DevolucionVentaRepository devolucionVentaRepository, DevolucionCompraRepository devolucionCompraRepository, VentaService ventaService) {
+            CajaRepository cajaRepository,
+            DevolucionVentaRepository devolucionVentaRepository,
+            DevolucionCompraRepository devolucionCompraRepository,
+            VentaService ventaService) {
 
         this.productoRepository = productoRepository;
         this.compraRepository = compraRepository;
@@ -72,6 +75,11 @@ public class DashboardService {
         LocalDateTime finHoy = LocalDate.now().plusDays(1).atStartOfDay().minusNanos(1);
 
         dto.setValorInventario(valor);
+
+        // =====================================================
+        // VENTAS Y DEVOLUCIONES DEL DÍA
+        // =====================================================
+
         Double ventasContadoBrutas =
                 ventaRepository.calcularTotalContadoHoy();
 
@@ -79,17 +87,28 @@ public class DashboardService {
                 ventaRepository.calcularTotalFiadoHoy();
 
         Double devolucionesContadoHoy =
-                devolucionVentaRepository.calcularTotalContadoEntre(
-                        inicioHoy,
-                        finHoy
+                devolucionVentaRepository
+                        .calcularTotalContadoEntre(inicioHoy, finHoy
                 ).doubleValue();
+
+
+        // =====================================================
+        // DEVOLUCIONES POR TIPO DE PAGO
+        // =====================================================
+        Double devolucionesVentashoy =
+                devolucionVentaRepository
+                        .calcularTotalContadoEntre(inicioHoy, finHoy)
+                        .doubleValue();
 
         Double devolucionesFiadoHoy =
-                devolucionVentaRepository.calcularTotalFiadoEntre(
-                        inicioHoy,
-                        finHoy
+                devolucionVentaRepository
+                        .calcularTotalFiadoEntre(inicioHoy, finHoy
                 ).doubleValue();
 
+
+        // =====================================================
+        // VENTAS NETAS
+        // =====================================================
         Double ventasContadoNetas =
                 ventasContadoBrutas - devolucionesContadoHoy;
 
@@ -99,9 +118,30 @@ public class DashboardService {
         Double ventasNetas =
                 ventasContadoNetas + ventasFiadoNetas;
 
+        if (ventasContadoNetas < 0) {
+            ventasContadoNetas = 0.0;
+        }
+
+        if (ventasFiadoNetas < 0) {
+            ventasFiadoNetas = 0.0;
+        }
+
+        if (ventasNetas< 0) {
+            ventasNetas = 0.0;
+        }
+
         dto.setVentasContadoHoy(ventasContadoNetas);
         dto.setVentasFiadoHoy(ventasFiadoNetas);
         dto.setVentasHoy(ventasNetas);
+
+        dto.setDevolucionesVentaHoy(
+                devolucionVentaRepository
+                        .calcularCantidadEntre(inicioHoy, finHoy)
+        );
+
+        dto.setValorDevolucionesVentaHoy(devolucionesVentashoy);
+
+
         dto.setProductosMasVendidos(
                 ventaService.obtenerProductosMasVendidos(
                         inicioHoy,
