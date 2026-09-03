@@ -78,6 +78,8 @@ public class CompraService {
                 Double nuevoCostoPromedio =
                         (valorInventarioAnterior + valorCompraNueva) / stockNuevo;
 
+                nuevoCostoPromedio = Math.round(nuevoCostoPromedio * 100.0) / 100.0;
+
                 producto.setCostoCompra(nuevoCostoPromedio);
 
             } else {
