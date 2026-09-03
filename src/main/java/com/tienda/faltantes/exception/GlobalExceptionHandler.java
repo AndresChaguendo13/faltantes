@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.stream.Collectors;
+import com.tienda.faltantes.dto.response.ErrorResponse;
 
 import java.time.LocalDateTime;
 
@@ -83,4 +84,20 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
+
+    @ExceptionHandler(CajaNoAbiertaException.class)
+    public ResponseEntity<ErrorResponse> manejarCajaNoAbierta(
+            CajaNoAbiertaException ex) {
+
+        ErrorResponse error = new ErrorResponse();
+
+        error.setFecha(LocalDateTime.now());
+        error.setCodigo(HttpStatus.CONFLICT.value());
+        error.setError(ex.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(error);
+    }
+
 }

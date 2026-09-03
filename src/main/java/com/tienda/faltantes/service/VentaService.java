@@ -27,6 +27,8 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import com.tienda.faltantes.service.CajaService;
+import com.tienda.faltantes.exception.CajaNoAbiertaException;
 
 @Service
 @Transactional
@@ -37,6 +39,7 @@ public class VentaService {
     private final ClienteRepository clienteRepository;
     private final FiadoRepository fiadoRepository;
     private final DevolucionVentaRepository devolucionVentaRepository;
+    private final CajaService cajaService;
 
 
     public VentaService(
@@ -45,7 +48,8 @@ public class VentaService {
             MovimientoInventarioRepository movimientoRepository,
             ClienteRepository clienteRepository,
             FiadoRepository fiadoRepository,
-            DevolucionVentaRepository devolucionVentaRepository) {
+            DevolucionVentaRepository devolucionVentaRepository,
+            CajaService cajaService) {
 
         this.ventaRepository = ventaRepository;
         this.productoRepository = productoRepository;
@@ -53,6 +57,7 @@ public class VentaService {
         this.clienteRepository = clienteRepository;
         this.fiadoRepository = fiadoRepository;
         this.devolucionVentaRepository = devolucionVentaRepository;
+        this.cajaService = cajaService;
     }
 
     public VentaResponseDTO buscarPorId(Long id) {
@@ -199,9 +204,21 @@ public class VentaService {
         }
         Venta venta = new Venta();
 
-        TipoPago tipoPago = TipoPago.valueOf(
-                dto.getTipoPago().toUpperCase()
-        );
+        TipoPago tipoPago;
+
+        try {
+            tipoPago = TipoPago.valueOf(
+                    dto.getTipoPago().toUpperCase()
+            );
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Tipo de pago inválido. Use CONTADO o FIADO"
+            );
+        }
+
+        if (tipoPago == TipoPago.CONTADO) {
+            cajaService.obtenerCajaAbierta();
+        }
 
         venta.setTipoPago(tipoPago);
 
@@ -458,5 +475,7 @@ public class VentaService {
                 ))
                 .toList();
     }
+
+
 
 }

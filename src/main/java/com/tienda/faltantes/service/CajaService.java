@@ -5,6 +5,7 @@ import com.tienda.faltantes.dto.response.CajaDetalleResponseDTO;
 import com.tienda.faltantes.dto.response.CajaResponseDTO;
 import com.tienda.faltantes.entity.Caja;
 import com.tienda.faltantes.entity.EstadoCaja;
+import com.tienda.faltantes.exception.CajaNoAbiertaException;
 import com.tienda.faltantes.repository.AbonoRepository;
 import com.tienda.faltantes.repository.CajaRepository;
 import com.tienda.faltantes.repository.VentaRepository;
@@ -105,7 +106,7 @@ public class CajaService {
 
         return cajaRepository.findByEstado(EstadoCaja.ABIERTA)
                 .orElseThrow(() ->
-                        new IllegalStateException("No hay ninguna caja abierta"));
+                        new CajaNoAbiertaException("No hay ninguna caja abierta"));
     }
 
     @Transactional
