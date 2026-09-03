@@ -63,10 +63,33 @@ public class CompraService {
             detalleCompraRepository.save(detalle);
 
             Integer stockAnterior = producto.getCantidad();
+            Integer cantidadComprada = detalleDTO.getCantidad();
+            Double costoAnterior = producto.getCostoCompra();
+            Double costoCompraNueva = detalleDTO.getPrecioCompra();
 
-            Integer stockNuevo = stockAnterior + detalleDTO.getCantidad();
+            Integer stockNuevo = stockAnterior + cantidadComprada;
+
+            // Calcular costo promedio ponderado
+            if (stockAnterior > 0) {
+
+                Double valorInventarioAnterior = stockAnterior * costoAnterior;
+                Double valorCompraNueva = cantidadComprada * costoCompraNueva;
+
+                Double nuevoCostoPromedio =
+                        (valorInventarioAnterior + valorCompraNueva) / stockNuevo;
+
+                producto.setCostoCompra(nuevoCostoPromedio);
+
+            } else {
+
+                // Si no había existencias, el costo pasa a ser
+                // directamente el costo de la nueva compra.
+                producto.setCostoCompra(costoCompraNueva);
+            }
 
             producto.setCantidad(stockNuevo);
+
+            productoRepository.save(producto);
 
             productoRepository.save(producto);
 
