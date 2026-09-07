@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import com.tienda.faltantes.repository.DevolucionVentaRepository;
+import com.tienda.faltantes.entity.TipoMovimientoCaja;
+import com.tienda.faltantes.repository.MovimientoCajaRepository;
 
 @Service
 public class CajaService {
@@ -24,17 +26,20 @@ public class CajaService {
     private final AbonoRepository abonoRepository;
     private final CajaRepository cajaRepository;
     private final DevolucionVentaRepository devolucionVentaRepository;
+    private final MovimientoCajaRepository movimientoCajaRepository;
+
 
     public CajaService(
             VentaRepository ventaRepository,
             CajaRepository cajaRepository,
             AbonoRepository abonoRepository,
-            DevolucionVentaRepository devolucionVentaRepository) {
+            DevolucionVentaRepository devolucionVentaRepository, MovimientoCajaRepository movimientoCajaRepository) {
 
         this.ventaRepository = ventaRepository;
         this.cajaRepository = cajaRepository;
         this.abonoRepository = abonoRepository;
         this.devolucionVentaRepository = devolucionVentaRepository;
+        this.movimientoCajaRepository = movimientoCajaRepository;
     }
 
     public CajaResponseDTO obtenerResumenHoy() {
@@ -135,9 +140,26 @@ public class CajaService {
                 fechaCierre
         );
 
+        BigDecimal ingresos = movimientoCajaRepository.calcularTotalPorTipo(
+                caja.getId(),
+                TipoMovimientoCaja.INGRESO,
+                caja.getFechaApertura(),
+                fechaCierre
+        );
+
+        BigDecimal retiros = movimientoCajaRepository.calcularTotalPorTipo(
+                caja.getId(),
+                TipoMovimientoCaja.RETIRO,
+                caja.getFechaApertura(),
+                fechaCierre
+        );
+
+
         BigDecimal montoEsperado = caja.getMontoInicial()
                 .add(ventasContado)
                 .add(abonosFiados)
+                .add(ingresos)
+                .subtract(retiros)
                 .subtract(devolucionesVenta);
 
         BigDecimal montoFinal = request.getMontoFinal();
@@ -189,6 +211,22 @@ public class CajaService {
                 fechaFin
         );
 
+        BigDecimal ingresos = movimientoCajaRepository.calcularTotalPorTipo(
+                caja.getId(),
+                TipoMovimientoCaja.INGRESO,
+                caja.getFechaApertura(),
+                fechaFin
+                        );
+
+        BigDecimal retiros = movimientoCajaRepository.calcularTotalPorTipo(
+                caja.getId(),
+                TipoMovimientoCaja.RETIRO,
+                caja.getFechaApertura(),
+                fechaFin
+
+        );
+
+
         BigDecimal devolucionesVenta =
                 devolucionVentaRepository.calcularTotalContadoEntre(
                         caja.getFechaApertura(),
@@ -198,6 +236,8 @@ public class CajaService {
         BigDecimal montoEsperado = caja.getMontoInicial()
                 .add(ventasContado)
                 .add(abonosFiados)
+                .add(ingresos)
+                .subtract(retiros)
                 .subtract(devolucionesVenta);
 
         System.out.println("===== DEBUG CAJA =====");
