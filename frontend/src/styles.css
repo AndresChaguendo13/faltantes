@@ -1,1 +1,639 @@
 /* You can add global styles to this file, and also import other style files */
+/* =========================================================
+   MERCATODO LA 11
+   PALETA GLOBAL DEL SISTEMA
+   ========================================================= */
+
+:root {
+
+  /* =========================
+     COLORES PRINCIPALES
+     ========================= */
+
+  --color-primary: #1689e8;
+  --color-primary-dark: #0758ae;
+  --color-primary-light: #28a9e3;
+
+
+  /* =========================
+     COLORES DE ESTADO
+     ========================= */
+
+  --color-success: #28b779;
+  --color-warning: #feb848;
+  --color-danger: #dc542e;
+  --color-info: #20a9c7;
+
+
+  /* =========================
+     COLORES DEL SISTEMA
+     ========================= */
+
+  --color-sidebar: #0879d5;
+  --color-sidebar-dark: #0758ae;
+
+  --color-header: #15161a;
+
+  --color-background: #f1f3f6;
+
+  --color-white: #ffffff;
+
+  --color-dark: #353a40;
+
+  --color-text: #333333;
+  --color-text-light: #777777;
+
+  --color-border: #e2e6ea;
+
+
+  /* =========================
+     COLORES PARA TARJETAS
+     ========================= */
+
+  --color-card-blue: #1689e8;
+  --color-card-green: #16a34a;
+  --color-card-purple: #7c16e8;
+  --color-card-orange: #f58b08;
+  --color-card-red: #e94736;
+  --color-card-cyan: #20a9c7;
+
+
+  /* =========================
+     SOMBRAS
+     ========================= */
+
+  --shadow-card:
+    0 2px 10px rgba(0, 0, 0, 0.08);
+
+  --shadow-sidebar:
+    2px 0 10px rgba(0, 0, 0, 0.12);
+
+}
+
+
+/* =========================================================
+   CONFIGURACIÓN GLOBAL
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  background: var(--color-background);
+  color: var(--color-text);
+}
+
+/* =========================================================
+   MENU USUARIO - CORRECCION DEFINITIVA
+========================================================= */
+
+.topbar .user-container {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+
+/* =========================================================
+   PERFIL ADMINISTRADOR
+========================================================= */
+
+.topbar .user-profile {
+  width: auto !important;
+  height: 48px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  gap: 9px !important;
+
+  margin: 0 !important;
+  padding: 5px 8px !important;
+
+  border: 0 !important;
+  border-radius: 7px !important;
+
+  background: transparent !important;
+
+  color: white !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 12px !important;
+
+  cursor: pointer !important;
+
+  box-sizing: border-box !important;
+}
+
+.topbar .user-profile:hover {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+
+/* AVATAR */
+
+.topbar .user-avatar {
+  width: 38px !important;
+  height: 38px !important;
+
+  min-width: 38px !important;
+  max-width: 38px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  border-radius: 50% !important;
+
+  background: #4b9cf2 !important;
+
+  color: white !important;
+
+  font-size: 14px !important;
+  font-weight: 700 !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* INFORMACION */
+
+.topbar .user-info {
+  display: block !important;
+
+  width: auto !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.topbar .user-info strong {
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: white !important;
+
+  font-size: 11px !important;
+  line-height: 14px !important;
+}
+
+.topbar .user-info span {
+  display: block !important;
+
+  margin: 2px 0 0 !important;
+  padding: 0 !important;
+
+  color: #aeb8c2 !important;
+
+  font-size: 9px !important;
+  line-height: 12px !important;
+}
+
+
+/* FLECHA */
+
+.topbar .user-arrow {
+  width: 18px !important;
+  height: 18px !important;
+
+  min-width: 18px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 0 0 2px !important;
+  padding: 0 !important;
+
+  font-size: 0 !important;
+}
+
+.topbar .user-arrow svg {
+  width: 15px !important;
+  height: 15px !important;
+
+  min-width: 15px !important;
+  min-height: 15px !important;
+
+  display: block !important;
+
+  fill: none !important;
+
+  stroke: currentColor !important;
+
+  stroke-width: 1.8 !important;
+
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+
+/* =========================================================
+   MENU DESPLEGABLE
+========================================================= */
+
+.topbar .user-dropdown {
+  position: absolute !important;
+
+  top: 52px !important;
+  right: 0 !important;
+  left: auto !important;
+
+  width: 225px !important;
+  min-width: 225px !important;
+  max-width: 225px !important;
+
+  height: auto !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  margin: 0 !important;
+  padding: 7px !important;
+
+  box-sizing: border-box !important;
+
+  background: #ffffff !important;
+
+  border: 1px solid #e1e6eb !important;
+
+  border-radius: 9px !important;
+
+  box-shadow:
+    0 8px 25px rgba(0,0,0,0.18) !important;
+
+  z-index: 99999 !important;
+}
+
+
+/* =========================================================
+   BOTONES DEL MENU
+========================================================= */
+
+.topbar .user-dropdown .dropdown-item {
+  width: 100% !important;
+  height: 42px !important;
+
+  min-width: 100% !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+
+  display: flex !important;
+  flex-direction: row !important;
+
+  align-items: center !important;
+  justify-content: flex-start !important;
+
+  gap: 11px !important;
+
+  margin: 0 !important;
+  padding: 0 11px !important;
+
+  box-sizing: border-box !important;
+
+  border: 0 !important;
+  border-radius: 6px !important;
+
+  background: #ffffff !important;
+
+  color: #354656 !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+
+  font-size: 12px !important;
+  font-weight: 500 !important;
+
+  line-height: normal !important;
+
+  text-align: left !important;
+
+  white-space: nowrap !important;
+
+  cursor: pointer !important;
+}
+
+
+/* HOVER */
+
+.topbar .user-dropdown .dropdown-item:hover {
+  background: #f1f5f8 !important;
+  color: #087fd8 !important;
+}
+
+
+/* =========================================================
+   ICONOS MENU
+========================================================= */
+
+.topbar .user-dropdown .dropdown-icon {
+  width: 22px !important;
+  height: 22px !important;
+
+  min-width: 22px !important;
+  max-width: 22px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  flex-shrink: 0 !important;
+}
+
+.topbar .user-dropdown .dropdown-icon svg {
+  width: 17px !important;
+  height: 17px !important;
+
+  min-width: 17px !important;
+  min-height: 17px !important;
+
+  max-width: 17px !important;
+  max-height: 17px !important;
+
+  display: block !important;
+
+  fill: none !important;
+
+  stroke: currentColor !important;
+
+  stroke-width: 1.8 !important;
+
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+
+/* TEXTO */
+
+.topbar .user-dropdown .dropdown-text {
+  display: block !important;
+
+  width: auto !important;
+
+  height: auto !important;
+
+  flex: 1 !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: inherit !important;
+
+  font-size: 12px !important;
+
+  line-height: normal !important;
+}
+
+
+/* =========================================================
+   SEPARADOR
+========================================================= */
+
+.topbar .user-dropdown .dropdown-divider {
+  width: calc(100% - 8px) !important;
+
+  height: 1px !important;
+  min-height: 1px !important;
+
+  margin: 5px 4px !important;
+  padding: 0 !important;
+
+  background: #e5e9ed !important;
+}
+
+
+/* =========================================================
+   CERRAR SESION
+========================================================= */
+
+.topbar .user-dropdown .logout-option {
+  color: #dc3030 !important;
+}
+
+.topbar .user-dropdown .logout-option:hover {
+  background: #fff1f1 !important;
+  color: #c92020 !important;
+}
+
+
+/* =========================================================
+   MODAL CONFIRMACION
+========================================================= */
+
+.logout-overlay {
+  position: fixed !important;
+
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  background: rgba(15,23,30,0.55) !important;
+
+  z-index: 999999 !important;
+}
+
+
+/* VENTANA */
+
+.logout-modal {
+  width: 400px !important;
+
+  max-width: calc(100vw - 30px) !important;
+
+  display: block !important;
+
+  margin: 0 !important;
+  padding: 30px !important;
+
+  box-sizing: border-box !important;
+
+  background: #ffffff !important;
+
+  border-radius: 12px !important;
+
+  text-align: center !important;
+
+  box-shadow:
+    0 18px 50px rgba(0,0,0,0.28) !important;
+}
+
+
+/* ICONO MODAL */
+
+.logout-icon {
+  width: 58px !important;
+  height: 58px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 auto 16px !important;
+  padding: 0 !important;
+
+  border-radius: 50% !important;
+
+  background: #fff0f0 !important;
+
+  color: #dc3030 !important;
+}
+
+.logout-icon svg {
+  width: 25px !important;
+  height: 25px !important;
+
+  min-width: 25px !important;
+  min-height: 25px !important;
+
+  display: block !important;
+
+  fill: none !important;
+
+  stroke: currentColor !important;
+
+  stroke-width: 1.8 !important;
+
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+
+/* TITULO */
+
+.logout-modal h2 {
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #1c2b39 !important;
+
+  font-size: 20px !important;
+}
+
+
+/* TEXTO */
+
+.logout-modal p {
+  margin: 10px 0 25px !important;
+  padding: 0 !important;
+
+  color: #71808f !important;
+
+  font-size: 12px !important;
+
+  line-height: 1.5 !important;
+}
+
+
+/* BOTONES MODAL */
+
+.logout-actions {
+  width: 100% !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  gap: 10px !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.logout-actions button {
+  width: 135px !important;
+  height: 39px !important;
+
+  min-width: 135px !important;
+  min-height: 39px !important;
+
+  display: flex !important;
+
+  align-items: center !important;
+  justify-content: center !important;
+
+  margin: 0 !important;
+  padding: 0 15px !important;
+
+  box-sizing: border-box !important;
+
+  border-radius: 7px !important;
+
+  font-family: Arial, Helvetica, sans-serif !important;
+
+  font-size: 11px !important;
+  font-weight: 600 !important;
+
+  cursor: pointer !important;
+}
+
+
+/* CANCELAR */
+
+.logout-actions .cancel-button {
+  border: 1px solid #d7dde3 !important;
+
+  background: #ffffff !important;
+
+  color: #596978 !important;
+}
+
+.logout-actions .cancel-button:hover {
+  background: #f4f6f8 !important;
+}
+
+
+/* CONFIRMAR */
+
+.logout-actions .confirm-button {
+  border: none !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f53643,
+      #df202d
+    ) !important;
+
+  color: #ffffff !important;
+}
+
+.logout-actions .confirm-button:hover {
+  opacity: 0.9 !important;
+}
