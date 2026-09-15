@@ -1,0 +1,789 @@
+<div class="productos-page">
+
+  <!-- =====================================================
+       ENCABEZADO
+  ====================================================== -->
+
+  <div class="page-header">
+
+    <div>
+
+      <h1>
+        Productos
+      </h1>
+
+      <p>
+        Gestiona los productos de tu inventario
+      </p>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="new-product-button"
+      (click)="abrirFormulario()"
+    >
+
+      <span>
+        +
+      </span>
+
+      Nuevo producto
+
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       MENSAJES
+  ====================================================== -->
+
+  @if (mensaje) {
+
+  <div class="success-message">
+    {{ mensaje }}
+  </div>
+
+  }
+
+
+  @if (error && !mostrarFormulario) {
+
+  <div class="error-message">
+    {{ error }}
+  </div>
+
+  }
+
+
+  <!-- =====================================================
+       FILTROS
+  ====================================================== -->
+
+  <div class="filters-card">
+
+    <div class="search-box">
+
+      <span>
+        ⌕
+      </span>
+
+
+      <input
+        #busquedaInput
+        type="text"
+        [(ngModel)]="terminoBusqueda"
+        placeholder="Escanea o busca por nombre o código de barras..."
+        autocomplete="off"
+        [disabled]="mostrarFormulario"
+        (input)="filtrarProductos()"
+        (keydown.enter)="buscarProductoEscaneado()"
+      >
+
+    </div>
+
+
+    <select class="filter-select">
+
+      <option value="">
+        Todas las categorías
+      </option>
+
+    </select>
+
+
+    <select class="filter-select">
+
+      <option value="">
+        Todos los estados
+      </option>
+
+      <option value="normal">
+        Stock normal
+      </option>
+
+      <option value="bajo">
+        Stock bajo
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <!-- =====================================================
+       PRODUCTOS
+  ====================================================== -->
+
+  <div class="products-card">
+
+
+    @if (cargando) {
+
+    <div class="state-message">
+
+      <div class="loading-spinner"></div>
+
+      <h3>
+        Cargando productos...
+      </h3>
+
+      <p>
+        Estamos consultando el inventario.
+      </p>
+
+    </div>
+
+
+    } @else if (productosVisibles.length === 0) {
+
+
+    <div class="state-message empty-state">
+
+      <div class="empty-icon">
+        📦
+      </div>
+
+      <h3>
+        No hay productos
+      </h3>
+
+      <p>
+        No encontramos productos que coincidan con la búsqueda.
+      </p>
+
+      @if (!terminoBusqueda) {
+
+      <button
+        type="button"
+        class="empty-action-button"
+        (click)="abrirFormulario()"
+      >
+        + Registrar primer producto
+      </button>
+
+      }
+
+    </div>
+
+
+    } @else {
+
+
+    <div class="table-header">
+
+      <div>
+
+        <strong>
+          Productos registrados
+        </strong>
+
+        <span>
+            {{ productosVisibles.length }}
+            productos
+          </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+        <tr>
+
+          <th>
+            ID
+          </th>
+
+          <th>
+            PRODUCTO
+          </th>
+
+          <th>
+            CÓDIGO DE BARRAS
+          </th>
+
+          <th>
+            CATEGORÍA
+          </th>
+
+          <th>
+            STOCK
+          </th>
+
+          <th>
+            PRECIO VENTA
+          </th>
+
+          <th>
+            VENCIMIENTO
+          </th>
+
+          <th>
+            ACCIONES
+          </th>
+
+        </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        @for (
+        producto of productosVisibles;
+        track producto.id
+        ) {
+
+        <tr>
+
+          <td>
+            #{{ producto.id }}
+          </td>
+
+
+          <td>
+
+            <div class="product-name">
+              {{ producto.nombre }}
+            </div>
+
+          </td>
+
+
+          <td>
+            {{ producto.codigoBarras }}
+          </td>
+
+
+          <td>
+            {{ producto.categoria?.nombre || 'Sin categoría' }}
+          </td>
+
+
+          <td>
+
+                  <span
+                    class="stock-badge"
+                    [class.stock-low]="
+                      producto.cantidad <= producto.stockMinimo
+                    "
+                  >
+
+                    {{ producto.cantidad }}
+
+                  </span>
+
+          </td>
+
+
+          <td class="price">
+
+            $
+            {{
+            (producto.precioVenta ?? producto.precio)
+            | number:'1.0-0'
+            }}
+
+          </td>
+
+
+          <td>
+            {{ producto.fechaVencimiento || 'Sin fecha' }}
+          </td>
+
+
+          <td>
+
+            <div class="action-buttons">
+
+              <button
+                type="button"
+                class="action-button edit-button"
+                title="Editar producto"
+              >
+                ✎
+              </button>
+
+
+              <button
+                type="button"
+                class="action-button delete-button"
+                title="Eliminar producto"
+              >
+                ×
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+        }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+    }
+
+  </div>
+
+
+  <!-- =====================================================
+       MODAL NUEVO PRODUCTO
+  ====================================================== -->
+
+  @if (mostrarFormulario) {
+
+  <div class="product-modal-overlay">
+
+    <div class="product-modal">
+
+
+      <div class="modal-header">
+
+        <div>
+
+          <h2>
+            Nuevo producto
+          </h2>
+
+          <p>
+            Registra un nuevo producto en tu inventario
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="cerrarFormulario()"
+          [disabled]="guardando"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="product-form">
+
+
+        <!-- CÓDIGO -->
+
+        <div class="form-group">
+
+          <label for="codigoBarras">
+
+            Código de barras
+            <span>*</span>
+
+          </label>
+
+
+          <input
+            #codigoBarrasInput
+            id="codigoBarras"
+            type="text"
+            [(ngModel)]="productoNuevo.codigoBarras"
+            placeholder="Escanea o escribe el código de barras"
+            autocomplete="off"
+            [disabled]="guardando"
+            (keydown.enter)="nombreInput.focus()"
+          >
+
+        </div>
+
+
+        <!-- NOMBRE -->
+
+        <div class="form-group">
+
+          <label for="nombre">
+
+            Nombre del producto
+            <span>*</span>
+
+          </label>
+
+
+          <input
+            #nombreInput
+            id="nombre"
+            type="text"
+            [(ngModel)]="productoNuevo.nombre"
+            placeholder="Ej. Coca-Cola 1.5L"
+            [disabled]="guardando"
+            (keydown.enter)="cantidadInput.focus()"
+          >
+
+        </div>
+
+
+        <!-- CANTIDAD / PRECIO -->
+
+        <div class="form-row">
+
+
+          <div class="form-group">
+
+            <label for="cantidad">
+
+              Cantidad inicial
+              <span>*</span>
+
+            </label>
+
+
+            <input
+              #cantidadInput
+              id="cantidad"
+              type="number"
+              min="0"
+              [(ngModel)]="productoNuevo.cantidad"
+              [disabled]="guardando"
+              (keydown.enter)="precioInput.focus()"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="precio">
+
+              Precio
+              <span>*</span>
+
+            </label>
+
+
+            <input
+              #precioInput
+              id="precio"
+              type="number"
+              min="1"
+              [(ngModel)]="productoNuevo.precio"
+              placeholder="Ej. 3500"
+              [disabled]="guardando"
+              (keydown.enter)="guardarProducto()"
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- ERROR -->
+
+        @if (error) {
+
+        <div class="form-error">
+          {{ error }}
+        </div>
+
+        }
+
+
+        <!-- BOTONES -->
+
+        <div class="modal-actions">
+
+          <button
+            type="button"
+            class="cancel-button"
+            (click)="cerrarFormulario()"
+            [disabled]="guardando"
+          >
+            Cancelar
+          </button>
+
+
+          <button
+            type="button"
+            class="save-button"
+            (click)="guardarProducto()"
+            [disabled]="guardando"
+          >
+
+            @if (guardando) {
+
+            <span class="button-spinner"></span>
+
+            Guardando...
+
+            } @else {
+
+            <span>
+                  ✓
+                </span>
+
+            Guardar producto
+
+            }
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  }
+
+
+  <!-- =====================================================
+       MODAL CONSULTA RÁPIDA
+  ====================================================== -->
+
+  @if (mostrarConsulta) {
+
+  <div class="product-lookup-overlay">
+
+    <div class="product-lookup-modal">
+
+
+      @if (productoConsultado) {
+
+
+      <!-- ENCABEZADO -->
+
+      <div class="lookup-header">
+
+        <div class="lookup-title">
+
+              <span class="lookup-icon">
+                📦
+              </span>
+
+
+          <div>
+
+            <h2>
+              Producto encontrado
+            </h2>
+
+            <p>
+              Consulta rápida de inventario
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="lookup-close"
+          (click)="cerrarConsulta()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- PRODUCTO -->
+
+      <div class="lookup-product-main">
+
+        <div class="lookup-product-name">
+
+          {{ productoConsultado.nombre }}
+
+        </div>
+
+
+        <div class="lookup-barcode">
+
+          Código de barras:
+
+          <strong>
+            {{ productoConsultado.codigoBarras }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- INFORMACIÓN -->
+
+      <div class="lookup-info-grid">
+
+
+        <div class="lookup-info-card">
+
+              <span class="lookup-label">
+                STOCK
+              </span>
+
+
+          <strong
+            class="lookup-stock"
+            [class.lookup-stock-low]="
+                  productoConsultado.cantidad <=
+                  productoConsultado.stockMinimo
+                "
+          >
+
+            {{ productoConsultado.cantidad }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="lookup-info-card">
+
+              <span class="lookup-label">
+                PRECIO DE VENTA
+              </span>
+
+
+          <strong class="lookup-price">
+
+            $
+            {{
+            (productoConsultado.precioVenta ??
+            productoConsultado.precio)
+            | number:'1.0-0'
+            }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="lookup-info-card">
+
+              <span class="lookup-label">
+                CATEGORÍA
+              </span>
+
+
+          <strong>
+
+            {{
+            productoConsultado.categoria?.nombre ||
+            'Sin categoría'
+            }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="lookup-info-card">
+
+              <span class="lookup-label">
+                VENCIMIENTO
+              </span>
+
+
+          <strong>
+
+            {{
+            productoConsultado.fechaVencimiento ||
+            'Sin fecha'
+            }}
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- PIE -->
+
+      <div class="lookup-footer">
+
+            <span>
+
+              🔎 Escanea otro código para consultar otro producto
+
+            </span>
+
+
+        <button
+          type="button"
+          class="lookup-ok-button"
+          (click)="cerrarConsulta()"
+        >
+          Cerrar
+        </button>
+
+      </div>
+
+
+      } @else {
+
+
+      <!-- PRODUCTO NO ENCONTRADO -->
+
+      <div class="lookup-not-found">
+
+        <div class="not-found-icon">
+          ⚠
+        </div>
+
+
+        <h2>
+          Producto no encontrado
+        </h2>
+
+
+        <p>
+          No existe un producto registrado con el código:
+        </p>
+
+
+        <strong>
+          {{ errorBusqueda }}
+        </strong>
+
+
+        <div class="lookup-footer">
+
+              <span>
+                🔎 Escanea otro código para continuar
+              </span>
+
+
+          <button
+            type="button"
+            class="lookup-ok-button"
+            (click)="cerrarConsulta()"
+          >
+            Cerrar
+          </button>
+
+        </div>
+
+      </div>
+
+      }
+
+    </div>
+
+  </div>
+
+  }
+
+</div>

@@ -1,0 +1,840 @@
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  ChangeDetectorRef,
+  ViewChild,
+  ElementRef
+} from '@angular/core';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import {
+  Producto,
+  ProductoService
+} from '../../services/producto';
+
+import { finalize } from 'rxjs';
+
+
+@Component({
+  selector: 'app-productos',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
+  templateUrl: './productos.html',
+  styleUrl: './productos.css'
+})
+export class Productos implements OnInit, AfterViewInit, OnDestroy {
+
+
+  // =====================================================
+  // REFERENCIAS
+  // =====================================================
+
+  @ViewChild('busquedaInput')
+  busquedaInput!: ElementRef<HTMLInputElement>;
+
+  @ViewChild('codigoBarrasInput')
+  codigoBarrasInput!: ElementRef<HTMLInputElement>;
+
+
+  // =====================================================
+  // PRODUCTOS
+  // =====================================================
+
+  productos: Producto[] = [];
+
+  productosVisibles: Producto[] = [];
+
+
+  // =====================================================
+  // ESTADOS
+  // =====================================================
+
+  cargando: boolean = false;
+
+  guardando: boolean = false;
+
+  buscando: boolean = false;
+
+  error: string = '';
+
+  mensaje: string = '';
+
+  errorBusqueda: string = '';
+
+
+  // =====================================================
+  // FORMULARIO
+  // =====================================================
+
+  mostrarFormulario: boolean = false;
+
+  productoNuevo = {
+    nombre: '',
+    codigoBarras: '',
+    cantidad: 0,
+    precio: 0
+  };
+
+
+  // =====================================================
+  // CONSULTA RÁPIDA
+  // =====================================================
+
+  terminoBusqueda: string = '';
+
+  productoConsultado: Producto | null = null;
+
+  mostrarConsulta: boolean = false;
+
+
+  // =====================================================
+  // CONTROL DE FOCO
+  // =====================================================
+
+  private intervaloFoco: any;
+
+
+  // =====================================================
+  // CONSTRUCTOR
+  // =====================================================
+
+  constructor(
+    private productoService: ProductoService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+
+  // =====================================================
+  // INICIO
+  // =====================================================
+
+  ngOnInit(): void {
+
+    this.cargarProductos();
+
+  }
+
+
+  // =====================================================
+  // VISTA
+  // =====================================================
+
+  ngAfterViewInit(): void {
+
+    setTimeout(() => {
+
+      this.enfocarBuscador();
+
+    }, 500);
+
+
+    this.intervaloFoco = setInterval(() => {
+
+      this.mantenerLectorPreparado();
+
+    }, 1000);
+
+  }
+
+
+  // =====================================================
+  // DESTRUIR COMPONENTE
+  // =====================================================
+
+  ngOnDestroy(): void {
+
+    if (this.intervaloFoco) {
+
+      clearInterval(this.intervaloFoco);
+
+    }
+
+  }
+
+
+  // =====================================================
+  // MANTENER LECTOR PREPARADO
+  // =====================================================
+
+  mantenerLectorPreparado(): void {
+
+    if (this.mostrarFormulario) {
+
+      return;
+
+    }
+
+
+    const elementoActivo =
+      document.activeElement;
+
+
+    if (
+      elementoActivo &&
+      elementoActivo !== document.body &&
+      elementoActivo !== this.busquedaInput?.nativeElement
+    ) {
+
+      if (!this.mostrarConsulta) {
+
+        return;
+
+      }
+
+    }
+
+
+    this.enfocarBuscador();
+
+  }
+
+
+  // =====================================================
+  // ENFOCAR BUSCADOR
+  // =====================================================
+
+  enfocarBuscador(): void {
+
+    if (this.mostrarFormulario) {
+
+      return;
+
+    }
+
+
+    if (!this.busquedaInput) {
+
+      return;
+
+    }
+
+
+    const input =
+      this.busquedaInput.nativeElement;
+
+
+    if (
+      document.activeElement !== input
+    ) {
+
+      input.focus();
+
+    }
+
+  }
+
+
+  // =====================================================
+  // CARGAR PRODUCTOS
+  // =====================================================
+
+  cargarProductos(): void {
+
+    this.cargando = true;
+
+    this.error = '';
+
+
+    this.productoService.listar().subscribe({
+
+      next: (respuesta) => {
+
+        console.log(
+          'PRODUCTOS RECIBIDOS:',
+          respuesta
+        );
+
+
+        this.productos =
+          respuesta.content || [];
+
+
+        this.productosVisibles =
+          [...this.productos];
+
+
+        this.cargando = false;
+
+
+        this.cdr.detectChanges();
+
+      },
+
+
+      error: (error) => {
+
+        console.error(
+          'ERROR AL CARGAR PRODUCTOS:',
+          error
+        );
+
+
+        this.cargando = false;
+
+
+        if (error.status === 401) {
+
+          this.error =
+            'Sesión expirada. Inicia sesión nuevamente.';
+
+        } else if (error.status === 0) {
+
+          this.error =
+            'No se pudo conectar con el servidor.';
+
+        } else {
+
+          this.error =
+            'No se pudieron cargar los productos.';
+
+        }
+
+
+        this.cdr.detectChanges();
+
+      }
+
+    });
+
+  }
+
+
+  // =====================================================
+  // FILTRAR PRODUCTOS
+  //
+  // Se ejecuta mientras el empleado escribe.
+  // =====================================================
+
+  filtrarProductos(): void {
+
+    const texto =
+      this.terminoBusqueda
+        .trim()
+        .toLowerCase();
+
+
+    // Mostrar todos si el buscador está vacío.
+
+    if (!texto) {
+
+      this.productosVisibles =
+        [...this.productos];
+
+      return;
+
+    }
+
+
+    this.productosVisibles =
+      this.productos.filter((producto) => {
+
+        const nombre =
+          (producto.nombre || '')
+            .toLowerCase();
+
+        const codigo =
+          (producto.codigoBarras || '')
+            .toLowerCase();
+
+
+        return (
+          nombre.includes(texto) ||
+          codigo.includes(texto)
+        );
+
+      });
+
+
+    this.cdr.detectChanges();
+
+  }
+
+
+  // =====================================================
+  // ENTER EN BUSCADOR
+  //
+  // Si coincide exactamente con un código,
+  // abrimos el modal.
+  //
+  // Si es un nombre, mantenemos el filtro.
+  // =====================================================
+
+  buscarProductoEscaneado(): void {
+
+    const texto =
+      this.terminoBusqueda.trim();
+
+
+    if (!texto) {
+
+      return;
+
+    }
+
+
+    if (this.mostrarFormulario) {
+
+      return;
+
+    }
+
+
+    console.log(
+      'BUSQUEDA:',
+      texto
+    );
+
+
+    // =================================================
+    // PRIMERO BUSCAMOS LOCALMENTE
+    // =================================================
+
+    const productoLocal =
+      this.productos.find((producto) => {
+
+        return (
+          producto.codigoBarras &&
+          producto.codigoBarras.toLowerCase() ===
+          texto.toLowerCase()
+        );
+
+      });
+
+
+    // =================================================
+    // SI EXISTE LOCALMENTE
+    // ABRIMOS DIRECTAMENTE EL MODAL
+    // =================================================
+
+    if (productoLocal) {
+
+      this.productoConsultado =
+        productoLocal;
+
+      this.errorBusqueda = '';
+
+      this.mostrarConsulta = true;
+
+
+      this.terminoBusqueda = '';
+
+
+      this.productosVisibles =
+        [...this.productos];
+
+
+      this.cdr.detectChanges();
+
+
+      setTimeout(() => {
+
+        this.enfocarBuscador();
+
+      }, 150);
+
+
+      return;
+
+    }
+
+
+    // =================================================
+    // SI NO EXISTE LOCALMENTE
+    //
+    // Consultamos el backend por código.
+    // Esto permite encontrar productos que no estén
+    // en la página actualmente cargada.
+    // =================================================
+
+    this.buscarPorCodigoBackend(texto);
+
+  }
+
+
+  // =====================================================
+  // CONSULTAR CÓDIGO EN BACKEND
+  // =====================================================
+
+  private buscarPorCodigoBackend(
+    codigo: string
+  ): void {
+
+    this.buscando = true;
+
+    this.errorBusqueda = '';
+
+
+    this.productoService
+      .buscarPorCodigo(codigo)
+
+      .pipe(
+
+        finalize(() => {
+
+          this.buscando = false;
+
+          this.terminoBusqueda = '';
+
+          this.cdr.detectChanges();
+
+
+          setTimeout(() => {
+
+            this.enfocarBuscador();
+
+          }, 150);
+
+        })
+
+      )
+
+      .subscribe({
+
+        next: (producto) => {
+
+          console.log(
+            'PRODUCTO ENCONTRADO:',
+            producto
+          );
+
+
+          this.productoConsultado =
+            producto;
+
+
+          this.errorBusqueda = '';
+
+          this.mostrarConsulta = true;
+
+
+          this.cdr.detectChanges();
+
+        },
+
+
+        error: (error) => {
+
+          console.error(
+            'ERROR BUSCANDO PRODUCTO:',
+            error
+          );
+
+
+          this.productoConsultado = null;
+
+
+          if (error.status === 404) {
+
+            this.errorBusqueda =
+              'Producto no encontrado.';
+
+          } else if (error.status === 401) {
+
+            this.errorBusqueda =
+              'Sesión expirada. Inicia sesión nuevamente.';
+
+          } else {
+
+            this.errorBusqueda =
+              'No se pudo consultar el producto.';
+
+          }
+
+
+          this.mostrarConsulta = true;
+
+
+          this.cdr.detectChanges();
+
+        }
+
+      });
+
+  }
+
+
+  // =====================================================
+  // CERRAR CONSULTA
+  // =====================================================
+
+  cerrarConsulta(): void {
+
+    this.mostrarConsulta = false;
+
+    this.productoConsultado = null;
+
+    this.errorBusqueda = '';
+
+    this.terminoBusqueda = '';
+
+
+    this.productosVisibles =
+      [...this.productos];
+
+
+    this.cdr.detectChanges();
+
+
+    setTimeout(() => {
+
+      this.enfocarBuscador();
+
+    }, 150);
+
+  }
+
+
+  // =====================================================
+  // ABRIR FORMULARIO
+  // =====================================================
+
+  abrirFormulario(): void {
+
+    this.mensaje = '';
+
+    this.error = '';
+
+
+    this.productoNuevo = {
+
+      nombre: '',
+      codigoBarras: '',
+      cantidad: 0,
+      precio: 0
+
+    };
+
+
+    this.mostrarFormulario = true;
+
+
+    this.cdr.detectChanges();
+
+
+    setTimeout(() => {
+
+      if (this.codigoBarrasInput) {
+
+        this.codigoBarrasInput
+          .nativeElement
+          .focus();
+
+        this.codigoBarrasInput
+          .nativeElement
+          .select();
+
+      }
+
+    }, 150);
+
+  }
+
+
+  // =====================================================
+  // CERRAR FORMULARIO
+  // =====================================================
+
+  cerrarFormulario(): void {
+
+    if (this.guardando) {
+
+      return;
+
+    }
+
+
+    this.mostrarFormulario = false;
+
+
+    this.cdr.detectChanges();
+
+
+    setTimeout(() => {
+
+      this.enfocarBuscador();
+
+    }, 150);
+
+  }
+
+
+  // =====================================================
+  // GUARDAR PRODUCTO
+  // =====================================================
+
+  guardarProducto(): void {
+
+    this.mensaje = '';
+
+    this.error = '';
+
+
+    if (
+      !this.productoNuevo.nombre.trim()
+    ) {
+
+      this.error =
+        'El nombre del producto es obligatorio.';
+
+      return;
+
+    }
+
+
+    if (
+      !this.productoNuevo.codigoBarras.trim()
+    ) {
+
+      this.error =
+        'El código de barras es obligatorio.';
+
+      return;
+
+    }
+
+
+    if (
+      this.productoNuevo.cantidad < 0
+    ) {
+
+      this.error =
+        'La cantidad no puede ser negativa.';
+
+      return;
+
+    }
+
+
+    if (
+      this.productoNuevo.precio <= 0
+    ) {
+
+      this.error =
+        'El precio debe ser mayor que cero.';
+
+      return;
+
+    }
+
+
+    this.guardando = true;
+
+
+    const producto = {
+
+      nombre:
+        this.productoNuevo.nombre.trim(),
+
+      codigoBarras:
+        this.productoNuevo.codigoBarras.trim(),
+
+      cantidad:
+      this.productoNuevo.cantidad,
+
+      precio:
+      this.productoNuevo.precio
+
+    };
+
+
+    console.log(
+      'ENVIANDO PRODUCTO:',
+      producto
+    );
+
+
+    this.productoService
+      .crear(producto)
+
+      .pipe(
+
+        finalize(() => {
+
+          this.guardando = false;
+
+          this.cdr.detectChanges();
+
+        })
+
+      )
+
+      .subscribe({
+
+        next: (respuesta) => {
+
+          console.log(
+            'PRODUCTO CREADO:',
+            respuesta
+          );
+
+
+          this.mostrarFormulario = false;
+
+          this.mensaje =
+            'Producto creado correctamente.';
+
+
+          this.cargarProductos();
+
+
+          setTimeout(() => {
+
+            this.enfocarBuscador();
+
+          }, 300);
+
+        },
+
+
+        error: (error) => {
+
+          console.error(
+            'ERROR AL CREAR PRODUCTO:',
+            error
+          );
+
+
+          if (error.status === 400) {
+
+            this.error =
+              'Los datos del producto no son válidos.';
+
+          } else if (error.status === 409) {
+
+            this.error =
+              'Ya existe un producto con ese código de barras.';
+
+          } else if (error.status === 401) {
+
+            this.error =
+              'Sesión expirada. Inicia sesión nuevamente.';
+
+          } else if (error.status === 0) {
+
+            this.error =
+              'No se pudo conectar con el servidor.';
+
+          } else {
+
+            this.error =
+              'No se pudo crear el producto.';
+
+          }
+
+
+          this.cdr.detectChanges();
+
+        }
+
+      });
+
+  }
+
+}
