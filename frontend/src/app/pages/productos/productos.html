@@ -308,6 +308,7 @@
                 type="button"
                 class="action-button edit-button"
                 title="Editar producto"
+                (click)="editarProducto(producto)"
               >
                 ✎
               </button>
@@ -341,7 +342,7 @@
 
 
   <!-- =====================================================
-       MODAL NUEVO PRODUCTO
+       MODAL NUEVO / EDITAR PRODUCTO
   ====================================================== -->
 
   @if (mostrarFormulario) {
@@ -350,21 +351,22 @@
 
     <div class="product-modal">
 
-
       <div class="modal-header">
 
         <div>
 
           <h2>
-            Nuevo producto
+            {{ modoEdicion ? 'Editar producto' : 'Nuevo producto' }}
           </h2>
 
           <p>
-            Registra un nuevo producto en tu inventario
+            {{ modoEdicion
+            ? 'Modifica la información del producto'
+            : 'Registra un nuevo producto en tu inventario'
+            }}
           </p>
 
         </div>
-
 
         <button
           type="button"
@@ -377,21 +379,14 @@
 
       </div>
 
-
       <div class="product-form">
 
-
-        <!-- CÓDIGO -->
-
+        <!-- CÓDIGO DE BARRAS -->
         <div class="form-group">
-
           <label for="codigoBarras">
-
             Código de barras
             <span>*</span>
-
           </label>
-
 
           <input
             #codigoBarrasInput
@@ -403,21 +398,14 @@
             [disabled]="guardando"
             (keydown.enter)="nombreInput.focus()"
           >
-
         </div>
 
-
         <!-- NOMBRE -->
-
         <div class="form-group">
-
           <label for="nombre">
-
             Nombre del producto
             <span>*</span>
-
           </label>
-
 
           <input
             #nombreInput
@@ -428,63 +416,145 @@
             [disabled]="guardando"
             (keydown.enter)="cantidadInput.focus()"
           >
+        </div>
 
+        <!-- CATEGORÍA -->
+        <div class="form-group">
+          <label for="categoriaProducto">Categoría</label>
+
+          <select
+            id="categoriaProducto"
+            [(ngModel)]="productoNuevo.categoriaId"
+            [disabled]="guardando"
+          >
+            <option [ngValue]="null">Sin categoría</option>
+
+            @for (categoria of categorias; track categoria.id) {
+            <option [ngValue]="categoria.id">
+              {{ categoria.nombre }}
+            </option>
+            }
+          </select>
+        </div>
+
+        <!-- PROVEEDOR -->
+        <div class="form-group">
+          <label for="proveedorProducto">Proveedor</label>
+
+          <input
+            id="proveedorProducto"
+            type="text"
+            [(ngModel)]="productoNuevo.proveedor"
+            placeholder="Proveedor"
+            autocomplete="off"
+            [disabled]="guardando"
+          >
+        </div>
+
+        <!-- CANTIDAD -->
+        <div class="form-group">
+          <label for="cantidad">
+            Cantidad inicial
+            <span>*</span>
+          </label>
+
+          <input
+            #cantidadInput
+            id="cantidad"
+            type="number"
+            min="0"
+            [(ngModel)]="productoNuevo.cantidad"
+            [disabled]="guardando"
+            (keydown.enter)="precioInput.focus()"
+          >
+        </div>
+
+        <!-- STOCK MÍNIMO -->
+        <div class="form-group">
+          <label for="stockMinimo">Stock mínimo</label>
+
+          <input
+            id="stockMinimo"
+            type="number"
+            min="0"
+            [(ngModel)]="productoNuevo.stockMinimo"
+            [disabled]="guardando"
+          >
+        </div>
+
+        <!-- COSTO DE COMPRA -->
+        <div class="form-group">
+          <label for="costoCompra">Costo de compra</label>
+
+          <input
+            id="costoCompra"
+            type="number"
+            min="0"
+            step="0.01"
+            [(ngModel)]="productoNuevo.costoCompra"
+            placeholder="0.00"
+            [disabled]="guardando"
+          >
+        </div>
+
+        <!-- PRECIO -->
+        <div class="form-group">
+          <label for="precio">
+            Precio
+            <span>*</span>
+          </label>
+
+          <input
+            #precioInput
+            id="precio"
+            type="number"
+            min="1"
+            step="0.01"
+            [(ngModel)]="productoNuevo.precio"
+            placeholder="Ej. 3500"
+            [disabled]="guardando"
+            (keydown.enter)="guardarOActualizarProducto()"
+          >
+        </div>
+
+        <!-- PRECIO DE VENTA -->
+        <div class="form-group">
+          <label for="precioVenta">Precio de venta</label>
+
+          <input
+            id="precioVenta"
+            type="number"
+            min="1"
+            step="0.01"
+            [(ngModel)]="productoNuevo.precioVenta"
+            placeholder="0.00"
+            [disabled]="guardando"
+          >
+        </div>
+
+        <!-- FECHA DE VENCIMIENTO -->
+        <div class="form-group">
+          <label for="fechaVencimiento">Fecha de vencimiento</label>
+
+          <input
+            id="fechaVencimiento"
+            type="date"
+            [(ngModel)]="productoNuevo.fechaVencimiento"
+            [disabled]="guardando"
+          >
         </div>
 
 
-        <!-- CANTIDAD / PRECIO -->
 
-        <div class="form-row">
+      <!-- ERROR -->
 
+      @if (error) {
 
-          <div class="form-group">
+      <div class="form-error">
+        {{ error }}
+      </div>
 
-            <label for="cantidad">
-
-              Cantidad inicial
-              <span>*</span>
-
-            </label>
-
-
-            <input
-              #cantidadInput
-              id="cantidad"
-              type="number"
-              min="0"
-              [(ngModel)]="productoNuevo.cantidad"
-              [disabled]="guardando"
-              (keydown.enter)="precioInput.focus()"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="precio">
-
-              Precio
-              <span>*</span>
-
-            </label>
-
-
-            <input
-              #precioInput
-              id="precio"
-              type="number"
-              min="1"
-              [(ngModel)]="productoNuevo.precio"
-              placeholder="Ej. 3500"
-              [disabled]="guardando"
-              (keydown.enter)="guardarProducto()"
-            >
-
-          </div>
-
-        </div>
-
+      }
 
         <!-- ERROR -->
 
@@ -495,7 +565,6 @@
         </div>
 
         }
-
 
         <!-- BOTONES -->
 
@@ -510,11 +579,10 @@
             Cancelar
           </button>
 
-
           <button
             type="button"
             class="save-button"
-            (click)="guardarProducto()"
+            (click)="guardarOActualizarProducto()"
             [disabled]="guardando"
           >
 
@@ -526,11 +594,12 @@
 
             } @else {
 
-            <span>
-                  ✓
-                </span>
+            <span>✓</span>
 
-            Guardar producto
+            {{ modoEdicion
+            ? 'Actualizar producto'
+            : 'Guardar producto'
+            }}
 
             }
 

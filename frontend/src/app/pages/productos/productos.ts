@@ -16,6 +16,11 @@ import {
   ProductoService
 } from '../../services/producto';
 
+import {
+  Categoria,
+  CategoriaService
+} from '../../services/categoria';
+
 import { finalize } from 'rxjs';
 
 
@@ -51,6 +56,7 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   productosVisibles: Producto[] = [];
 
+  categorias: Categoria[] = [];
 
   // =====================================================
   // ESTADOS
@@ -75,11 +81,21 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   mostrarFormulario: boolean = false;
 
+  modoEdicion: boolean = false;
+
+  productoEditandoId: number | null = null;
+
   productoNuevo = {
     nombre: '',
     codigoBarras: '',
     cantidad: 0,
-    precio: 0
+    precio: 0,
+    stockMinimo: 0,
+    costoCompra: 0,
+    precioVenta: 0,
+    categoriaId: null as number | null,
+    proveedor: '',
+    fechaVencimiento: ''
   };
 
 
@@ -107,6 +123,7 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private productoService: ProductoService,
+    private categoriaService: CategoriaService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -115,10 +132,9 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   // INICIO
   // =====================================================
 
-  ngOnInit(): void {
-
+    ngOnInit(): void {
     this.cargarProductos();
-
+    this.cargarCategorias();
   }
 
 
@@ -303,6 +319,19 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
     });
 
+  }
+
+  cargarCategorias(): void {
+    this.categoriaService.listar().subscribe({
+      next: (categorias) => {
+        this.categorias = categorias || [];
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('ERROR AL CARGAR CATEGORÍAS:', error);
+        this.categorias = [];
+      }
+    });
   }
 
 
@@ -590,6 +619,45 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   }
 
+  // =====================================================
+// EDITAR PRODUCTO
+// =====================================================
+
+  editarProducto(producto: Producto): void {
+    this.mensaje = '';
+    this.error = '';
+
+    this.modoEdicion = true;
+    this.productoEditandoId = producto.id;
+
+    this.productoNuevo = {
+      nombre: producto.nombre || '',
+      codigoBarras: producto.codigoBarras || '',
+      cantidad: producto.cantidad ?? 0,
+      precio: producto.precio ?? producto.precioVenta ?? 0,
+      stockMinimo: producto.stockMinimo ?? 0,
+      costoCompra: producto.costoCompra ?? 0,
+      precioVenta: producto.precioVenta ?? producto.precio ?? 0,
+      categoriaId:
+        (producto as any).categoriaId ??
+        producto.categoria?.id ??
+        null,
+      proveedor: producto.proveedor || '',
+      fechaVencimiento: producto.fechaVencimiento || ''
+    };
+
+    this.mostrarFormulario = true;
+
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      if (this.codigoBarrasInput) {
+        this.codigoBarrasInput.nativeElement.focus();
+        this.codigoBarrasInput.nativeElement.select();
+      }
+    }, 150);
+  }
+
 
   // =====================================================
   // ABRIR FORMULARIO
@@ -601,14 +669,21 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
     this.error = '';
 
+    this.modoEdicion = false;
+
+    this.productoEditandoId = null;
 
     this.productoNuevo = {
-
       nombre: '',
       codigoBarras: '',
       cantidad: 0,
-      precio: 0
-
+      precio: 0,
+      stockMinimo: 0,
+      costoCompra: 0,
+      precioVenta: 0,
+      categoriaId: null,
+      proveedor: '',
+      fechaVencimiento: ''
     };
 
 
@@ -670,171 +745,256 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   // =====================================================
 
   guardarProducto(): void {
-
     this.mensaje = '';
-
     this.error = '';
 
-
-    if (
-      !this.productoNuevo.nombre.trim()
-    ) {
-
-      this.error =
-        'El nombre del producto es obligatorio.';
-
+    if (!this.productoNuevo.nombre.trim()) {
+      this.error = 'El nombre del producto es obligatorio.';
       return;
-
     }
 
-
-    if (
-      !this.productoNuevo.codigoBarras.trim()
-    ) {
-
-      this.error =
-        'El código de barras es obligatorio.';
-
+    if (!this.productoNuevo.codigoBarras.trim()) {
+      this.error = 'El código de barras es obligatorio.';
       return;
-
     }
 
-
-    if (
-      this.productoNuevo.cantidad < 0
-    ) {
-
-      this.error =
-        'La cantidad no puede ser negativa.';
-
+    if (this.productoNuevo.cantidad < 0) {
+      this.error = 'La cantidad no puede ser negativa.';
       return;
-
     }
 
-
-    if (
-      this.productoNuevo.precio <= 0
-    ) {
-
-      this.error =
-        'El precio debe ser mayor que cero.';
-
+    if (this.productoNuevo.stockMinimo < 0) {
+      this.error = 'El stock mínimo no puede ser negativo.';
       return;
-
     }
 
+    if (this.productoNuevo.costoCompra < 0) {
+      this.error = 'El costo de compra no puede ser negativo.';
+      return;
+    }
+
+    if (this.productoNuevo.precio <= 0) {
+      this.error = 'El precio debe ser mayor que cero.';
+      return;
+    }
+
+    if (this.productoNuevo.precioVenta <= 0) {
+      this.error = 'El precio de venta debe ser mayor que cero.';
+      return;
+    }
 
     this.guardando = true;
 
-
     const producto = {
-
-      nombre:
-        this.productoNuevo.nombre.trim(),
-
-      codigoBarras:
-        this.productoNuevo.codigoBarras.trim(),
-
-      cantidad:
-      this.productoNuevo.cantidad,
-
-      precio:
-      this.productoNuevo.precio
-
+      nombre: this.productoNuevo.nombre.trim(),
+      codigoBarras: this.productoNuevo.codigoBarras.trim(),
+      cantidad: this.productoNuevo.cantidad,
+      precio: this.productoNuevo.precio,
+      stockMinimo: this.productoNuevo.stockMinimo,
+      costoCompra: this.productoNuevo.costoCompra,
+      precioVenta: this.productoNuevo.precioVenta,
+      proveedor: this.productoNuevo.proveedor.trim(),
+      fechaVencimiento:
+        this.productoNuevo.fechaVencimiento || null,
+      categoriaId: this.productoNuevo.categoriaId
     };
 
-
-    console.log(
-      'ENVIANDO PRODUCTO:',
-      producto
-    );
-
+    console.log('ENVIANDO PRODUCTO:', producto);
 
     this.productoService
       .crear(producto)
-
       .pipe(
-
         finalize(() => {
-
           this.guardando = false;
-
           this.cdr.detectChanges();
-
         })
-
       )
-
       .subscribe({
-
         next: (respuesta) => {
-
-          console.log(
-            'PRODUCTO CREADO:',
-            respuesta
-          );
-
+          console.log('PRODUCTO CREADO:', respuesta);
 
           this.mostrarFormulario = false;
-
-          this.mensaje =
-            'Producto creado correctamente.';
-
+          this.mensaje = 'Producto creado correctamente.';
 
           this.cargarProductos();
 
-
           setTimeout(() => {
-
             this.enfocarBuscador();
-
           }, 300);
-
         },
 
+        error: (error) => {
+          console.error('ERROR AL CREAR PRODUCTO:', error);
+
+          if (error.status === 400) {
+            this.error =
+              error.error?.message ||
+              'Los datos del producto no son válidos.';
+          } else if (error.status === 409) {
+            this.error =
+              'Ya existe un producto con ese código de barras.';
+          } else if (error.status === 401) {
+            this.error =
+              'Sesión expirada. Inicia sesión nuevamente.';
+          } else if (error.status === 403) {
+            this.error =
+              'No tienes permisos para crear productos.';
+          } else if (error.status === 0) {
+            this.error =
+              'No se pudo conectar con el servidor.';
+          } else {
+            this.error =
+              'No se pudo crear el producto.';
+          }
+
+          this.cdr.detectChanges();
+        }
+      });
+  }
+// =====================================================
+// GUARDAR O ACTUALIZAR PRODUCTO
+// =====================================================
+
+  guardarOActualizarProducto(): void {
+
+    if (this.modoEdicion) {
+
+      this.actualizarProducto();
+
+    } else {
+
+      this.guardarProducto();
+
+    }
+  }
+
+  // =====================================================
+// ACTUALIZAR PRODUCTO
+// =====================================================
+
+  private actualizarProducto(): void {
+    this.mensaje = '';
+    this.error = '';
+
+    if (this.productoEditandoId === null) {
+      this.error = 'No se encontró el producto a editar.';
+      return;
+    }
+
+    if (!this.productoNuevo.nombre.trim()) {
+      this.error = 'El nombre del producto es obligatorio.';
+      return;
+    }
+
+    if (!this.productoNuevo.codigoBarras.trim()) {
+      this.error = 'El código de barras es obligatorio.';
+      return;
+    }
+
+    if (this.productoNuevo.cantidad < 0) {
+      this.error = 'La cantidad no puede ser negativa.';
+      return;
+    }
+
+    if (this.productoNuevo.stockMinimo < 0) {
+      this.error = 'El stock mínimo no puede ser negativo.';
+      return;
+    }
+
+    if (this.productoNuevo.costoCompra < 0) {
+      this.error = 'El costo de compra no puede ser negativo.';
+      return;
+    }
+
+    if (this.productoNuevo.precio <= 0) {
+      this.error = 'El precio debe ser mayor que cero.';
+      return;
+    }
+
+    if (this.productoNuevo.precioVenta <= 0) {
+      this.error = 'El precio de venta debe ser mayor que cero.';
+      return;
+    }
+
+    this.guardando = true;
+
+    const producto = {
+      id: this.productoEditandoId,
+      nombre: this.productoNuevo.nombre.trim(),
+      codigoBarras: this.productoNuevo.codigoBarras.trim(),
+      cantidad: this.productoNuevo.cantidad,
+      precio: this.productoNuevo.precio,
+      stockMinimo: this.productoNuevo.stockMinimo,
+      costoCompra: this.productoNuevo.costoCompra,
+      precioVenta: this.productoNuevo.precioVenta,
+      proveedor: this.productoNuevo.proveedor.trim(),
+      fechaVencimiento:
+        this.productoNuevo.fechaVencimiento || null,
+      categoria: this.productoNuevo.categoriaId
+        ? {
+          id: this.productoNuevo.categoriaId
+        }
+        : null
+    };
+
+    console.log('ACTUALIZANDO PRODUCTO:', producto);
+
+    this.productoService
+      .actualizar(this.productoEditandoId, producto)
+      .pipe(
+        finalize(() => {
+          this.guardando = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (respuesta) => {
+          console.log('PRODUCTO ACTUALIZADO:', respuesta);
+
+          this.modoEdicion = false;
+          this.productoEditandoId = null;
+          this.mostrarFormulario = false;
+
+          this.mensaje =
+            'Producto actualizado correctamente.';
+
+          this.cargarProductos();
+
+          setTimeout(() => {
+            this.enfocarBuscador();
+          }, 300);
+        },
 
         error: (error) => {
-
           console.error(
-            'ERROR AL CREAR PRODUCTO:',
+            'ERROR AL ACTUALIZAR PRODUCTO:',
             error
           );
 
-
           if (error.status === 400) {
-
             this.error =
+              error.error?.message ||
               'Los datos del producto no son válidos.';
-
           } else if (error.status === 409) {
-
             this.error =
-              'Ya existe un producto con ese código de barras.';
-
+              'Ya existe otro producto con ese código de barras.';
           } else if (error.status === 401) {
-
             this.error =
               'Sesión expirada. Inicia sesión nuevamente.';
-
+          } else if (error.status === 403) {
+            this.error =
+              'No tienes permisos para actualizar productos.';
           } else if (error.status === 0) {
-
             this.error =
               'No se pudo conectar con el servidor.';
-
           } else {
-
             this.error =
-              'No se pudo crear el producto.';
-
+              'No se pudo actualizar el producto.';
           }
 
-
           this.cdr.detectChanges();
-
         }
-
       });
-
   }
 
 }
