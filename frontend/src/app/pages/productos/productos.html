@@ -214,6 +214,8 @@
             CATEGORÍA
           </th>
 
+          <th>Proveedor</th>
+
           <th>
             STOCK
           </th>
@@ -267,6 +269,9 @@
             {{ producto.categoriaNombre || producto.categoria?.nombre || 'Sin categoría' }}
           </td>
 
+          <td>
+            {{ producto.proveedor || 'Sin proveedor' }}
+          </td>
 
           <td>
 

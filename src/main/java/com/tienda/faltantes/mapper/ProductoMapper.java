@@ -13,5 +13,6 @@ public interface ProductoMapper {
 
     @Mapping(target = "categoriaId", source = "categoria.id")
     @Mapping(target = "categoriaNombre", source = "categoria.nombre")
+    @Mapping(target = "proveedor", source = "proveedor")
     ProductoResponseDTO toResponseDTO(Producto producto);
 }
