@@ -111,6 +111,8 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   terminoBusqueda: string = '';
 
+  filtroEstado: string = '';
+
   productoConsultado: Producto | null = null;
 
   mostrarConsulta: boolean = false;
@@ -362,49 +364,59 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   // Se ejecuta mientras el empleado escribe.
   // =====================================================
 
-  filtrarProductos(): void {
-
-    const texto =
-      this.terminoBusqueda
-        .trim()
-        .toLowerCase();
 
 
-    // Mostrar todos si el buscador está vacío.
+    filtrarProductos(): void {
 
-    if (!texto) {
+      const texto =
+        this.terminoBusqueda
+          .trim()
+          .toLowerCase();
 
       this.productosVisibles =
-        [...this.productos];
+        this.productos.filter((producto) => {
 
-      return;
+          // ==========================================
+          // FILTRO POR TEXTO
+          // ==========================================
 
+          const nombre =
+            (producto.nombre || '')
+              .toLowerCase();
+
+          const codigo =
+            (producto.codigoBarras || '')
+              .toLowerCase();
+
+          const coincideTexto =
+            !texto ||
+            nombre.includes(texto) ||
+            codigo.includes(texto);
+
+
+          // ==========================================
+          // FILTRO POR ESTADO DE STOCK
+          // ==========================================
+
+          const stockBajo =
+            producto.cantidad <= producto.stockMinimo;
+
+          const coincideEstado =
+            !this.filtroEstado ||
+            (this.filtroEstado === 'bajo' && stockBajo) ||
+            (this.filtroEstado === 'normal' && !stockBajo);
+
+
+          // ==========================================
+          // RESULTADO
+          // ==========================================
+
+          return coincideTexto && coincideEstado;
+
+        });
+
+      this.cdr.detectChanges();
     }
-
-
-    this.productosVisibles =
-      this.productos.filter((producto) => {
-
-        const nombre =
-          (producto.nombre || '')
-            .toLowerCase();
-
-        const codigo =
-          (producto.codigoBarras || '')
-            .toLowerCase();
-
-
-        return (
-          nombre.includes(texto) ||
-          codigo.includes(texto)
-        );
-
-      });
-
-
-    this.cdr.detectChanges();
-
-  }
 
 
   // =====================================================

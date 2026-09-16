@@ -94,8 +94,11 @@
     </select>
 
 
-    <select class="filter-select">
-
+    <select
+      class="filter-select"
+      [(ngModel)]="filtroEstado"
+      (change)="filtrarProductos()"
+    >
       <option value="">
         Todos los estados
       </option>
@@ -107,7 +110,6 @@
       <option value="bajo">
         Stock bajo
       </option>
-
     </select>
 
   </div>
