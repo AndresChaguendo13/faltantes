@@ -12,6 +12,8 @@ export interface Producto {
   precioVenta?: number;
   precio?: number;
   categoria: any;
+  categoriaId?: number | null;
+  categoriaNombre?: string | null;
   proveedor: string;
   fechaVencimiento: string;
 }
