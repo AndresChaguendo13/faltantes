@@ -444,16 +444,18 @@
 
         <!-- PROVEEDOR -->
         <div class="form-group">
-          <label for="proveedorProducto">Proveedor</label>
+          <label>Proveedor</label>
 
-          <input
-            id="proveedorProducto"
-            type="text"
-            [(ngModel)]="productoNuevo.proveedor"
-            placeholder="Proveedor"
-            autocomplete="off"
-            [disabled]="guardando"
-          >
+          <select [(ngModel)]="productoNuevo.proveedor">
+            <option value="">Seleccione un proveedor</option>
+
+            <option
+              *ngFor="let proveedor of proveedores"
+              [value]="proveedor.nombre"
+            >
+              {{ proveedor.nombre }}
+            </option>
+          </select>
         </div>
 
         <!-- CANTIDAD -->

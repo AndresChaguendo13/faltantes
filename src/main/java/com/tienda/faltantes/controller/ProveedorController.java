@@ -22,6 +22,12 @@ public class ProveedorController {
         this.service = service;
     }
 
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
+    public ResponseEntity<List<ProveedorResponseDTO>> listar() {
+        return ResponseEntity.ok(service.listar());
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public ResponseEntity<Proveedor> buscar(@PathVariable Long id) {

@@ -21,6 +21,11 @@ import {
   CategoriaService
 } from '../../services/categoria';
 
+import {
+  Proveedor,
+  ProveedorService
+} from '../../services/proveedor';
+
 import { finalize } from 'rxjs';
 
 
@@ -58,6 +63,7 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   categorias: Categoria[] = [];
 
+  proveedores: Proveedor[] = [];
   // =====================================================
   // ESTADOS
   // =====================================================
@@ -124,6 +130,7 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
+    private proveedorService: ProveedorService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -132,9 +139,10 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   // INICIO
   // =====================================================
 
-    ngOnInit(): void {
+  ngOnInit(): void {
     this.cargarProductos();
     this.cargarCategorias();
+    this.cargarProveedores();
   }
 
 
@@ -330,6 +338,19 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
       error: (error) => {
         console.error('ERROR AL CARGAR CATEGORÍAS:', error);
         this.categorias = [];
+      }
+    });
+  }
+
+  cargarProveedores(): void {
+    this.proveedorService.listar().subscribe({
+      next: (proveedores) => {
+        this.proveedores = proveedores || [];
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('ERROR AL CARGAR PROVEEDORES:', error);
+        this.proveedores = [];
       }
     });
   }
