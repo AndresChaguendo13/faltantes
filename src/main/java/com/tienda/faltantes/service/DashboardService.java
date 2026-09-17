@@ -2,6 +2,7 @@ package com.tienda.faltantes.service;
 
 import com.tienda.faltantes.dto.response.DashboardResponseDTO;
 import com.tienda.faltantes.entity.Producto;
+import com.tienda.faltantes.exception.CajaNoAbiertaException;
 import com.tienda.faltantes.repository.*;
 import org.springframework.stereotype.Service;
 import com.tienda.faltantes.entity.EstadoFiado;
@@ -234,7 +235,7 @@ public class DashboardService {
             dto.setDiferenciaCaja(caja.getDiferencia());
             dto.setResultadoCaja(caja.getResultado());
 
-        } catch (IllegalStateException e) {
+        } catch (CajaNoAbiertaException e) {
 
             List<Caja> cajas = cajaRepository.findAllByOrderByFechaAperturaDesc();
 
