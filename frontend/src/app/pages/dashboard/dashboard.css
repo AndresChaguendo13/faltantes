@@ -1400,3 +1400,177 @@
   }
 
 }
+
+/* =====================================================
+   MODAL CONSULTA RÁPIDA DE PRODUCTO
+===================================================== */
+
+.product-lookup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.product-lookup-modal {
+  width: 100%;
+  max-width: 620px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.lookup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.lookup-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lookup-icon {
+  font-size: 30px;
+}
+
+.lookup-title h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #111827;
+}
+
+.lookup-title p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.lookup-close {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  color: #6b7280;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.lookup-close:hover {
+  color: #111827;
+}
+
+.lookup-product-main {
+  padding: 24px;
+}
+
+.lookup-product-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+}
+
+.lookup-barcode {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.lookup-barcode strong {
+  color: #111827;
+}
+
+.lookup-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 0 24px 24px;
+}
+
+.lookup-info-card {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.lookup-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.lookup-info-card strong {
+  font-size: 16px;
+  color: #111827;
+}
+
+.lookup-stock {
+  color: #16a34a !important;
+}
+
+.lookup-stock-low {
+  color: #dc2626 !important;
+}
+
+.lookup-price {
+  color: #2563eb !important;
+}
+
+.lookup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.lookup-footer span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.lookup-ok-button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lookup-ok-button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 600px) {
+
+  .lookup-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lookup-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lookup-ok-button {
+    width: 100%;
+  }
+
+}

@@ -1,11 +1,11 @@
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import {
-  Component,
-  OnInit,
-  ChangeDetectorRef
-} from '@angular/core';
+  CurrencyPipe,
+  DecimalPipe
+} from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { ProductoService } from '../../services/producto';
-import { CurrencyPipe } from '@angular/common';
+import { DashboardService, DashboardResponse } from '../../services/dashboard';
+import {Producto, ProductoService} from '../../services/producto';
 
 
 @Component({
@@ -13,11 +13,16 @@ import { CurrencyPipe } from '@angular/common';
   imports: [
     RouterLink,
     RouterLinkActive,
-    CurrencyPipe
+    CurrencyPipe,
+    DecimalPipe
   ],
+
+
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
+
+
 export class Dashboard implements OnInit {
 
   menuUsuarioAbierto: boolean = false;
@@ -26,68 +31,144 @@ export class Dashboard implements OnInit {
   totalProductos: number = 0;
   valorInventario: number = 0;
   productosStockBajo: number = 0;
+
+  ventasHoy: number = 0;
+  ventasContadoHoy: number = 0;
+  ventasFiadoHoy: number = 0;
+  cuentasPorCobrar: number = 0;
+
+  totalCompras: number = 0;
+  totalVentas: number = 0;
+
   productosProximosVencer: number = 0;
   productosVencidos: number = 0;
   productosSinFecha: number = 0;
 
+  utilidadBrutaHoy: number = 0;
+  margenUtilidadHoy: number = 0;
+  costoVentasHoy: number = 0;
+
+  devolucionesVentaHoy: number = 0;
+  devolucionesCompraHoy: number = 0;
+
+  estadoCaja: string = '';
+  montoInicialCaja: number = 0;
+  ventasContadoCaja: number = 0;
+  abonosFiadosCaja: number = 0;
+  montoEsperadoCaja: number = 0;
+  montoFinalCaja: number = 0;
+  diferenciaCaja: number = 0;
+  resultadoCaja: string = '';
+
+  productosMasVendidos: any[] = [];
+
+  comprasPendientes: number = 0;
+
+  almacenesActivos: number = 0;
+
+
+  productoConsultado: Producto | null = null;
+
+  mostrarConsulta: boolean = false;
+
+  buscandoProducto: boolean = false;
+
+  errorBusquedaProducto: string = '';
+
   constructor(
     private router: Router,
+    private dashboardService: DashboardService,
     private productoService: ProductoService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.cargarEstadisticas();
+    this.cargarDashboard();
   }
 
-  cargarEstadisticas(): void {
+  cargarDashboard(): void {
 
-    this.productoService.listar().subscribe({
+    this.dashboardService.obtenerDashboard().subscribe({
 
-      next: (respuesta) => {
+      next: (respuesta: DashboardResponse) => {
 
-        const productos = respuesta.content || [];
+        console.log('DASHBOARD:', respuesta);
 
-        this.totalProductos = respuesta.totalElements;
+        this.totalProductos =
+          respuesta.totalProductos || 0;
 
-        this.productosStockBajo = productos.filter(
-          producto =>
-            producto.cantidad <= producto.stockMinimo
-        ).length;
+        this.productosStockBajo =
+          respuesta.productosStockBajo || 0;
 
-        this.productosVencidos = productos.filter(
-          producto =>
-            this.obtenerEstadoVencimiento(
-              producto.fechaVencimiento
-            ) === 'vencido'
-        ).length;
+        this.totalCompras =
+          respuesta.totalCompras || 0;
 
-        this.productosProximosVencer = productos.filter(
-          producto =>
-            this.obtenerEstadoVencimiento(
-              producto.fechaVencimiento
-            ) === 'proximo'
-        ).length;
+        this.totalVentas =
+          respuesta.totalVentas || 0;
 
-        this.productosSinFecha = productos.filter(
-          producto =>
-            !producto.fechaVencimiento
-        ).length;
+        this.valorInventario =
+          respuesta.valorInventario || 0;
 
-        this.valorInventario = productos.reduce(
-          (total, producto) =>
-            total +
-            (producto.costoCompra || 0) *
-            (producto.cantidad || 0),
-          0
-        );
+        this.ventasHoy =
+          respuesta.ventasHoy || 0;
+
+        this.ventasContadoHoy =
+          respuesta.ventasContadoHoy || 0;
+
+        this.ventasFiadoHoy =
+          respuesta.ventasFiadoHoy || 0;
+
+        this.cuentasPorCobrar =
+          respuesta.cuentasPorCobrar || 0;
+
+        this.utilidadBrutaHoy =
+          respuesta.utilidadBrutaHoy || 0;
+
+        this.margenUtilidadHoy =
+          respuesta.margenUtilidadHoy || 0;
+
+        this.costoVentasHoy =
+          respuesta.costoVentasHoy || 0;
+
+        this.devolucionesVentaHoy =
+          respuesta.devolucionesVentaHoy || 0;
+
+        this.devolucionesCompraHoy =
+          respuesta.devolucionesCompraHoy || 0;
+
+        this.estadoCaja =
+          respuesta.estadoCaja || '';
+
+        this.montoInicialCaja =
+          respuesta.montoInicialCaja || 0;
+
+        this.ventasContadoCaja =
+          respuesta.ventasContadoCaja || 0;
+
+        this.abonosFiadosCaja =
+          respuesta.abonosFiadosCaja || 0;
+
+        this.montoEsperadoCaja =
+          respuesta.montoEsperadoCaja || 0;
+
+        this.montoFinalCaja =
+          respuesta.montoFinalCaja || 0;
+
+        this.diferenciaCaja =
+          respuesta.diferenciaCaja || 0;
+
+        this.resultadoCaja =
+          respuesta.resultadoCaja || '';
+
+        this.productosMasVendidos =
+          respuesta.productosMasVendidos || [];
 
         this.cdr.detectChanges();
       },
 
       error: (error) => {
         console.error(
-          'ERROR AL CARGAR ESTADÍSTICAS:',
+          'ERROR AL CARGAR DASHBOARD:',
           error
         );
       }
@@ -96,41 +177,97 @@ export class Dashboard implements OnInit {
 
   }
 
-  obtenerEstadoVencimiento(
-    fecha: string | null | undefined
-  ): string {
+  buscarProductoDesdeDashboard(
+    codigo: string,
+    input: HTMLInputElement
+  ): void {
 
-    if (!fecha) {
-      return 'sin-fecha';
+    const texto = codigo.trim();
+    input.value = '';
+
+    if (!texto) {
+      return;
     }
 
-    const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0);
+    this.buscandoProducto = true;
+    this.errorBusquedaProducto = '';
+    this.productoConsultado = null;
 
-    const vencimiento = new Date(fecha);
-    vencimiento.setHours(0, 0, 0, 0);
+    this.productoService.buscarPorCodigo(texto).subscribe({
 
-    if (vencimiento < hoy) {
-      return 'vencido';
-    }
+      next: (producto) => {
 
-    const diferencia =
-      vencimiento.getTime() - hoy.getTime();
+        console.log(
+          'PRODUCTO ENCONTRADO DESDE DASHBOARD:',
+          producto
+        );
 
-    const dias =
-      Math.ceil(
-        diferencia / (1000 * 60 * 60 * 24)
-      );
+        this.productoConsultado = producto;
 
-    if (dias <= 30) {
-      return 'proximo';
-    }
+        this.mostrarConsulta = true;
 
-    return 'vigente';
+        this.buscandoProducto = false;
+
+        this.cdr.detectChanges();
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'ERROR BUSCANDO PRODUCTO DESDE DASHBOARD:',
+          error
+        );
+
+        this.productoConsultado = null;
+
+        if (error.status === 404) {
+
+          this.errorBusquedaProducto =
+            'Producto no encontrado.';
+
+        } else if (error.status === 401) {
+
+          this.errorBusquedaProducto =
+            'Sesión expirada. Inicia sesión nuevamente.';
+
+        } else {
+
+          this.errorBusquedaProducto =
+            'No se pudo consultar el producto.';
+
+        }
+
+        this.mostrarConsulta = true;
+
+        this.buscandoProducto = false;
+
+        this.cdr.detectChanges();
+
+      }
+
+    });
+
+  }
+
+
+  cerrarConsultaProducto(): void {
+
+    this.mostrarConsulta = false;
+
+    this.productoConsultado = null;
+
+    this.errorBusquedaProducto = '';
+
+    this.buscandoProducto = false;
+
+    this.cdr.detectChanges();
+
   }
 
   abrirMenuUsuario(): void {
-    this.menuUsuarioAbierto = !this.menuUsuarioAbierto;
+    this.menuUsuarioAbierto =
+      !this.menuUsuarioAbierto;
   }
 
   cerrarMenuUsuario(): void {
@@ -152,5 +289,4 @@ export class Dashboard implements OnInit {
 
     this.router.navigate(['/']);
   }
-
 }

@@ -211,7 +211,9 @@
 
       <input
         type="text"
-        placeholder="Buscar en el menú..."
+        placeholder="Buscar por código de barras..."
+        #busquedaMenu
+        (keydown.enter)="buscarProductoDesdeDashboard(busquedaMenu.value, busquedaMenu)"
       >
 
     </div>
@@ -530,7 +532,9 @@
 
           <input
             type="text"
-            placeholder="Buscar productos, clientes, etc..."
+            placeholder="Buscar por código de barras..."
+            #busquedaDashboard
+            (keydown.enter)="buscarProductoDesdeDashboard(busquedaDashboard.value, busquedaDashboard)"
           >
 
         </div>
@@ -914,7 +918,7 @@
             </span>
 
             <strong>
-              $ 2,150,000
+              {{ ventasHoy | currency:'$ ':'symbol':'1.0-0' }}
             </strong>
 
             <small>
@@ -944,11 +948,11 @@
           <div class="stat-content">
 
             <span>
-              Compras Pendientes
+              Total de Compras
             </span>
 
             <strong>
-              9
+              {{ totalCompras }}S
             </strong>
 
             <small>
@@ -1012,11 +1016,11 @@
           <div class="stat-content">
 
             <span>
-              Almacenes Activos
+              Cuentas por Cobrar
             </span>
 
             <strong>
-              15
+              {{ cuentasPorCobrar | currency:'$ ':'symbol':'1.0-0' }}
             </strong>
 
             <small>
@@ -1598,6 +1602,240 @@
       </div>
 
     </section>
+
+    <!-- =====================================================
+         MODAL CONSULTA RÁPIDA DESDE DASHBOARD
+    ====================================================== -->
+
+    @if (mostrarConsulta) {
+
+    <div class="product-lookup-overlay">
+
+      <div class="product-lookup-modal">
+
+        @if (productoConsultado) {
+
+        <!-- ENCABEZADO -->
+
+        <div class="lookup-header">
+
+          <div class="lookup-title">
+
+            <span class="lookup-icon">
+              📦
+            </span>
+
+            <div>
+
+              <h2>
+                Producto encontrado
+              </h2>
+
+              <p>
+                Consulta rápida de inventario
+              </p>
+
+            </div>
+
+          </div>
+
+          <button
+            type="button"
+            class="lookup-close"
+            (click)="cerrarConsultaProducto()"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <!-- PRODUCTO -->
+
+        <div class="lookup-product-main">
+
+          <div class="lookup-product-name">
+            {{ productoConsultado.nombre }}
+          </div>
+
+          <div class="lookup-barcode">
+
+            Código de barras:
+
+            <strong>
+              {{ productoConsultado.codigoBarras }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- INFORMACIÓN -->
+
+        <div class="lookup-info-grid">
+
+          <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              STOCK
+            </span>
+
+            <strong
+              class="lookup-stock"
+              [class.lookup-stock-low]="
+                productoConsultado.cantidad <=
+                productoConsultado.stockMinimo
+              "
+            >
+              {{ productoConsultado.cantidad }}
+            </strong>
+
+          </div>
+
+
+          <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              PRECIO DE VENTA
+            </span>
+
+            <strong class="lookup-price">
+
+              $
+              {{
+              (productoConsultado.precioVenta ??
+              productoConsultado.precio)
+              | number:'1.0-0'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              CATEGORÍA
+            </span>
+
+            <strong>
+
+              {{
+              productoConsultado.categoria?.nombre ||
+              productoConsultado.categoriaNombre ||
+              'Sin categoría'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              VENCIMIENTO
+            </span>
+
+            <strong>
+
+              {{
+              productoConsultado.fechaVencimiento ||
+              'Sin fecha'
+              }}
+
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- PIE -->
+
+        <div class="lookup-footer">
+
+          <span>
+            🔎 Escanea otro código para consultar otro producto
+          </span>
+
+          <button
+            type="button"
+            class="lookup-ok-button"
+            (click)="cerrarConsultaProducto()"
+          >
+            Cerrar
+          </button>
+
+        </div>
+
+
+        } @else if (errorBusquedaProducto) {
+
+        <div class="lookup-header">
+
+          <div class="lookup-title">
+
+            <span class="lookup-icon">
+              ⚠️
+            </span>
+
+            <div>
+
+              <h2>
+                Producto no encontrado
+              </h2>
+
+              <p>
+                Consulta rápida de inventario
+              </p>
+
+            </div>
+
+          </div>
+
+          <button
+            type="button"
+            class="lookup-close"
+            (click)="cerrarConsultaProducto()"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <div class="lookup-product-main">
+
+          <div class="lookup-product-name">
+            {{ errorBusquedaProducto }}
+          </div>
+
+        </div>
+
+
+        <div class="lookup-footer">
+
+          <button
+            type="button"
+            class="lookup-ok-button"
+            (click)="cerrarConsultaProducto()"
+          >
+            Cerrar
+          </button>
+
+        </div>
+
+        }
+
+      </div>
+
+    </div>
+
+    }
+
 
   </main>
 
