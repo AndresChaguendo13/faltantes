@@ -72,6 +72,8 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   guardando: boolean = false;
 
+  eliminandoId: number | null = null;
+
   buscando: boolean = false;
 
   error: string = '';
@@ -1123,5 +1125,93 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
         }
       });
   }
+
+  // =====================================================
+  // ELIMINAR PRODUCTO
+  // =====================================================
+
+  eliminarProducto(producto: Producto): void {
+
+    const confirmar = window.confirm(
+      `¿Está seguro de eliminar el producto "${producto.nombre}"?`
+    );
+
+    if (!confirmar) {
+      return;
+    }
+
+    this.eliminandoId = producto.id;
+    this.mensaje = '';
+    this.error = '';
+
+    this.productoService
+      .eliminar(producto.id)
+      .pipe(
+        finalize(() => {
+          this.eliminandoId = null;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+
+        next: () => {
+
+          console.log(
+            'PRODUCTO ELIMINADO:',
+            producto
+          );
+
+          this.mensaje =
+            'Producto eliminado correctamente.';
+
+          this.productos =
+            this.productos.filter(
+              (p) => p.id !== producto.id
+            );
+
+          this.filtrarProductos();
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'ERROR AL ELIMINAR PRODUCTO:',
+            error
+          );
+
+          if (error.status === 401) {
+
+            this.error =
+              'Sesión expirada. Inicia sesión nuevamente.';
+
+          } else if (error.status === 403) {
+
+            this.error =
+              'No tienes permisos para eliminar productos.';
+
+          } else if (error.status === 404) {
+
+            this.error =
+              'El producto ya no existe.';
+
+          } else if (error.status === 0) {
+
+            this.error =
+              'No se pudo conectar con el servidor.';
+
+          } else {
+
+            this.error =
+              'No se pudo eliminar el producto.';
+          }
+
+          this.cdr.detectChanges();
+        }
+
+      });
+  }
+
+
 
 }

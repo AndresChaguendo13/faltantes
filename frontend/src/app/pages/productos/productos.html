@@ -369,6 +369,8 @@
                 type="button"
                 class="action-button delete-button"
                 title="Eliminar producto"
+                (click)="eliminarProducto(producto)"
+                [disabled]="eliminandoId === producto.id"
               >
                 ×
               </button>
