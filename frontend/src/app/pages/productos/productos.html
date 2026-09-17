@@ -119,7 +119,21 @@
       </option>
     </select>
 
+    <select
+      class="filter-select"
+      [(ngModel)]="filtroVencimiento"
+      (change)="filtrarProductos()"
+    >
+      <option value="">Todos los vencimientos</option>
+      <option value="vigente">Vigentes</option>
+      <option value="proximo">Próximos a vencer</option>
+      <option value="vencido">Vencidos</option>
+      <option value="sin-fecha">Sin fecha</option>
+    </select>
   </div>
+
+
+
 
 
   <!-- =====================================================
@@ -310,9 +324,32 @@
 
 
           <td>
-            {{ producto.fechaVencimiento || 'Sin fecha' }}
-          </td>
+            <div
+              class="vencimiento"
+              [class.vencimiento-vencido]="
+      obtenerEstadoVencimiento(producto.fechaVencimiento) === 'vencido'
+    "
+              [class.vencimiento-proximo]="
+      obtenerEstadoVencimiento(producto.fechaVencimiento) === 'proximo'
+    "
+              [class.vencimiento-vigente]="
+      obtenerEstadoVencimiento(producto.fechaVencimiento) === 'vigente'
+    "
+            >
 
+    <span class="fecha-vencimiento">
+      {{ producto.fechaVencimiento || 'Sin fecha' }}
+    </span>
+
+              <span
+                *ngIf="producto.fechaVencimiento"
+                class="estado-vencimiento"
+              >
+      {{ textoVencimiento(producto.fechaVencimiento) }}
+    </span>
+
+            </div>
+          </td>
 
           <td>
 

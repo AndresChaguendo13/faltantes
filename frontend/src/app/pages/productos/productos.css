@@ -1217,6 +1217,54 @@ tbody tr:hover {
     border-color: #666;
   }
 
+  .vencimiento {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .fecha-vencimiento {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .estado-vencimiento {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .vencimiento-vencido .fecha-vencimiento {
+    color: #dc2626;
+  }
+
+  .vencimiento-vencido .estado-vencimiento {
+    color: #dc2626;
+    background-color: #fee2e2;
+  }
+
+  .vencimiento-proximo .fecha-vencimiento {
+    color: #d97706;
+  }
+
+  .vencimiento-proximo .estado-vencimiento {
+    color: #d97706;
+    background-color: #fef3c7;
+  }
+
+  .vencimiento-vigente .fecha-vencimiento {
+    color: #16a34a;
+  }
+
+  .vencimiento-vigente .estado-vencimiento {
+    color: #16a34a;
+    background-color: #dcfce7;
+  }
+
 
 
 

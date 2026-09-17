@@ -113,6 +113,8 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   filtroEstado: string = '';
 
+  filtroVencimiento: string = '';
+
   filtroCategoria: number | null = null;
 
 
@@ -416,6 +418,19 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
           !this.filtroCategoria ||
           producto.categoriaId === this.filtroCategoria;
 
+        // ==========================================
+        // FILTRO POR VENCIMIENTO
+        // ==========================================
+
+        const estadoVencimiento =
+          this.obtenerEstadoVencimiento(
+            producto.fechaVencimiento
+          );
+
+        const coincideVencimiento =
+          !this.filtroVencimiento ||
+          estadoVencimiento === this.filtroVencimiento;
+
 
         // ==========================================
         // RESULTADO
@@ -424,7 +439,8 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
         return (
           coincideTexto &&
           coincideEstado &&
-          coincideCategoria
+          coincideCategoria &&
+          coincideVencimiento
         );
 
       });
@@ -432,6 +448,65 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  // =====================================================
+// ESTADO DE VENCIMIENTO
+// =====================================================
+
+  obtenerEstadoVencimiento(
+    fecha: string | null | undefined
+  ): string {
+
+    if (!fecha) {
+      return 'sin-fecha';
+    }
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+
+    const vencimiento = new Date(fecha);
+    vencimiento.setHours(0, 0, 0, 0);
+
+    if (vencimiento < hoy) {
+      return 'vencido';
+    }
+
+    const diferencia =
+      vencimiento.getTime() - hoy.getTime();
+
+    const dias =
+      Math.ceil(
+        diferencia / (1000 * 60 * 60 * 24)
+      );
+
+    if (dias <= 30) {
+      return 'proximo';
+    }
+
+    return 'vigente';
+  }
+
+
+  textoVencimiento(
+    fecha: string | null | undefined
+  ): string {
+
+    const estado =
+      this.obtenerEstadoVencimiento(fecha);
+
+    if (estado === 'vencido') {
+      return 'Vencido';
+    }
+
+    if (estado === 'proximo') {
+      return 'Próximo a vencer';
+    }
+
+    if (estado === 'vigente') {
+      return 'Vigente';
+    }
+
+    return 'Sin fecha';
+  }
 
   // =====================================================
   // ENTER EN BUSCADOR
