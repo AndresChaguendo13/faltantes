@@ -391,10 +391,15 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
           (producto.codigoBarras || '')
             .toLowerCase();
 
+        const proveedor =
+          (producto.proveedor || '')
+            .toLowerCase();
+
         const coincideTexto =
           !texto ||
           nombre.includes(texto) ||
-          codigo.includes(texto);
+          codigo.includes(texto) ||
+          proveedor.includes(texto);
 
 
         // ==========================================
