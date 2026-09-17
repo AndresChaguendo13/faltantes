@@ -812,6 +812,7 @@
         <button
           type="button"
           class="refresh-button"
+
         >
 
           <svg>
@@ -845,7 +846,7 @@
             </span>
 
             <strong>
-              124
+              {{ totalProductos }}
             </strong>
 
             <small>
@@ -879,7 +880,7 @@
             </span>
 
             <strong>
-              $ 12,450,000
+              {{ valorInventario | currency:'$ ':'symbol':'1.0-0' }}
             </strong>
 
             <small>
@@ -981,7 +982,7 @@
             </span>
 
             <strong>
-              14
+              {{ productosStockBajo }}
             </strong>
 
             <small>
