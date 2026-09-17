@@ -113,6 +113,9 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
 
   filtroEstado: string = '';
 
+  filtroCategoria: number | null = null;
+
+
   productoConsultado: Producto | null = null;
 
   mostrarConsulta: boolean = false;
@@ -364,59 +367,70 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   // Se ejecuta mientras el empleado escribe.
   // =====================================================
 
+  filtrarProductos(): void {
+
+    const texto =
+      this.terminoBusqueda
+        .trim()
+        .toLowerCase();
+
+    this.productosVisibles =
+      this.productos.filter((producto) => {
+
+        // ==========================================
+        // FILTRO POR TEXTO
+        // ==========================================
+
+        const nombre =
+          (producto.nombre || '')
+            .toLowerCase();
+
+        const codigo =
+          (producto.codigoBarras || '')
+            .toLowerCase();
+
+        const coincideTexto =
+          !texto ||
+          nombre.includes(texto) ||
+          codigo.includes(texto);
 
 
-    filtrarProductos(): void {
+        // ==========================================
+        // FILTRO POR ESTADO DE STOCK
+        // ==========================================
 
-      const texto =
-        this.terminoBusqueda
-          .trim()
-          .toLowerCase();
+        const stockBajo =
+          producto.cantidad <= producto.stockMinimo;
 
-      this.productosVisibles =
-        this.productos.filter((producto) => {
-
-          // ==========================================
-          // FILTRO POR TEXTO
-          // ==========================================
-
-          const nombre =
-            (producto.nombre || '')
-              .toLowerCase();
-
-          const codigo =
-            (producto.codigoBarras || '')
-              .toLowerCase();
-
-          const coincideTexto =
-            !texto ||
-            nombre.includes(texto) ||
-            codigo.includes(texto);
+        const coincideEstado =
+          !this.filtroEstado ||
+          (this.filtroEstado === 'bajo' && stockBajo) ||
+          (this.filtroEstado === 'normal' && !stockBajo);
 
 
-          // ==========================================
-          // FILTRO POR ESTADO DE STOCK
-          // ==========================================
+        // ==========================================
+        // FILTRO POR CATEGORÍA
+        // ==========================================
 
-          const stockBajo =
-            producto.cantidad <= producto.stockMinimo;
-
-          const coincideEstado =
-            !this.filtroEstado ||
-            (this.filtroEstado === 'bajo' && stockBajo) ||
-            (this.filtroEstado === 'normal' && !stockBajo);
+        const coincideCategoria =
+          !this.filtroCategoria ||
+          producto.categoriaId === this.filtroCategoria;
 
 
-          // ==========================================
-          // RESULTADO
-          // ==========================================
+        // ==========================================
+        // RESULTADO
+        // ==========================================
 
-          return coincideTexto && coincideEstado;
+        return (
+          coincideTexto &&
+          coincideEstado &&
+          coincideCategoria
+        );
 
-        });
+      });
 
-      this.cdr.detectChanges();
-    }
+    this.cdr.detectChanges();
+  }
 
 
   // =====================================================

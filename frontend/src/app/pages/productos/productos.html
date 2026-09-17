@@ -85,12 +85,19 @@
     </div>
 
 
-    <select class="filter-select">
+    <select
+      class="filter-select"
+      [(ngModel)]="filtroCategoria"
+      (change)="filtrarProductos()"
+    >
+      <option [ngValue]="null">Todas las categorías</option>
 
-      <option value="">
-        Todas las categorías
+      <option
+        *ngFor="let categoria of categorias"
+        [ngValue]="categoria.id"
+      >
+        {{ categoria.nombre }}
       </option>
-
     </select>
 
 
