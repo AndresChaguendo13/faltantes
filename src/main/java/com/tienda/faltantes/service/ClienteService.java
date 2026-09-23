@@ -80,6 +80,18 @@ public class ClienteService {
                         )
                 );
 
+        // =====================================================
+        // VALIDAR DOCUMENTO DUPLICADO
+        // =====================================================
+
+        if (!cliente.getDocumento().equals(dto.getDocumento())
+                && repository.existsByDocumento(dto.getDocumento())) {
+
+            throw new RecursoDuplicadoException(
+                    "Ya existe otro cliente con ese documento"
+            );
+        }
+
         cliente.setNombre(dto.getNombre());
         cliente.setDocumento(dto.getDocumento());
         cliente.setTelefono(dto.getTelefono());

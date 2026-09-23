@@ -1,0 +1,255 @@
+/* =========================================================
+   CLIENTES - ESTILOS ESPECÍFICOS
+   El diseño general vive en shared/styles/erp-design.css
+   ========================================================= */
+
+
+/* =========================================================
+   CLIENTE
+   ========================================================= */
+
+.client-name {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.client-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #edf2f8;
+  color: #355474;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.client-name strong {
+  display: block;
+  color: #253047;
+  font-size: 13px;
+}
+
+.client-name small {
+  display: block;
+  margin-top: 3px;
+  color: #9aa2b0;
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   DOCUMENTO
+   ========================================================= */
+
+.document-badge {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #f2f4f7;
+  color: #536074;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   DIRECCIÓN
+   ========================================================= */
+
+.address-cell {
+  max-width: 220px;
+  color: #6e788a;
+}
+
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.status-badge.active {
+  background: #eaf9f0;
+  color: #16834a;
+}
+
+.status-badge.inactive {
+  background: #f1f3f5;
+  color: #737b87;
+}
+
+
+/* =========================================================
+   BOTONES DE ACCIONES
+   ========================================================= */
+
+.erp-action-btn.edit {
+  color: #355b83;
+}
+
+.erp-action-btn.edit:hover {
+  background: #edf4fb;
+  border-color: #c8d9e9;
+}
+
+.erp-action-btn.delete {
+  color: #bd3333;
+}
+
+.erp-action-btn.delete:hover {
+  background: #fff0f0;
+  border-color: #f1caca;
+}
+
+
+/* =========================================================
+   SWITCH ACTIVO
+   ========================================================= */
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.switch-row input {
+  display: none;
+}
+
+.switch {
+  position: relative;
+  width: 43px;
+  height: 24px;
+  flex: 0 0 43px;
+  border-radius: 999px;
+  background: #d9dee6;
+  transition: .2s;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,.18);
+  transition: .2s;
+}
+
+.switch-row input:checked + .switch {
+  background: #2f7a55;
+}
+
+.switch-row input:checked + .switch::after {
+  left: 22px;
+}
+
+.switch-row strong {
+  display: block;
+  color: #364054;
+  font-size: 12px;
+}
+
+.switch-row small {
+  display: block;
+  margin-top: 3px;
+  color: #919aaa;
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   MODAL CONFIRMACIÓN
+   ========================================================= */
+
+.erp-confirm-modal {
+  width: min(430px, 100%);
+  padding-top: 30px;
+  text-align: center;
+}
+
+.erp-confirm-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 15px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0f0;
+  color: #c52c2c;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.erp-confirm-modal h2 {
+  margin: 0;
+  color: #242d3e;
+  font-size: 20px;
+}
+
+.erp-confirm-modal p {
+  padding: 0 28px;
+  margin: 10px 0 20px;
+  color: #7b8494;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.erp-confirm-modal .erp-modal-footer {
+  justify-content: center;
+}
+
+
+/* =========================================================
+   ERROR DENTRO DEL FORMULARIO
+   Igual al utilizado en Productos
+   ========================================================= */
+
+.form-error {
+  grid-column: 1 / -1;
+  padding: 11px 13px;
+  border: 1px solid #ffd3d0;
+  border-radius: 9px;
+  background: #fff2f2;
+  color: #b42318;
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 620px) {
+
+  .address-cell {
+    max-width: 140px;
+  }
+
+  .client-name {
+    gap: 8px;
+  }
+
+  .client-avatar {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+
+}

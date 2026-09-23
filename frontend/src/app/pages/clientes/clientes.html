@@ -1,0 +1,749 @@
+<div class="erp-page clientes-page">
+
+  <!-- NAVEGACIÓN -->
+  <div class="erp-top-navigation">
+    <div class="erp-breadcrumb">
+      <span>ERP</span>
+      <span class="separator">/</span>
+      <span>Ventas</span>
+      <span class="separator">/</span>
+      <strong>Clientes</strong>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="erp-hero">
+
+    <div class="erp-hero-icon">👥</div>
+
+    <div class="erp-hero-content">
+      <div class="erp-hero-kicker">GESTIÓN COMERCIAL</div>
+
+      <h1>Clientes</h1>
+
+      <p>
+        Administra tus clientes y mantén organizada su información comercial.
+      </p>
+    </div>
+
+    <div class="erp-hero-stats">
+
+      <div class="erp-hero-stat">
+        <span class="erp-stat-number">
+          {{ clientes.length }}
+        </span>
+
+        <span class="erp-stat-label">
+          Registrados
+        </span>
+      </div>
+
+      <div class="erp-hero-stat">
+        <span class="erp-stat-number">
+          {{ clientes.filter(c => c.activo).length }}
+        </span>
+
+        <span class="erp-stat-label">
+          Activos
+        </span>
+      </div>
+
+    </div>
+
+    <div class="erp-hero-decoration erp-decoration-one"></div>
+    <div class="erp-hero-decoration erp-decoration-two"></div>
+
+  </section>
+
+
+  <!-- LISTADO -->
+  <section class="erp-card">
+
+    <div class="erp-card-header">
+
+      <div>
+        <span class="section-kicker">
+          DIRECTORIO
+        </span>
+
+        <h2>
+          Listado de clientes
+        </h2>
+
+        <p>
+          Consulta, crea, edita o elimina clientes.
+        </p>
+      </div>
+
+      <button
+        class="erp-btn-primary"
+        type="button"
+        (click)="abrirNuevo()">
+
+        <span>＋</span>
+
+        Nuevo cliente
+
+      </button>
+
+    </div>
+
+
+    <!-- TOOLBAR -->
+    <div class="erp-toolbar">
+
+      <div class="erp-search-box">
+
+        <span class="search-icon">
+          ⌕
+        </span>
+
+        <input
+          type="text"
+          [(ngModel)]="terminoBusqueda"
+          (ngModelChange)="aplicarFiltros()"
+          placeholder="Buscar por nombre, documento, teléfono o dirección..."
+          autocomplete="off">
+
+        <button
+          *ngIf="terminoBusqueda"
+          class="clear-search"
+          type="button"
+          (click)="terminoBusqueda = ''; aplicarFiltros()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <div class="erp-filter-group">
+
+        <label>
+          Estado
+        </label>
+
+        <select
+          [(ngModel)]="filtroEstado"
+          (ngModelChange)="aplicarFiltros()">
+
+          <option value="todos">
+            Todos
+          </option>
+
+          <option value="activos">
+            Activos
+          </option>
+
+          <option value="inactivos">
+            Inactivos
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <button
+        *ngIf="terminoBusqueda || filtroEstado !== 'todos'"
+        class="erp-btn-secondary"
+        type="button"
+        (click)="limpiarFiltros()">
+
+        Limpiar filtros
+
+      </button>
+
+
+      <div class="erp-results-count">
+
+        {{ clientesVisibles.length }}
+
+        resultado{{ clientesVisibles.length === 1 ? '' : 's' }}
+
+      </div>
+
+    </div>
+
+
+    <!-- TABLA -->
+    <div
+      class="erp-table-wrapper"
+      *ngIf="!cargando && clientesVisibles.length > 0">
+
+      <table class="erp-table">
+
+        <thead>
+
+        <tr>
+
+          <th>ID</th>
+
+          <th>Cliente</th>
+
+          <th>Documento</th>
+
+          <th>Teléfono</th>
+
+          <th>Dirección</th>
+
+          <th>Estado</th>
+
+          <th class="erp-actions-column">
+            Acciones
+          </th>
+
+        </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        <tr
+          *ngFor="let cliente of clientesVisibles; trackBy: trackById">
+
+          <td class="erp-id-cell">
+            #{{ cliente.id }}
+          </td>
+
+
+          <td>
+
+            <div class="client-name">
+
+              <div class="client-avatar">
+
+                {{
+                (cliente.nombre || '?')
+                .charAt(0)
+                .toUpperCase()
+                }}
+
+              </div>
+
+              <div>
+
+                <strong>
+                  {{ cliente.nombre }}
+                </strong>
+
+                <small>
+                  Cliente comercial
+                </small>
+
+              </div>
+
+            </div>
+
+          </td>
+
+
+          <td>
+
+              <span class="document-badge">
+                {{ cliente.documento || '—' }}
+              </span>
+
+          </td>
+
+
+          <td>
+            {{ cliente.telefono || '—' }}
+          </td>
+
+
+          <td class="address-cell">
+            {{ cliente.direccion || '—' }}
+          </td>
+
+
+          <td>
+
+              <span
+                class="status-badge"
+                [class.active]="cliente.activo"
+                [class.inactive]="!cliente.activo">
+
+                <span class="erp-status-dot"></span>
+
+                {{ cliente.activo ? 'Activo' : 'Inactivo' }}
+
+              </span>
+
+          </td>
+
+
+          <td class="erp-actions-cell">
+
+            <button
+              class="erp-action-btn edit"
+              type="button"
+              title="Editar"
+              (click)="editar(cliente)">
+
+              ✎
+
+            </button>
+
+
+            <button
+              class="erp-action-btn delete"
+              type="button"
+              title="Eliminar"
+              [disabled]="eliminandoId === cliente.id"
+              (click)="confirmarEliminar(cliente)">
+
+              {{
+              eliminandoId === cliente.id
+              ? '…'
+              : '🗑'
+              }}
+
+            </button>
+
+          </td>
+
+        </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- CARGANDO -->
+    <div
+      class="erp-loading-state"
+      *ngIf="cargando">
+
+      <div class="erp-spinner"></div>
+
+      <h3>
+        Cargando clientes...
+      </h3>
+
+      <p>
+        Estamos consultando la información.
+      </p>
+
+    </div>
+
+
+    <!-- SIN RESULTADOS -->
+    <div
+      class="erp-empty-state"
+      *ngIf="!cargando && clientesVisibles.length === 0">
+
+      <div class="erp-empty-icon">
+        👥
+      </div>
+
+      <h3>
+        No hay clientes para mostrar
+      </h3>
+
+      <p
+        *ngIf="terminoBusqueda || filtroEstado !== 'todos'">
+
+        Prueba cambiando los filtros de búsqueda.
+
+      </p>
+
+      <p
+        *ngIf="!terminoBusqueda && filtroEstado === 'todos'">
+
+        Comienza registrando tu primer cliente.
+
+      </p>
+
+      <button
+        class="erp-btn-primary"
+        type="button"
+        (click)="abrirNuevo()">
+
+        ＋ Crear cliente
+
+      </button>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <div
+      class="erp-card-footer"
+      *ngIf="!cargando">
+
+      <span>
+
+        Mostrando
+        <strong>
+          {{ clientesVisibles.length }}
+        </strong>
+
+        de
+
+        <strong>
+          {{ clientes.length }}
+        </strong>
+
+        clientes
+
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <!-- ========================================================= -->
+  <!-- MODAL CREAR / EDITAR -->
+  <!-- ========================================================= -->
+
+  <div
+    class="erp-modal-backdrop"
+    *ngIf="mostrarFormulario"
+    (click)="cerrarFormulario()">
+
+    <div
+      class="erp-modal"
+      (click)="$event.stopPropagation()">
+
+
+      <!-- HEADER -->
+      <div class="erp-modal-header">
+
+        <div>
+
+          <span class="section-kicker">
+
+            {{
+              modoEdicion
+                ? 'ACTUALIZACIÓN'
+                : 'NUEVO REGISTRO'
+            }}
+
+          </span>
+
+          <h2>
+
+            {{
+            modoEdicion
+            ? 'Editar cliente'
+            : 'Nuevo cliente'
+            }}
+
+          </h2>
+
+        </div>
+
+
+        <button
+          class="erp-modal-close"
+          type="button"
+          (click)="cerrarFormulario()">
+
+          ×
+
+        </button>
+
+      </div>
+
+
+      <!-- FORMULARIO -->
+      <form
+        (ngSubmit)="guardar()">
+
+
+        <!-- INFORMACIÓN -->
+        <div class="erp-form-section">
+
+          <div class="erp-form-section-title">
+
+            <span>
+              01
+            </span>
+
+            <div>
+
+              <strong>
+                Información del cliente
+              </strong>
+
+              <small>
+                Datos principales del cliente
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <div class="erp-form-grid">
+
+
+            <!-- NOMBRE -->
+            <div class="erp-form-field full">
+
+              <label for="nombre">
+
+                Nombre del cliente
+
+                <span>*</span>
+
+              </label>
+
+              <input
+                id="nombre"
+                name="nombre"
+                type="text"
+                maxlength="120"
+                [(ngModel)]="clienteNuevo.nombre"
+                placeholder="Ej. Juan Pérez"
+                required>
+
+            </div>
+
+
+            <!-- DOCUMENTO -->
+            <div class="erp-form-field">
+
+              <label for="documento">
+
+                Documento
+
+                <span>*</span>
+
+              </label>
+
+              <input
+                id="documento"
+                name="documento"
+                type="text"
+                maxlength="30"
+                [(ngModel)]="clienteNuevo.documento"
+                placeholder="Ej. 1090123456"
+                required>
+
+            </div>
+
+
+            <!-- TELÉFONO -->
+            <div class="erp-form-field">
+
+              <label for="telefono">
+                Teléfono
+              </label>
+
+              <input
+                id="telefono"
+                name="telefono"
+                type="text"
+                maxlength="20"
+                [(ngModel)]="clienteNuevo.telefono"
+                placeholder="Ej. 3001234567">
+
+            </div>
+
+
+            <!-- DIRECCIÓN -->
+            <div class="erp-form-field full">
+
+              <label for="direccion">
+                Dirección
+              </label>
+
+              <input
+                id="direccion"
+                name="direccion"
+                type="text"
+                maxlength="200"
+                [(ngModel)]="clienteNuevo.direccion"
+                placeholder="Dirección del cliente">
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+
+        <!-- ESTADO -->
+        <div class="erp-form-section">
+
+          <div class="erp-form-section-title">
+
+            <span>
+              02
+            </span>
+
+            <div>
+
+              <strong>
+                Estado
+              </strong>
+
+              <small>
+                Disponibilidad del cliente
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <label class="switch-row">
+
+            <input
+              type="checkbox"
+              name="activo"
+              [(ngModel)]="clienteNuevo.activo">
+
+            <span class="switch"></span>
+
+            <span>
+
+              <strong>
+                Cliente activo
+              </strong>
+
+              <small>
+                El cliente estará disponible
+                para las operaciones del sistema.
+              </small>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <!-- ERROR DEL FORMULARIO -->
+        @if (error) {
+
+        <div class="form-error">
+          {{ error }}
+        </div>
+
+        }
+
+
+        <!-- FOOTER -->
+        <div class="erp-modal-footer">
+
+          <button
+            class="erp-btn-secondary"
+            type="button"
+            (click)="cerrarFormulario()">
+
+            Cancelar
+
+          </button>
+
+
+          <button
+            class="erp-btn-primary"
+            type="submit"
+            [disabled]="guardando">
+
+            <span *ngIf="!guardando">
+
+              {{
+                modoEdicion
+                  ? 'Guardar cambios'
+                  : 'Crear cliente'
+              }}
+
+            </span>
+
+            <span *ngIf="guardando">
+              Guardando...
+            </span>
+
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- MODAL ELIMINAR -->
+  <!-- ========================================================= -->
+
+  <div
+    class="erp-modal-backdrop"
+    *ngIf="mostrarConfirmacionEliminar"
+    (click)="cancelarEliminar()">
+
+
+    <div
+      class="erp-modal erp-confirm-modal"
+      (click)="$event.stopPropagation()">
+
+
+      <div class="erp-confirm-icon">
+        !
+      </div>
+
+
+      <h2>
+        ¿Eliminar cliente?
+      </h2>
+
+
+      <p>
+
+        Vas a eliminar a
+
+        <strong>
+          {{ clienteAEliminar?.nombre }}
+        </strong>.
+
+        Esta acción no se puede deshacer.
+
+      </p>
+
+
+      <div class="erp-modal-footer">
+
+        <button
+          class="erp-btn-secondary"
+          type="button"
+          (click)="cancelarEliminar()"
+          [disabled]="eliminandoId !== null">
+
+          Cancelar
+
+        </button>
+
+
+        <button
+          class="erp-btn-danger"
+          type="button"
+          (click)="eliminar()"
+          [disabled]="eliminandoId !== null">
+
+          {{
+          eliminandoId !== null
+          ? 'Eliminando...'
+          : 'Sí, eliminar'
+          }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
