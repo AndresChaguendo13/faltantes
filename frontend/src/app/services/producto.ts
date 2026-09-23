@@ -56,6 +56,14 @@ export class ProductoService {
   );
   }
 
+  buscarPorProveedor(proveedor: string): Observable<ProductoPage> {
+    return this.http.get<ProductoPage>(
+      `${this.apiUrl}/proveedor/${encodeURIComponent(proveedor)}`
+    );
+  }
+
+
+
   crear(producto: any): Observable<Producto> {
     return this.http.post<Producto>(
       this.apiUrl,

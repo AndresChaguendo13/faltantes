@@ -46,12 +46,23 @@ public class ProductoService {
                 .map(mapper::toResponseDTO);
     }
 
+
+
     public Page<ProductoResponseDTO> buscarPorNombre(
             String nombre,
             Pageable pageable
     ) {
         return repository
                 .findByNombreContainingIgnoreCase(nombre, pageable)
+                .map(mapper::toResponseDTO);
+    }
+
+    public Page<ProductoResponseDTO> buscarPorProveedor(
+            String proveedor,
+            Pageable pageable
+    ) {
+        return repository
+                .findByProveedorIgnoreCase(proveedor, pageable)
                 .map(mapper::toResponseDTO);
     }
 

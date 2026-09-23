@@ -1,0 +1,785 @@
+.compras-page {
+  padding-bottom: 40px;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.compras-hero {
+  margin-bottom: 20px;
+}
+
+.compras-hero .erp-hero-main {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.compras-hero .erp-hero-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef4ff;
+  font-size: 25px;
+  flex-shrink: 0;
+}
+
+.erp-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.erp-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.erp-stat-label {
+  font-size: 11px;
+  color: #7b8494;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.erp-stat strong {
+  font-size: 18px;
+  color: #172033;
+}
+
+
+/* =========================================================
+   CARD
+   ========================================================= */
+
+.erp-card {
+  margin-bottom: 18px;
+}
+
+.erp-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.erp-card-header h2 {
+  margin: 0;
+}
+
+.erp-card-header p {
+  margin: 5px 0 0;
+  color: #7b8494;
+  font-size: 13px;
+}
+
+.purchase-badge,
+.products-count,
+.detail-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f2f5f9;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   FORMULARIO
+   ========================================================= */
+
+.erp-form-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 420px);
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.erp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.erp-field label {
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.required {
+  color: #d92d20;
+}
+
+.erp-field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d9dee8;
+  border-radius: 9px;
+  background: #fff;
+  color: #1d2939;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .18s, box-shadow .18s;
+}
+
+.erp-field select:focus {
+  border-color: #8aa4d6;
+  box-shadow: 0 0 0 3px rgba(80, 120, 190, .10);
+}
+
+
+/* =========================================================
+   BUSCADOR
+   ========================================================= */
+
+.product-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.product-search input {
+  width: 100%;
+  height: 44px;
+  padding: 0 42px;
+  border: 1px solid #d9dee8;
+  border-radius: 10px;
+  background: #fff;
+  color: #1d2939;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .18s, box-shadow .18s;
+}
+
+.product-search input::placeholder {
+  color: #98a2b3;
+}
+
+.product-search input:focus {
+  border-color: #8aa4d6;
+  box-shadow: 0 0 0 3px rgba(80, 120, 190, .10);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  z-index: 2;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.clear-search {
+  position: absolute;
+  right: 10px;
+  width: 27px;
+  height: 27px;
+  border: none;
+  border-radius: 7px;
+  background: #f1f3f6;
+  color: #667085;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.clear-search:hover {
+  background: #e7eaf0;
+}
+
+
+/* =========================================================
+   RESULTADOS DE PRODUCTOS
+   ========================================================= */
+
+.product-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.product-result {
+  display: grid;
+  grid-template-columns: minmax(250px, 1fr) 100px 145px auto;
+  align-items: center;
+  gap: 18px;
+  padding: 12px 14px;
+  border: 1px solid #edf0f4;
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color .18s, box-shadow .18s;
+}
+
+.product-result:hover {
+  border-color: #d7dce5;
+  box-shadow: 0 3px 12px rgba(16, 24, 40, .05);
+}
+
+.product-result-info {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.product-result-avatar {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef4ff;
+  color: #315da8;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.product-result-info > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.product-result-info strong {
+  color: #1d2939;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-result-info span {
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.product-result-stock,
+.product-result-price {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.product-result-stock span,
+.product-result-price span {
+  color: #98a2b3;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.product-result-stock strong,
+.product-result-price strong {
+  color: #344054;
+  font-size: 12px;
+}
+
+.btn-add-product {
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid #d5dce8;
+  border-radius: 8px;
+  background: #fff;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .18s, border-color .18s, transform .18s;
+}
+
+.btn-add-product span {
+  font-size: 17px;
+  margin-right: 4px;
+}
+
+.btn-add-product:hover {
+  background: #f5f7fa;
+  border-color: #bfc8d6;
+}
+
+.btn-add-product:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================================================
+   VACÍOS
+   ========================================================= */
+
+.empty-products,
+.empty-purchase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 38px 20px;
+  color: #667085;
+}
+
+.empty-icon,
+.empty-purchase-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f6f8;
+  font-size: 21px;
+}
+
+.empty-products strong,
+.empty-purchase h3 {
+  margin: 0;
+  color: #344054;
+  font-size: 14px;
+}
+
+.empty-products span,
+.empty-purchase p {
+  margin: 6px 0 0;
+  color: #98a2b3;
+  font-size: 12px;
+}
+
+.empty-purchase h3 {
+  margin-top: 0;
+}
+
+.empty-purchase p {
+  max-width: 430px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   TABLA DE COMPRA
+   ========================================================= */
+
+.purchase-table-wrapper {
+  overflow-x: auto;
+  margin-top: 18px;
+  border: 1px solid #edf0f4;
+  border-radius: 10px;
+}
+
+.purchase-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.purchase-table thead {
+  background: #f8f9fb;
+}
+
+.purchase-table th {
+  padding: 11px 13px;
+  color: #667085;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.purchase-table td {
+  padding: 12px 13px;
+  border-top: 1px solid #edf0f4;
+  vertical-align: middle;
+}
+
+.purchase-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+
+/* =========================================================
+   PRODUCTO EN TABLA
+   ========================================================= */
+
+.table-product {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.table-product-avatar {
+  width: 35px;
+  height: 35px;
+  min-width: 35px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f4fa;
+  color: #315da8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.table-product > div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.table-product strong {
+  color: #344054;
+  font-size: 12px;
+}
+
+.table-product span {
+  color: #98a2b3;
+  font-size: 10px;
+}
+
+
+/* =========================================================
+   CANTIDAD
+   ========================================================= */
+
+.quantity-control {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  border: 1px solid #d9dee8;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.quantity-control button {
+  width: 30px;
+  height: 100%;
+  border: none;
+  background: #f8f9fb;
+  color: #344054;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.quantity-control button:hover {
+  background: #edf0f4;
+}
+
+.quantity-control input {
+  width: 48px;
+  height: 100%;
+  border: none;
+  border-left: 1px solid #e4e7ec;
+  border-right: 1px solid #e4e7ec;
+  text-align: center;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+  outline: none;
+}
+
+
+/* =========================================================
+   PRECIO
+   ========================================================= */
+
+.price-input {
+  display: flex;
+  align-items: center;
+  width: 125px;
+  height: 34px;
+  border: 1px solid #d9dee8;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.price-input span {
+  padding-left: 9px;
+  color: #667085;
+  font-size: 12px;
+}
+
+.price-input input {
+  width: 100%;
+  height: 100%;
+  padding: 0 7px;
+  border: none;
+  outline: none;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.subtotal {
+  color: #1d2939;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.btn-delete {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: #fff1f0;
+  color: #b42318;
+  cursor: pointer;
+  transition: background .18s;
+}
+
+.btn-delete:hover {
+  background: #ffe3e0;
+}
+
+
+/* =========================================================
+   RESUMEN
+   ========================================================= */
+
+.purchase-summary {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 35px;
+  padding: 18px 4px 3px;
+}
+
+.summary-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  color: #98a2b3;
+  font-size: 11px;
+}
+
+.summary-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.summary-total span {
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.summary-total strong {
+  color: #172033;
+  font-size: 22px;
+}
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.form-error {
+  padding: 11px 13px;
+  margin-bottom: 18px;
+  border: 1px solid #ffd3d0;
+  border-radius: 9px;
+  background: #fff2f2;
+  color: #b42318;
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.purchase-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.btn-primary,
+.btn-secondary {
+  min-height: 40px;
+  padding: 0 17px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .18s, transform .18s, background .18s;
+}
+
+.btn-primary {
+  border: 1px solid #315da8;
+  background: #315da8;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: .92;
+}
+
+.btn-secondary {
+  border: 1px solid #d9dee8;
+  background: #fff;
+  color: #475467;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #f8f9fb;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.btn-primary:active:not(:disabled),
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button-spinner,
+.loading-spinner {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 7px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  vertical-align: -3px;
+  animation: compras-spin .7s linear infinite;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.loading-card {
+  min-height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.loading-spinner {
+  margin: 0;
+  color: #315da8;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .product-result {
+    grid-template-columns: minmax(220px, 1fr) 85px 125px auto;
+    gap: 12px;
+  }
+
+}
+
+@media (max-width: 800px) {
+
+  .compras-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .erp-hero-stats {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .product-result {
+    grid-template-columns: 1fr auto;
+  }
+
+  .product-result-stock,
+  .product-result-price {
+    display: none;
+  }
+
+  .btn-add-product {
+    justify-self: end;
+  }
+
+  .purchase-summary {
+    justify-content: space-between;
+  }
+
+}
+
+@media (max-width: 600px) {
+
+  .erp-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .erp-card-header {
+    align-items: flex-start;
+  }
+
+  .erp-hero-stats {
+    gap: 20px;
+  }
+
+  .summary-total strong {
+    font-size: 19px;
+  }
+
+  .purchase-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+
+}
+
+
+/* =========================================================
+   ANIMACIÓN
+   ========================================================= */
+
+@keyframes compras-spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}

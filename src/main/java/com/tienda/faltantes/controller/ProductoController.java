@@ -45,6 +45,16 @@ public class ProductoController {
         return service.buscarPorNombre(nombre, pageable);
     }
 
+    @GetMapping("/proveedor/{proveedor}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO')")
+    public Page<ProductoResponseDTO> buscarPorProveedor(
+            @PathVariable String proveedor,
+            Pageable pageable
+    ) {
+        return service.buscarPorProveedor(proveedor, pageable);
+    }
+
+
     @GetMapping("/codigo/{codigo}")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public ResponseEntity<Producto> buscarPorCodigo(
