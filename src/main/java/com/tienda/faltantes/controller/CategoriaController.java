@@ -43,6 +43,22 @@ public class CategoriaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
     }
 
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Categoria> actualizar(
+            @PathVariable Long id,
+            @RequestBody Categoria categoria) {
+
+        Categoria actualizada = service.actualizar(id, categoria);
+
+        return ResponseEntity.ok(actualizada);
+    }
+
+
+
+
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {

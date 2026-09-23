@@ -1,0 +1,503 @@
+/* =========================================================
+   PROVEEDORES - ESTILOS ESPECÍFICOS
+   El diseño general vive en shared/styles/erp-design.css
+   ========================================================= */
+
+:host {
+  display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   PROVEEDORES - ERP FALTANTES
+   ========================================================= */
+
+:host {
+  display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* ALERTS */
+
+.alert {
+  max-width: 1500px;
+  margin: 0 auto 16px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.alert button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  color: inherit;
+}
+
+.alert-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 800;
+}
+
+.alert.success {
+  background: #ecfdf3;
+  color: #147a45;
+  border: 1px solid #c9f2da;
+}
+
+.alert.success .alert-icon {
+  background: #c9f2da;
+}
+
+.alert.error {
+  background: #fff2f2;
+  color: #b42318;
+  border: 1px solid #ffd3d0;
+}
+
+.alert.error .alert-icon {
+  background: #ffd3d0;
+}
+
+
+
+
+.supplier-name {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.supplier-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #edf2f8;
+  color: #355474;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.supplier-name strong {
+  display: block;
+  color: #253047;
+  font-size: 13px;
+}
+
+.supplier-name small {
+  display: block;
+  margin-top: 3px;
+  color: #9aa2b0;
+  font-size: 10px;
+}
+
+.nit-badge {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #f2f4f7;
+  color: #536074;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.email-cell {
+  color: #526a86;
+}
+
+.address-cell {
+  max-width: 190px;
+  color: #6e788a;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.status-badge.active {
+  background: #eaf9f0;
+  color: #16834a;
+}
+
+.status-badge.inactive {
+  background: #f1f3f5;
+  color: #737b87;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.action-btn.edit {
+  color: #355b83;
+}
+
+.action-btn.edit:hover {
+  background: #edf4fb;
+  border-color: #c8d9e9;
+}
+
+.action-btn.delete {
+  color: #bd3333;
+}
+
+.action-btn.delete:hover {
+  background: #fff0f0;
+  border-color: #f1caca;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.switch-row input {
+  display: none;
+}
+
+.switch {
+  position: relative;
+  width: 43px;
+  height: 24px;
+  flex: 0 0 43px;
+  border-radius: 999px;
+  background: #d9dee6;
+  transition: .2s;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,.18);
+  transition: .2s;
+}
+
+.switch-row input:checked + .switch {
+  background: #2f7a55;
+}
+
+.switch-row input:checked + .switch::after {
+  left: 22px;
+}
+
+.switch-row strong {
+  display: block;
+  color: #364054;
+  font-size: 12px;
+}
+
+.switch-row small {
+  display: block;
+  margin-top: 3px;
+  color: #919aaa;
+  font-size: 10px;
+}
+
+.confirm-modal {
+  width: min(430px, 100%);
+  padding-top: 30px;
+  text-align: center;
+}
+
+.confirm-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 15px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0f0;
+  color: #c52c2c;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.confirm-modal h2 {
+  margin: 0;
+  color: #242d3e;
+  font-size: 20px;
+}
+
+.confirm-modal p {
+  padding: 0 28px;
+  margin: 10px 0 20px;
+  color: #7b8494;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.confirm-modal .modal-footer {
+  justify-content: center;
+}
+
+/* =========================================================
+   AJUSTES ESPECÍFICOS DE PROVEEDORES
+   ========================================================= */
+
+.supplier-name {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.supplier-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #edf2f8;
+  color: #355474;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.supplier-name strong {
+  display: block;
+  color: #253047;
+  font-size: 13px;
+}
+
+.supplier-name small {
+  display: block;
+  margin-top: 3px;
+  color: #9aa2b0;
+  font-size: 10px;
+}
+
+.nit-badge {
+  display: inline-block;
+  padding: 5px 8px;
+  border-radius: 7px;
+  background: #f2f4f7;
+  color: #536074;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.email-cell {
+  color: #526a86;
+}
+
+.address-cell {
+  max-width: 190px;
+  color: #6e788a;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.status-badge.active {
+  background: #eaf9f0;
+  color: #16834a;
+}
+
+.status-badge.inactive {
+  background: #f1f3f5;
+  color: #737b87;
+}
+
+/* Acciones propias de proveedores */
+.erp-action-btn.edit {
+  color: #355b83;
+}
+
+.erp-action-btn.edit:hover {
+  background: #edf4fb;
+  border-color: #c8d9e9;
+}
+
+.erp-action-btn.delete {
+  color: #bd3333;
+}
+
+.erp-action-btn.delete:hover {
+  background: #fff0f0;
+  border-color: #f1caca;
+}
+
+/* Estado activo/inactivo del formulario */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.switch-row input {
+  display: none;
+}
+
+.switch {
+  position: relative;
+  width: 43px;
+  height: 24px;
+  flex: 0 0 43px;
+  border-radius: 999px;
+  background: #d9dee6;
+  transition: .2s;
+}
+
+.switch::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,.18);
+  transition: .2s;
+}
+
+.switch-row input:checked + .switch {
+  background: #2f7a55;
+}
+
+.switch-row input:checked + .switch::after {
+  left: 22px;
+}
+
+.switch-row strong {
+  display: block;
+  color: #364054;
+  font-size: 12px;
+}
+
+.switch-row small {
+  display: block;
+  margin-top: 3px;
+  color: #919aaa;
+  font-size: 10px;
+}
+
+/* Confirmación de eliminación */
+.erp-confirm-modal {
+  width: min(430px, 100%);
+  padding-top: 30px;
+  text-align: center;
+}
+
+.erp-confirm-icon {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto 15px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff0f0;
+  color: #c52c2c;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+/* Alertas antiguas: se mantienen mientras terminamos la migración
+   al sistema global de notificaciones. */
+.alert {
+  max-width: 1500px;
+  margin: 0 auto 16px;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.alert button {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  color: inherit;
+}
+
+.alert-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 800;
+}
+
+.alert.success {
+  background: #ecfdf3;
+  color: #147a45;
+  border: 1px solid #c9f2da;
+}
+
+.alert.success .alert-icon {
+  background: #c9f2da;
+}
+
+.alert.error {
+  background: #fff2f2;
+  color: #b42318;
+  border: 1px solid #ffd3d0;
+}
+
+.alert.error .alert-icon {
+  background: #ffd3d0;
+}
+
+@media (max-width: 620px) {
+  .address-cell {
+    max-width: 140px;
+  }
+
+  .supplier-name {
+    gap: 8px;
+  }
+
+  .supplier-avatar {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+  }
+}

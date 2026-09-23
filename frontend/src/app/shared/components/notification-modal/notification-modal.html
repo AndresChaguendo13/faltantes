@@ -1,0 +1,67 @@
+@if (notification.visible) {
+
+<div
+  class="notification-overlay"
+  (click)="cerrar()"
+>
+
+  <div
+    class="notification-modal"
+    [ngClass]="'notification-' + notification.type"
+    (click)="$event.stopPropagation()"
+  >
+
+    <button
+      type="button"
+      class="notification-close"
+      (click)="cerrar()"
+      aria-label="Cerrar"
+    >
+      ×
+    </button>
+
+    <div class="notification-icon">
+
+      @if (notification.type === 'success') {
+      ✓
+      }
+
+      @if (notification.type === 'error') {
+      !
+      }
+
+      @if (notification.type === 'warning') {
+      ⚠
+      }
+
+      @if (notification.type === 'info') {
+      i
+      }
+
+    </div>
+
+    <div class="notification-content">
+
+      <h2>
+        {{ notification.title }}
+      </h2>
+
+      <p>
+        {{ notification.message }}
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="notification-button"
+      (click)="cerrar()"
+    >
+      Entendido
+    </button>
+
+  </div>
+
+</div>
+
+}

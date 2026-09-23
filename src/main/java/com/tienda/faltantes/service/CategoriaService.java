@@ -36,4 +36,19 @@ public class CategoriaService {
     public void eliminar(Long id) {
         repository.deleteById(id);
     }
+
+    public Categoria actualizar(Long id, Categoria categoria) {
+
+        Categoria existente = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("La categoría no existe"));
+
+        if (!existente.getNombre().equalsIgnoreCase(categoria.getNombre())
+                && repository.existsByNombre(categoria.getNombre())) {
+            throw new RuntimeException("La categoría ya existe");
+        }
+
+        existente.setNombre(categoria.getNombre());
+
+        return repository.save(existente);
+    }
 }

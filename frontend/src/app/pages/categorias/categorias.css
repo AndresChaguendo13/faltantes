@@ -1,0 +1,139 @@
+/* =========================================================
+   CATEGORÍAS - ESTILOS ESPECÍFICOS DEL MÓDULO
+   El diseño general pertenece a erp-design.css.
+   ========================================================= */
+
+.categoria-hero-icon svg {
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.erp-card-header > div:first-child {
+  min-width: 0;
+}
+
+.erp-toolbar .erp-search-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.categoria-table {
+  min-width: 680px;
+}
+
+.categoria-id-column {
+  width: 90px;
+}
+
+.categoria-name-cell {
+  min-width: 300px;
+}
+
+.categoria-name {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.categoria-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #edf2f8;
+  color: #355474;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.categoria-name strong {
+  display: block;
+  color: #253047;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.categoria-name small {
+  display: block;
+  margin-top: 3px;
+  color: #9aa2b0;
+  font-size: 10px;
+}
+
+.erp-action-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.categoria-form-section {
+  border-bottom: 1px solid #edf0f5;
+}
+
+.categoria-form-error {
+  margin-top: 14px;
+  padding: 11px 13px;
+  border: 1px solid #ffd3d0;
+  border-radius: 9px;
+  background: #fff2f2;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.categoria-delete-info {
+  margin: 0 28px 20px;
+  padding: 13px 15px;
+  border: 1px solid #edf0f5;
+  border-radius: 10px;
+  background: #fafbfd;
+  text-align: left;
+}
+
+.categoria-delete-info span {
+  display: block;
+  margin-bottom: 4px;
+  color: #8992a3;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.categoria-delete-info strong {
+  color: #303a4c;
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.categoria-button-spinner {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+  border-top-color: currentColor;
+}
+
+.erp-confirm-modal .erp-modal-footer {
+  border-top: 1px solid #edf0f5;
+}
+
+@media (max-width: 620px) {
+  .categoria-name-cell {
+    min-width: 240px;
+  }
+}

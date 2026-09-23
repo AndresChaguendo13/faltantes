@@ -3,7 +3,8 @@ import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { authGuard } from './guards/auth-guard';
 import { Productos } from './pages/productos/productos';
-
+import { Categorias } from './pages/categorias/categorias';
+import { ProveedoresComponent } from './proveedores/proveedores';
 export const routes: Routes = [
 
   {
@@ -18,6 +19,10 @@ export const routes: Routes = [
   },
 
 
+
+
+
+
   {
     path: 'productos',
     component: Productos,
@@ -25,8 +30,23 @@ export const routes: Routes = [
   },
 
   {
+    path: 'categorias',
+    component: Categorias,
+    canActivate: [authGuard]
+  },
+
+  {
+    path: 'proveedores',
+    component: ProveedoresComponent,
+    canActivate: [authGuard]
+  },
+
+
+
+  {
     path: '**',
     redirectTo: ''
   }
+
 
 ];

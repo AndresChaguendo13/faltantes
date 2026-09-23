@@ -1,0 +1,369 @@
+<div class="erp-page">
+
+  <div class="erp-top-navigation">
+    <div class="erp-breadcrumb">
+      <span>ERP</span>
+      <span class="separator">/</span>
+      <span>Compras</span>
+      <span class="separator">/</span>
+      <strong>Proveedores</strong>
+    </div>
+  </div>
+
+  <section class="erp-hero">
+    <div class="erp-hero-icon">🏢</div>
+    <div class="erp-hero-content">
+      <div class="erp-hero-kicker">GESTIÓN COMERCIAL</div>
+      <h1>Proveedores</h1>
+      <p>Administra tus proveedores y mantén organizada la información comercial.</p>
+    </div>
+
+    <div class="erp-hero-stats">
+      <div class="erp-hero-stat">
+        <span class="erp-stat-number">{{ proveedores.length }}</span>
+        <span class="erp-stat-label">Registrados</span>
+      </div>
+      <div class="erp-hero-stat">
+        <span class="erp-stat-number">{{ proveedores.filter(p => p.activo).length }}</span>
+        <span class="erp-stat-label">Activos</span>
+      </div>
+    </div>
+
+    <div class="erp-hero-decoration erp-decoration-one"></div>
+    <div class="erp-hero-decoration erp-decoration-two"></div>
+  </section>
+
+  <div class="alert success" *ngIf="mensaje">
+    <span class="alert-icon">✓</span>
+    <span>{{ mensaje }}</span>
+    <button type="button" (click)="mensaje = ''">×</button>
+  </div>
+
+  <div class="alert error" *ngIf="error">
+    <span class="alert-icon">!</span>
+    <span>{{ error }}</span>
+    <button type="button" (click)="error = ''">×</button>
+  </div>
+
+  <section class="erp-card">
+
+    <div class="erp-card-header">
+      <div>
+        <span class="section-kicker">DIRECTORIO</span>
+        <h2>Listado de proveedores</h2>
+        <p>Consulta, crea, edita o elimina proveedores.</p>
+      </div>
+
+      <button class="erp-btn-primary" type="button" (click)="abrirNuevo()">
+        <span>＋</span>
+        Nuevo proveedor
+      </button>
+    </div>
+
+    <div class="erp-toolbar">
+      <div class="erp-search-box">
+        <span class="search-icon">⌕</span>
+        <input
+          type="text"
+          [(ngModel)]="terminoBusqueda"
+          (ngModelChange)="aplicarFiltros()"
+          placeholder="Buscar por nombre, NIT, teléfono o correo..."
+          autocomplete="off">
+        <button
+          *ngIf="terminoBusqueda"
+          class="clear-search"
+          type="button"
+          (click)="terminoBusqueda = ''; aplicarFiltros()">
+          ×
+        </button>
+      </div>
+
+      <div class="erp-filter-group">
+        <label>Estado</label>
+        <select [(ngModel)]="filtroEstado" (ngModelChange)="aplicarFiltros()">
+          <option value="todos">Todos</option>
+          <option value="activos">Activos</option>
+          <option value="inactivos">Inactivos</option>
+        </select>
+      </div>
+
+      <button
+        *ngIf="terminoBusqueda || filtroEstado !== 'todos'"
+        class="erp-btn-secondary"
+        type="button"
+        (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+
+      <div class="erp-results-count">
+        {{ proveedoresVisibles.length }} resultado{{ proveedoresVisibles.length === 1 ? '' : 's' }}
+      </div>
+    </div>
+
+    <div class="erp-table-wrapper" *ngIf="!cargando && proveedoresVisibles.length > 0">
+      <table class="erp-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Proveedor</th>
+          <th>NIT</th>
+          <th>Teléfono</th>
+          <th>Correo</th>
+          <th>Dirección</th>
+          <th>Estado</th>
+          <th class="erp-actions-column">Acciones</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let proveedor of proveedoresVisibles; trackBy: trackById">
+          <td class="erp-id-cell">#{{ proveedor.id }}</td>
+
+          <td>
+            <div class="supplier-name">
+              <div class="supplier-avatar">
+                {{ (proveedor.nombre || '?').charAt(0).toUpperCase() }}
+              </div>
+              <div>
+                <strong>{{ proveedor.nombre }}</strong>
+                <small>Proveedor comercial</small>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <span class="nit-badge">{{ proveedor.nit || '—' }}</span>
+          </td>
+
+          <td>{{ proveedor.telefono || '—' }}</td>
+
+          <td>
+            <span class="email-cell">{{ proveedor.correo || '—' }}</span>
+          </td>
+
+          <td class="address-cell">{{ proveedor.direccion || '—' }}</td>
+
+          <td>
+              <span
+                class="status-badge"
+                [class.active]="proveedor.activo"
+                [class.inactive]="!proveedor.activo">
+                <span class="erp-status-dot"></span>
+                {{ proveedor.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+          </td>
+
+          <td class="erp-actions-cell">
+            <button
+              class="erp-action-btn edit"
+              type="button"
+              title="Editar"
+              (click)="editar(proveedor)">
+              ✎
+            </button>
+
+            <button
+              class="erp-action-btn delete"
+              type="button"
+              title="Eliminar"
+              [disabled]="eliminandoId === proveedor.id"
+              (click)="confirmarEliminar(proveedor)">
+              {{ eliminandoId === proveedor.id ? '…' : '🗑' }}
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="erp-loading-state" *ngIf="cargando">
+      <div class="erp-spinner"></div>
+      <h3>Cargando proveedores...</h3>
+      <p>Estamos consultando la información.</p>
+    </div>
+
+    <div class="erp-empty-state" *ngIf="!cargando && proveedoresVisibles.length === 0">
+      <div class="erp-empty-icon">🏢</div>
+      <h3>No hay proveedores para mostrar</h3>
+      <p *ngIf="terminoBusqueda || filtroEstado !== 'todos'">
+        Prueba cambiando los filtros de búsqueda.
+      </p>
+      <p *ngIf="!terminoBusqueda && filtroEstado === 'todos'">
+        Comienza registrando tu primer proveedor.
+      </p>
+
+      <button class="erp-btn-primary" type="button" (click)="abrirNuevo()">
+        ＋ Crear proveedor
+      </button>
+    </div>
+
+    <div class="erp-card-footer" *ngIf="!cargando">
+      <span>
+        Mostrando <strong>{{ proveedoresVisibles.length }}</strong> de
+        <strong>{{ proveedores.length }}</strong> proveedores
+      </span>
+    </div>
+
+  </section>
+
+  <!-- MODAL CREAR / EDITAR -->
+  <div class="erp-modal-backdrop" *ngIf="mostrarFormulario" (click)="cerrarFormulario()">
+    <div class="erp-modal" (click)="$event.stopPropagation()">
+
+      <div class="erp-modal-header">
+        <div>
+          <span class="section-kicker">{{ modoEdicion ? 'ACTUALIZACIÓN' : 'NUEVO REGISTRO' }}</span>
+          <h2>{{ modoEdicion ? 'Editar proveedor' : 'Nuevo proveedor' }}</h2>
+        </div>
+
+        <button class="erp-modal-close" type="button" (click)="cerrarFormulario()">×</button>
+      </div>
+
+      <form (ngSubmit)="guardar()">
+
+        <div class="erp-form-section">
+          <div class="erp-form-section-title">
+            <span>01</span>
+            <div>
+              <strong>Información comercial</strong>
+              <small>Datos principales del proveedor</small>
+            </div>
+          </div>
+
+          <div class="erp-form-grid">
+            <div class="erp-form-field full">
+              <label for="nombre">Nombre del proveedor <span>*</span></label>
+              <input
+                id="nombre"
+                name="nombre"
+                type="text"
+                maxlength="120"
+                [(ngModel)]="proveedorNuevo.nombre"
+                placeholder="Ej. Distribuciones El Sol"
+                required>
+            </div>
+
+            <div class="erp-form-field">
+              <label for="nit">NIT <span>*</span></label>
+              <input
+                id="nit"
+                name="nit"
+                type="text"
+                maxlength="20"
+                [(ngModel)]="proveedorNuevo.nit"
+                placeholder="Ej. 900123456-7"
+                required>
+            </div>
+
+            <div class="erp-form-field">
+              <label for="telefono">Teléfono</label>
+              <input
+                id="telefono"
+                name="telefono"
+                type="text"
+                maxlength="20"
+                [(ngModel)]="proveedorNuevo.telefono"
+                placeholder="Ej. 3001234567">
+            </div>
+
+            <div class="erp-form-field">
+              <label for="correo">Correo electrónico</label>
+              <input
+                id="correo"
+                name="correo"
+                type="email"
+                maxlength="120"
+                [(ngModel)]="proveedorNuevo.correo"
+                placeholder="proveedor@empresa.com">
+            </div>
+
+            <div class="erp-form-field">
+              <label for="direccion">Dirección</label>
+              <input
+                id="direccion"
+                name="direccion"
+                type="text"
+                maxlength="200"
+                [(ngModel)]="proveedorNuevo.direccion"
+                placeholder="Dirección comercial">
+            </div>
+          </div>
+        </div>
+
+        <div class="erp-form-section">
+          <div class="erp-form-section-title">
+            <span>02</span>
+            <div>
+              <strong>Estado</strong>
+              <small>Disponibilidad del proveedor</small>
+            </div>
+          </div>
+
+          <label class="switch-row">
+            <input
+              type="checkbox"
+              name="activo"
+              [(ngModel)]="proveedorNuevo.activo">
+            <span class="switch"></span>
+            <span>
+              <strong>Proveedor activo</strong>
+              <small>El proveedor estará disponible para las operaciones del sistema.</small>
+            </span>
+          </label>
+        </div>
+
+        <div class="erp-modal-footer">
+          <button class="erp-btn-secondary" type="button" (click)="cerrarFormulario()">
+            Cancelar
+          </button>
+
+          <button class="erp-btn-primary" type="submit" [disabled]="guardando">
+            <span *ngIf="!guardando">{{ modoEdicion ? 'Guardar cambios' : 'Crear proveedor' }}</span>
+            <span *ngIf="guardando">Guardando...</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL ELIMINAR -->
+  <div
+    class="erp-modal-backdrop"
+    *ngIf="mostrarConfirmacionEliminar"
+    (click)="cancelarEliminar()">
+
+    <div class="erp-modal erp-confirm-modal" (click)="$event.stopPropagation()">
+
+      <div class="erp-confirm-icon">!</div>
+
+      <h2>¿Eliminar proveedor?</h2>
+
+      <p>
+        Vas a eliminar a
+        <strong>{{ proveedorAEliminar?.nombre }}</strong>.
+        Esta acción no se puede deshacer.
+      </p>
+
+      <div class="erp-modal-footer">
+        <button
+          class="erp-btn-secondary"
+          type="button"
+          (click)="cancelarEliminar()"
+          [disabled]="eliminandoId !== null">
+          Cancelar
+        </button>
+
+        <button
+          class="erp-btn-danger"
+          type="button"
+          (click)="eliminar()"
+          [disabled]="eliminandoId !== null">
+          {{ eliminandoId !== null ? 'Eliminando...' : 'Sí, eliminar' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

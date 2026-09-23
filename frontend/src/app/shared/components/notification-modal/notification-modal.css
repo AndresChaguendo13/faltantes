@@ -1,0 +1,289 @@
+:host {
+  display: contents;
+}
+
+/* =========================================
+   FONDO DEL MODAL
+   ========================================= */
+
+.notification-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(5px);
+
+  animation: notificationFadeIn 0.2s ease-out;
+}
+
+
+/* =========================================
+   MODAL
+   ========================================= */
+
+.notification-modal {
+  position: relative;
+
+  width: min(500px, 100%);
+
+  padding: 38px 36px 32px;
+
+  background: #ffffff;
+
+  border-radius: 24px;
+
+  text-align: center;
+
+  box-shadow:
+    0 25px 70px rgba(15, 23, 42, 0.28);
+
+  animation: notificationScaleIn 0.25s ease-out;
+}
+
+
+/* =========================================
+   BOTÓN CERRAR
+   ========================================= */
+
+.notification-close {
+  position: absolute;
+
+  top: 16px;
+  right: 18px;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f1f5f9;
+
+  color: #64748b;
+
+  font-size: 25px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.notification-close:hover {
+  background: #e2e8f0;
+  color: #172033;
+}
+
+
+/* =========================================
+   ICONO
+   ========================================= */
+
+.notification-icon {
+  width: 82px;
+  height: 82px;
+
+  margin: 0 auto 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 42px;
+  font-weight: 800;
+}
+
+
+/* =========================================
+   CONTENIDO
+   ========================================= */
+
+.notification-content h2 {
+  margin: 0 0 10px;
+
+  color: #172033;
+
+  font-size: 25px;
+  font-weight: 750;
+}
+
+.notification-content p {
+  margin: 0 auto;
+
+  max-width: 390px;
+
+  color: #64748b;
+
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+
+/* =========================================
+   BOTÓN
+   ========================================= */
+
+.notification-button {
+  width: 100%;
+
+  margin-top: 28px;
+
+  padding: 13px 20px;
+
+  border: none;
+  border-radius: 12px;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+
+/* =========================================
+   SUCCESS
+   ========================================= */
+
+.notification-success .notification-icon {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.notification-success .notification-button {
+  background: #2563eb;
+}
+
+.notification-success .notification-button:hover {
+  background: #1d4ed8;
+}
+
+
+/* =========================================
+   ERROR
+   ========================================= */
+
+.notification-error .notification-icon {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.notification-error .notification-button {
+  background: #dc2626;
+}
+
+.notification-error .notification-button:hover {
+  background: #b91c1c;
+}
+
+
+/* =========================================
+   WARNING
+   ========================================= */
+
+.notification-warning .notification-icon {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.notification-warning .notification-button {
+  background: #d97706;
+}
+
+.notification-warning .notification-button:hover {
+  background: #b45309;
+}
+
+
+/* =========================================
+   INFO
+   ========================================= */
+
+.notification-info .notification-icon {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.notification-info .notification-button {
+  background: #2563eb;
+}
+
+.notification-info .notification-button:hover {
+  background: #1d4ed8;
+}
+
+
+/* =========================================
+   ANIMACIONES
+   ========================================= */
+
+@keyframes notificationFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes notificationScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  .notification-overlay {
+    padding: 16px;
+  }
+
+  .notification-modal {
+    padding: 34px 24px 26px;
+    border-radius: 20px;
+  }
+
+  .notification-icon {
+    width: 70px;
+    height: 70px;
+
+    font-size: 34px;
+  }
+
+  .notification-content h2 {
+    font-size: 21px;
+  }
+
+  .notification-content p {
+    font-size: 15px;
+  }
+
+}
