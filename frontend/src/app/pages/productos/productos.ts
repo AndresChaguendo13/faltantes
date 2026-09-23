@@ -28,6 +28,8 @@ import {
 
 import { finalize } from 'rxjs';
 
+import { NotificationService } from '../../shared/services/notification.service';
+
 
 @Component({
   selector: 'app-productos',
@@ -73,6 +75,10 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   guardando: boolean = false;
 
   eliminandoId: number | null = null;
+
+  mostrarConfirmacionEliminar: boolean = false;
+
+  productoAEliminar: Producto | null = null;
 
   buscando: boolean = false;
 
@@ -140,7 +146,8 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
     private proveedorService: ProveedorService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notification: NotificationService
   ) {}
 
 
@@ -453,6 +460,27 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
       });
 
     this.cdr.detectChanges();
+  }
+
+  // =====================================================
+  // LIMPIAR FILTROS
+  // =====================================================
+
+  limpiarFiltros(): void {
+
+    this.terminoBusqueda = '';
+
+    this.filtroCategoria = null;
+
+    this.filtroEstado = '';
+
+    this.filtroVencimiento = '';
+
+    this.filtrarProductos();
+
+    setTimeout(() => {
+      this.enfocarBuscador();
+    }, 100);
   }
 
   // =====================================================
@@ -1130,15 +1158,50 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   // ELIMINAR PRODUCTO
   // =====================================================
 
-  eliminarProducto(producto: Producto): void {
+// =====================================================
+// ABRIR CONFIRMACIÓN DE ELIMINACIÓN
+// =====================================================
 
-    const confirmar = window.confirm(
-      `¿Está seguro de eliminar el producto "${producto.nombre}"?`
-    );
+  abrirConfirmacionEliminar(producto: Producto): void {
 
-    if (!confirmar) {
+    this.productoAEliminar = producto;
+    this.mostrarConfirmacionEliminar = true;
+
+    this.mensaje = '';
+    this.error = '';
+
+    this.cdr.detectChanges();
+  }
+
+
+// =====================================================
+// CANCELAR ELIMINACIÓN
+// =====================================================
+
+  cancelarEliminarProducto(): void {
+
+    if (this.eliminandoId !== null) {
       return;
     }
+
+    this.mostrarConfirmacionEliminar = false;
+    this.productoAEliminar = null;
+
+    this.cdr.detectChanges();
+  }
+
+
+// =====================================================
+// CONFIRMAR ELIMINACIÓN
+// =====================================================
+
+  confirmarEliminarProducto(): void {
+
+    if (!this.productoAEliminar) {
+      return;
+    }
+
+    const producto = this.productoAEliminar;
 
     this.eliminandoId = producto.id;
     this.mensaje = '';
@@ -1148,7 +1211,12 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
       .eliminar(producto.id)
       .pipe(
         finalize(() => {
+
           this.eliminandoId = null;
+
+          this.mostrarConfirmacionEliminar = false;
+          this.productoAEliminar = null;
+
           this.cdr.detectChanges();
         })
       )
@@ -1161,16 +1229,19 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
             producto
           );
 
-          this.mensaje =
-            'Producto eliminado correctamente.';
-
           this.productos =
             this.productos.filter(
-              (p) => p.id !== producto.id
+              p => p.id !== producto.id
             );
 
           this.filtrarProductos();
 
+          this.notification.success(
+            'Producto eliminado correctamente.',
+            'Producto eliminado'
+          );
+
+          this.cdr.detectChanges();
         },
 
         error: (error) => {
@@ -1180,38 +1251,39 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
             error
           );
 
-          if (error.status === 401) {
+          let mensajeError =
+            'No se pudo eliminar el producto.';
 
-            this.error =
+          if (error?.status === 401) {
+
+            mensajeError =
               'Sesión expirada. Inicia sesión nuevamente.';
 
-          } else if (error.status === 403) {
+          } else if (error?.status === 403) {
 
-            this.error =
+            mensajeError =
               'No tienes permisos para eliminar productos.';
 
-          } else if (error.status === 404) {
+          } else if (error?.status === 404) {
 
-            this.error =
+            mensajeError =
               'El producto ya no existe.';
 
-          } else if (error.status === 0) {
+          } else if (error?.status === 0) {
 
-            this.error =
+            mensajeError =
               'No se pudo conectar con el servidor.';
-
-          } else {
-
-            this.error =
-              'No se pudo eliminar el producto.';
           }
+
+          this.notification.error(
+            mensajeError,
+            'No se pudo eliminar el producto'
+          );
 
           this.cdr.detectChanges();
         }
-
       });
   }
-
 
 
 }
