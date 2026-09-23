@@ -39,11 +39,7 @@
     <button type="button" (click)="mensaje = ''">×</button>
   </div>
 
-  <div class="alert error" *ngIf="error">
-    <span class="alert-icon">!</span>
-    <span>{{ error }}</span>
-    <button type="button" (click)="error = ''">×</button>
-  </div>
+
 
   <section class="erp-card">
 
@@ -311,6 +307,12 @@
             </span>
           </label>
         </div>
+
+        @if (error) {
+        <div class="form-error">
+          {{ error }}
+        </div>
+        }
 
         <div class="erp-modal-footer">
           <button class="erp-btn-secondary" type="button" (click)="cerrarFormulario()">

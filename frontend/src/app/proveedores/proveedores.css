@@ -485,6 +485,18 @@
 .alert.error .alert-icon {
   background: #ffd3d0;
 }
+.form-error {
+  grid-column: 1 / -1;
+  padding: 11px 13px;
+  border: 1px solid #ffd3d0;
+  border-radius: 9px;
+  background: #fff2f2;
+  color: #b42318;
+  font-size: 12px;
+}
+
+@media (max-width: 620px) {
+
 
 @media (max-width: 620px) {
   .address-cell {
@@ -500,4 +512,6 @@
     height: 34px;
     flex-basis: 34px;
   }
+
+
 }

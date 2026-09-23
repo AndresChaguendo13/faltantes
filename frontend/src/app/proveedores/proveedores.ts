@@ -6,6 +6,7 @@ import {
   OnInit,
   ChangeDetectorRef
 } from '@angular/core';
+import { NotificationService } from '../shared/services/notification.service';
 
 interface Proveedor {
   id?: number;
@@ -57,7 +58,8 @@ export class ProveedoresComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+  private notification: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -193,14 +195,37 @@ export class ProveedoresComponent implements OnInit {
         payload
       ).subscribe({
         next: () => {
-          this.mensaje = 'Proveedor actualizado correctamente.';
+          this.mensaje = '';
+
+          this.notification.success(
+            'El proveedor se actualizó correctamente.',
+            'Proveedor actualizado'
+          );
           this.guardando = false;
           this.cerrarFormulario();
           this.cargarProveedores();
         },
         error: (err) => {
           console.error(err);
-          this.error = this.obtenerMensajeError(err, 'No fue posible actualizar el proveedor.');
+
+          if (err.status === 409) {
+
+            this.error = '';
+
+            this.notification.warning(
+              'Ya existe otro proveedor registrado con ese NIT.',
+              'Proveedor duplicado'
+            );
+
+          } else {
+
+            this.error = this.obtenerMensajeError(
+              err,
+              'No fue posible actualizar el proveedor.'
+            );
+
+          }
+
           this.guardando = false;
           this.cdr.detectChanges();
         }
@@ -209,10 +234,16 @@ export class ProveedoresComponent implements OnInit {
     }
 
     this.http.post<Proveedor>(this.API_URL, payload).subscribe({
-      next: () => {
-        this.mensaje = 'Proveedor creado correctamente.';
+      next: (respuesta) => {
         this.guardando = false;
-        this.cerrarFormulario();
+        this.mostrarFormulario = false;
+        this.mensaje = '';
+
+        this.notification.success(
+          'El proveedor se registró correctamente.',
+          'Proveedor registrado'
+        );
+
         this.cargarProveedores();
       },
       error: (err) => {
@@ -246,7 +277,12 @@ export class ProveedoresComponent implements OnInit {
 
     this.http.delete<void>(`${this.API_URL}/${id}`).subscribe({
       next: () => {
-        this.mensaje = 'Proveedor eliminado correctamente.';
+        this.mensaje = '';
+
+        this.notification.success(
+          'El proveedor se eliminó correctamente.',
+          'Proveedor eliminado'
+        );
         this.eliminandoId = null;
         this.mostrarConfirmacionEliminar = false;
         this.proveedorAEliminar = null;
@@ -254,7 +290,12 @@ export class ProveedoresComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.error = this.obtenerMensajeError(err, 'No fue posible eliminar el proveedor.');
+        this.error = '';
+
+        this.notification.error(
+          'No se pudo eliminar el proveedor.',
+          'Error al eliminar'
+        );
         this.eliminandoId = null;
       }
     });

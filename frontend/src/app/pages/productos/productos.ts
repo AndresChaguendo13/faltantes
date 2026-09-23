@@ -971,7 +971,12 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
           console.log('PRODUCTO CREADO:', respuesta);
 
           this.mostrarFormulario = false;
-          this.mensaje = 'Producto creado correctamente.';
+          this.mensaje = '';
+
+          this.notification.success(
+            'El producto se registró correctamente.',
+            'Producto registrado'
+          );
 
           this.cargarProductos();
 
@@ -988,9 +993,14 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
               error.error?.message ||
               'Los datos del producto no son válidos.';
           } else if (error.status === 409) {
-            this.error =
-              'Ya existe un producto con ese código de barras.';
-          } else if (error.status === 401) {
+            this.error = '';
+
+            this.notification.warning(
+              'Ya existe un producto registrado con ese código de barras.',
+              'Producto duplicado'
+            );
+          }
+            else if (error.status === 401) {
             this.error =
               'Sesión expirada. Inicia sesión nuevamente.';
           } else if (error.status === 403) {
@@ -1111,9 +1121,12 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
           this.modoEdicion = false;
           this.productoEditandoId = null;
           this.mostrarFormulario = false;
+          this.mensaje = '';
 
-          this.mensaje =
-            'Producto actualizado correctamente.';
+          this.notification.success(
+            'El producto se actualizó correctamente.',
+            'Producto actualizado'
+          );
 
           this.cargarProductos();
 
@@ -1123,34 +1136,47 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
         },
 
         error: (error) => {
-          console.error(
-            'ERROR AL ACTUALIZAR PRODUCTO:',
-            error
-          );
+          console.error('ERROR AL CREAR PRODUCTO:', error);
 
           if (error.status === 400) {
+
             this.error =
               error.error?.message ||
               'Los datos del producto no son válidos.';
+
           } else if (error.status === 409) {
-            this.error =
-              'Ya existe otro producto con ese código de barras.';
+
+            this.error = '';
+
+            this.notification.warning(
+              'Ya existe un producto registrado con ese código de barras.',
+              'Producto duplicado'
+            );
+
           } else if (error.status === 401) {
+
             this.error =
               'Sesión expirada. Inicia sesión nuevamente.';
+
           } else if (error.status === 403) {
+
             this.error =
-              'No tienes permisos para actualizar productos.';
+              'No tienes permisos para crear productos.';
+
           } else if (error.status === 0) {
+
             this.error =
               'No se pudo conectar con el servidor.';
+
           } else {
+
             this.error =
-              'No se pudo actualizar el producto.';
+              'No se pudo crear el producto.';
           }
 
           this.cdr.detectChanges();
         }
+
       });
   }
 
