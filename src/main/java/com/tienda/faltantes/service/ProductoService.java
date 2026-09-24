@@ -66,6 +66,18 @@ public class ProductoService {
                 .map(mapper::toResponseDTO);
     }
 
+    public List<ProductoResponseDTO> listarAleatoriosParaVenta() {
+
+        List<Producto> productos = repository.findAll();
+
+        java.util.Collections.shuffle(productos);
+
+        return productos.stream()
+                .limit(20)
+                .map(mapper::toResponseDTO)
+                .toList();
+    }
+
     public ProductoResponseDTO guardar(ProductoRequestDTO dto) {
 
         Producto producto = mapper.toEntity(dto);
@@ -179,5 +191,14 @@ public class ProductoService {
         }
 
         repository.deleteById(id);
+    }
+
+    public Page<ProductoResponseDTO> buscarParaVenta(
+            String termino,
+            Pageable pageable
+    ) {
+        return repository
+                .buscarParaVenta(termino, pageable)
+                .map(mapper::toResponseDTO);
     }
 }

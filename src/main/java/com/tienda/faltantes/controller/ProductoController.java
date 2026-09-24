@@ -54,6 +54,22 @@ public class ProductoController {
         return service.buscarPorProveedor(proveedor, pageable);
     }
 
+    @GetMapping("/aleatorios-venta")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
+    public List<ProductoResponseDTO> listarAleatoriosParaVenta() {
+        return service.listarAleatoriosParaVenta();
+    }
+
+    @GetMapping("/buscar-venta")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
+    public Page<ProductoResponseDTO> buscarParaVenta(
+            @RequestParam String termino,
+            Pageable pageable
+    ) {
+        return service.buscarParaVenta(termino, pageable);
+    }
+
+
 
     @GetMapping("/codigo/{codigo}")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")

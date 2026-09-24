@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,4 +26,15 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     Page<Producto> findByProveedorIgnoreCase(String proveedor, Pageable pageable);
 
+    @Query("""
+    SELECT p
+    FROM Producto p
+    WHERE LOWER(p.nombre) LIKE LOWER(CONCAT('%', :termino, '%'))
+       OR LOWER(p.codigoBarras) LIKE LOWER(CONCAT('%', :termino, '%'))
+       OR LOWER(COALESCE(p.proveedor, '')) LIKE LOWER(CONCAT('%', :termino, '%'))
+""")
+    Page<Producto> buscarParaVenta(
+            @Param("termino") String termino,
+            Pageable pageable
+    );
 }

@@ -1,21 +1,28 @@
 import {
   Component,
   OnInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  HostListener
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
-  VentaService,
-  VentaResponse
+  VentaService
 } from '../../services/ventas';
 
 import {
   ProductoService,
   Producto
 } from '../../services/producto';
+
+import {
+  CategoriaService,
+  Categoria
+} from '../../services/categoria';
+
+
 
 import { NotificationService } from '../../shared/services/notification.service';
 
@@ -38,58 +45,56 @@ interface ProductoCarrito {
 })
 export class Ventas implements OnInit {
 
-  ventas: VentaResponse[] = [];
+  cargandoProductos = false;
 
-  cargando = false;
-  error = '';
+  productos: Producto[] = [];
+  productosVisibles: Producto[] = [];
+  private bufferEscaner = '';
+  private ultimoEventoEscaner = 0;
+  private temporizadorEscaner: any;
 
-  mostrarFormulario = false;
-
-  // =========================
-  // BUSCADOR
-  // =========================
+  categorias: Categoria[] = [];
+  categoriaSeleccionada: number | null = null;
 
   codigoBusqueda = '';
-
-  productoEncontrado: Producto | null = null;
-
-  cantidadProducto = 1;
-
   buscandoProducto = false;
+  resultadosBusqueda: Producto[] = [];
+  mostrarResultadosBusqueda = false;
 
-  // =========================
-  // CARRITO
-  // =========================
+  private temporizadorBusqueda: any;
 
   carrito: ProductoCarrito[] = [];
 
   constructor(
-    private ventaService: VentaService,
     private productoService: ProductoService,
+    private categoriaService: CategoriaService,
     private notification: NotificationService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.cargarVentas();
+    this.cargarProductosPOS();
+    this.cargarCategorias();
+
+    setTimeout(() => this.enfocarBuscador());
   }
 
   // =========================
-  // HISTORIAL
+  // PRODUCTOS
   // =========================
 
-  cargarVentas(): void {
+  private cargarProductosPOS(): void {
 
-    this.cargando = true;
-    this.error = '';
+    this.cargandoProductos = true;
 
-    this.ventaService.listar().subscribe({
+    this.productoService.listarAleatoriosParaVenta().subscribe({
 
-      next: (ventas) => {
+      next: (productos) => {
 
-        this.ventas = ventas || [];
+        this.productos = productos || [];
+        this.productosVisibles = [...this.productos];
 
-        this.cargando = false;
+        this.cargandoProductos = false;
 
         this.cdr.detectChanges();
       },
@@ -97,225 +102,423 @@ export class Ventas implements OnInit {
       error: (error) => {
 
         console.error(
-          'ERROR AL CARGAR VENTAS:',
+          'ERROR CARGANDO PRODUCTOS POS:',
           error
         );
 
-        this.cargando = false;
+        this.cargandoProductos = false;
 
-        if (error.status === 401) {
-
-          this.error =
-            'Sesión expirada. Inicia sesión nuevamente.';
-
-        } else if (error.status === 403) {
-
-          this.error =
-            'No tienes permisos para consultar las ventas.';
-
-        } else if (error.status === 0) {
-
-          this.error =
-            'No se pudo conectar con el servidor.';
-
-        } else {
-
-          this.error =
-            'No se pudieron cargar las ventas.';
-        }
+        this.notification.error(
+          'No fue posible cargar los productos para la venta.',
+          'Error'
+        );
 
         this.cdr.detectChanges();
       }
     });
   }
 
-  // =========================
-  // NUEVA VENTA
-  // =========================
+  private cargarCategorias(): void {
 
-  abrirNuevaVenta(): void {
+    this.categoriaService.listar().subscribe({
 
-    this.codigoBusqueda = '';
-    this.productoEncontrado = null;
-    this.cantidadProducto = 1;
-    this.carrito = [];
+      next: (categorias) => {
 
-    this.error = '';
-
-    this.mostrarFormulario = true;
-
-    this.cdr.detectChanges();
-  }
-
-  cerrarFormulario(): void {
-
-    this.mostrarFormulario = false;
-
-    this.codigoBusqueda = '';
-    this.productoEncontrado = null;
-    this.cantidadProducto = 1;
-    this.carrito = [];
-
-    this.cdr.detectChanges();
-  }
-
-  // =========================
-  // BUSCAR PRODUCTO
-  // =========================
-
-  buscarProducto(): void {
-
-    const codigo = this.codigoBusqueda.trim();
-
-    if (!codigo) {
-
-      this.notification.warning(
-        'Ingresa un código de barras.'
-      );
-
-      return;
-    }
-
-    this.buscandoProducto = true;
-    this.productoEncontrado = null;
-
-    this.productoService.buscarPorCodigo(codigo).subscribe({
-
-      next: (producto) => {
-
-        this.productoEncontrado = producto;
-
-        this.cantidadProducto = 1;
-
-        this.buscandoProducto = false;
+        this.categorias = categorias || [];
 
         this.cdr.detectChanges();
       },
 
       error: (error) => {
 
-        console.error(
-          'ERROR AL BUSCAR PRODUCTO:',
-          error
-        );
+        console.error('ERROR CARGANDO CATEGORÍAS:', error);
 
-        this.productoEncontrado = null;
+        this.categorias = [];
+
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  ///SCANEA EN CUALQUIER PARTE
+  @HostListener('document:keydown', ['$event'])
+  manejarEscanerGlobal(event: KeyboardEvent): void {
+
+    const ahora = Date.now();
+
+    // Si estamos escribiendo directamente en el buscador,
+    // dejamos que el buscador normal se encargue.
+    const elemento = event.target as HTMLElement;
+
+    if (elemento?.id === 'codigoBusqueda') {
+      return;
+    }
+
+    // El lector de código de barras normalmente envía
+    // los caracteres extremadamente rápido.
+    const diferencia = ahora - this.ultimoEventoEscaner;
+
+    if (diferencia > 100) {
+      this.bufferEscaner = '';
+    }
+
+    this.ultimoEventoEscaner = ahora;
+
+    // ENTER = terminó el escaneo
+    if (event.key === 'Enter') {
+
+      const codigo = this.bufferEscaner.trim();
+
+      this.bufferEscaner = '';
+
+      clearTimeout(this.temporizadorEscaner);
+
+      // Los códigos de barras normalmente tienen
+      // varios caracteres.
+      if (codigo.length >= 6) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        this.codigoBusqueda = codigo;
+
+        this.buscarProducto();
+
+      }
+
+      return;
+    }
+
+    // Solo capturamos caracteres normales
+    if (event.key.length === 1) {
+
+      this.bufferEscaner += event.key;
+
+      clearTimeout(this.temporizadorEscaner);
+
+      this.temporizadorEscaner = setTimeout(() => {
+        this.bufferEscaner = '';
+      }, 150);
+
+    }
+  }
+  // =========================
+  // FILTROS
+  // =========================
+
+  buscarMientrasEscribe(): void {
+
+    clearTimeout(this.temporizadorBusqueda);
+
+    const termino = this.codigoBusqueda.trim();
+
+    // Si está vacío, ocultamos resultados
+    if (!termino) {
+      this.resultadosBusqueda = [];
+      this.mostrarResultadosBusqueda = false;
+      return;
+    }
+
+    // Con una sola letra no buscamos todavía
+    if (termino.length < 2) {
+      this.resultadosBusqueda = [];
+      this.mostrarResultadosBusqueda = false;
+      return;
+    }
+
+    this.temporizadorBusqueda = setTimeout(() => {
+
+      this.productoService.buscarParaVenta(termino).subscribe({
+
+        next: (respuesta) => {
+
+          this.resultadosBusqueda =
+            (respuesta.content || []).slice(0, 8);
+
+          this.mostrarResultadosBusqueda =
+            this.resultadosBusqueda.length > 0;
+
+          this.cdr.detectChanges();
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'ERROR BUSCANDO PRODUCTOS:',
+            error
+          );
+
+          this.resultadosBusqueda = [];
+          this.mostrarResultadosBusqueda = false;
+
+          this.cdr.detectChanges();
+
+        }
+
+      });
+
+    }, 250);
+  }
+
+  private aplicarFiltros(termino: string): void {
+
+    this.productosVisibles = this.productos.filter(producto => {
+
+      const coincideTexto =
+        !termino ||
+        producto.nombre?.toLowerCase().includes(termino) ||
+        producto.codigoBarras?.toLowerCase().includes(termino) ||
+        producto.proveedor?.toLowerCase().includes(termino);
+
+      const coincideCategoria =
+        this.categoriaSeleccionada === null ||
+        this.obtenerCategoriaId(producto) === this.categoriaSeleccionada;
+
+      return coincideTexto && coincideCategoria;
+    });
+
+    this.cdr.detectChanges();
+  }
+
+  seleccionarCategoria(id: number | null): void {
+
+    this.categoriaSeleccionada = id;
+
+    this.aplicarFiltros(
+      this.codigoBusqueda.trim().toLowerCase()
+    );
+  }
+
+  limpiarFiltros(): void {
+
+    this.codigoBusqueda = '';
+    this.categoriaSeleccionada = null;
+    this.productosVisibles = [...this.productos];
+
+    setTimeout(() => this.enfocarBuscador());
+
+    this.cdr.detectChanges();
+  }
+
+  private obtenerCategoriaId(producto: Producto): number | null {
+
+    if (producto.categoriaId != null) {
+      return producto.categoriaId;
+    }
+
+    if (
+      producto.categoria &&
+      typeof producto.categoria === 'object' &&
+      producto.categoria.id != null
+    ) {
+      return Number(producto.categoria.id);
+    }
+
+    return null;
+  }
+
+  obtenerNombreCategoria(producto: Producto): string {
+
+    if (producto.categoriaNombre) {
+      return producto.categoriaNombre;
+    }
+
+    if (
+      producto.categoria &&
+      typeof producto.categoria === 'object' &&
+      producto.categoria.nombre
+    ) {
+      return producto.categoria.nombre;
+    }
+
+    return 'Sin categoría';
+  }
+
+  // =========================
+  // ESCÁNER
+  // =========================
+
+  buscarProducto(): void {
+    const termino = this.codigoBusqueda.trim();
+
+    if (!termino) {
+      return;
+    }
+
+    // Cancelamos cualquier búsqueda automática pendiente
+    clearTimeout(this.temporizadorBusqueda);
+
+    // Ocultamos inmediatamente los resultados del buscador
+    this.resultadosBusqueda = [];
+    this.mostrarResultadosBusqueda = false;
+
+    this.buscandoProducto = true;
+
+    this.productoService.buscarPorCodigo(termino).subscribe({
+
+      next: (producto) => {
+
+        this.buscandoProducto = false;
+
+        // Agrega directamente al carrito
+        this.agregarProductoDirectamente(producto);
+
+      },
+
+      error: (error) => {
 
         this.buscandoProducto = false;
 
         if (error.status === 404) {
 
-          this.notification.warning(
-            'No existe un producto con ese código de barras.'
-          );
+          // Si no es código exacto, entonces sí hacemos
+          // búsqueda normal por nombre/código/proveedor
+          this.productoService.buscarParaVenta(termino).subscribe({
 
-        } else if (error.status === 0) {
+            next: (respuesta) => {
 
-          this.notification.error(
-            'No se pudo conectar con el servidor.'
-          );
+              this.resultadosBusqueda =
+                (respuesta.content || []).slice(0, 8);
 
-        } else {
+              this.mostrarResultadosBusqueda =
+                this.resultadosBusqueda.length > 0;
 
-          this.notification.error(
-            'No se pudo buscar el producto.'
-          );
+              if (!this.mostrarResultadosBusqueda) {
+
+                this.notification.warning(
+                  `No encontramos productos para "${termino}".`,
+                  'Producto no encontrado'
+                );
+
+              }
+
+              this.cdr.detectChanges();
+
+            },
+
+            error: () => {
+
+              this.notification.error(
+                'No fue posible buscar el producto.',
+                'Error de búsqueda'
+              );
+
+            }
+
+          });
+
+          return;
         }
 
-        this.cdr.detectChanges();
+        this.notification.error(
+          'No fue posible buscar el producto.',
+          'Error de búsqueda'
+        );
+
       }
+
     });
   }
 
   // =========================
-  // AGREGAR AL CARRITO
+  // CARRITO
   // =========================
 
-  agregarAlCarrito(): void {
+  private agregarProductoDirectamente(producto: Producto): void {
 
-    if (!this.productoEncontrado) {
-      return;
-    }
-
-    const cantidad = Number(this.cantidadProducto);
-
-    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+    if (producto.cantidad <= 0) {
 
       this.notification.warning(
-        'La cantidad debe ser mayor que cero.'
+        `El producto "${producto.nombre}" no tiene stock disponible.`,
+        'Sin stock'
       );
 
-      return;
-    }
-
-    if (cantidad > this.productoEncontrado.cantidad) {
-
-      this.notification.warning(
-        `Solo hay ${this.productoEncontrado.cantidad} unidades disponibles.`
-      );
-
+      this.limpiarBusqueda();
       return;
     }
 
     const existente = this.carrito.find(
-      item => item.producto.id === this.productoEncontrado!.id
+      item => item.producto.id === producto.id
     );
 
     if (existente) {
 
-      const nuevaCantidad =
-        existente.cantidad + cantidad;
-
-      if (nuevaCantidad > this.productoEncontrado.cantidad) {
+      if (existente.cantidad >= producto.cantidad) {
 
         this.notification.warning(
-          `No puedes agregar más de ${this.productoEncontrado.cantidad} unidades.`
+          `No hay más unidades disponibles de "${producto.nombre}".`,
+          'Stock máximo'
         );
 
+        this.limpiarBusqueda();
         return;
       }
 
-      existente.cantidad = nuevaCantidad;
-
+      existente.cantidad++;
       existente.subtotal =
-        nuevaCantidad * existente.precioUnitario;
+        existente.cantidad * existente.precioUnitario;
 
     } else {
 
       const precio =
         Number(
-          this.productoEncontrado.precioVenta ??
-          this.productoEncontrado.precio ??
+          producto.precioVenta ??
+          producto.precio ??
           0
         );
 
       this.carrito.push({
-
-        producto: this.productoEncontrado,
-
-        cantidad: cantidad,
-
+        producto,
+        cantidad: 1,
         precioUnitario: precio,
-
-        subtotal: cantidad * precio
-
+        subtotal: precio
       });
     }
 
-    this.notification.success(
-      'Producto agregado al carrito.'
-    );
-
-    this.codigoBusqueda = '';
-    this.productoEncontrado = null;
-    this.cantidadProducto = 1;
+    // Sin alerta de producto agregado.
+    this.limpiarBusqueda();
 
     this.cdr.detectChanges();
   }
 
-  // =========================
-  // AUMENTAR CANTIDAD
-  // =========================
+  seleccionarProducto(producto: Producto): void {
+    this.agregarProductoDirectamente(producto);
+  }
+
+  private limpiarBusqueda(): void {
+
+    // Cancelar búsqueda pendiente
+    clearTimeout(this.temporizadorBusqueda);
+
+    // Limpiar texto
+    this.codigoBusqueda = '';
+
+    // Limpiar resultados del dropdown
+    this.resultadosBusqueda = [];
+
+    // Ocultar dropdown
+    this.mostrarResultadosBusqueda = false;
+
+    // IMPORTANTE:
+    // NO volver a cargar los productos.
+    // La grilla debe quedarse exactamente como estaba.
+
+    setTimeout(() => {
+      this.enfocarBuscador();
+    });
+
+    this.cdr.detectChanges();
+  }
+
+  private enfocarBuscador(): void {
+
+    const input = document.querySelector(
+      '#codigoBusqueda'
+    ) as HTMLInputElement | null;
+
+    input?.focus();
+  }
 
   aumentarCantidad(item: ProductoCarrito): void {
 
@@ -329,16 +532,11 @@ export class Ventas implements OnInit {
     }
 
     item.cantidad++;
-
     item.subtotal =
       item.cantidad * item.precioUnitario;
 
     this.cdr.detectChanges();
   }
-
-  // =========================
-  // DISMINUIR CANTIDAD
-  // =========================
 
   disminuirCantidad(item: ProductoCarrito): void {
 
@@ -347,16 +545,11 @@ export class Ventas implements OnInit {
     }
 
     item.cantidad--;
-
     item.subtotal =
       item.cantidad * item.precioUnitario;
 
     this.cdr.detectChanges();
   }
-
-  // =========================
-  // ELIMINAR PRODUCTO
-  // =========================
 
   eliminarDelCarrito(item: ProductoCarrito): void {
 
@@ -368,9 +561,16 @@ export class Ventas implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // =========================
-  // TOTAL
-  // =========================
+  vaciarCarrito(): void {
+
+    if (this.carrito.length === 0) {
+      return;
+    }
+
+    this.carrito = [];
+
+    this.cdr.detectChanges();
+  }
 
   obtenerTotalCarrito(): number {
 
@@ -381,26 +581,37 @@ export class Ventas implements OnInit {
     );
   }
 
-  // =========================
-  // HISTORIAL
-  // =========================
+  obtenerCantidadCarrito(): number {
 
-  verVenta(venta: VentaResponse): void {
-
-    console.log(
-      'VENTA SELECCIONADA:',
-      venta
+    return this.carrito.reduce(
+      (total, item) =>
+        total + item.cantidad,
+      0
     );
   }
 
-  obtenerTotalDetalles(
-    venta: VentaResponse
-  ): number {
+  obtenerClaseStock(producto: Producto): string {
 
-    return venta.detalles.reduce(
-      (total, detalle) =>
-        total + detalle.subtotal,
-      0
-    );
+    if (producto.cantidad <= 0) {
+      return 'sin-stock';
+    }
+
+    if (
+      producto.stockMinimo != null &&
+      producto.cantidad <= producto.stockMinimo
+    ) {
+      return 'stock-bajo';
+    }
+
+    return 'stock-normal';
+  }
+
+  obtenerTextoStock(producto: Producto): string {
+
+    if (producto.cantidad <= 0) {
+      return 'Sin stock';
+    }
+
+    return `${producto.cantidad} disponibles`;
   }
 }

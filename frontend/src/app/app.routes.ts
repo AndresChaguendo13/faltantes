@@ -8,6 +8,7 @@ import { ProveedoresComponent } from './proveedores/proveedores';
 import { ClientesComponent } from './pages/clientes/clientes';
 import { Compras } from './pages/compras/compras';
 import { Ventas } from './pages/ventas/ventas';
+import { Balance } from './pages/balance/balance';
 export const routes: Routes = [
 
   {
@@ -59,6 +60,12 @@ export const routes: Routes = [
   {
     path: 'ventas',
     component: Ventas,
+    canActivate: [authGuard]
+  },
+
+  {
+    path: 'balance',
+    component: Balance,
     canActivate: [authGuard]
   },
 

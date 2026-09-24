@@ -1,0 +1,158 @@
+<div class="balance-page">
+
+  <header class="balance-header">
+
+    <div>
+      <h1>Balance y estadísticas</h1>
+      <p>Resumen de las ventas realizadas y comportamiento comercial.</p>
+    </div>
+
+    <div class="balance-actions">
+      <a routerLink="/ventas" class="balance-btn primary">
+        + Vender
+      </a>
+
+      <a routerLink="/dashboard" class="balance-btn secondary">
+        ← Dashboard
+      </a>
+    </div>
+
+  </header>
+
+
+  <div
+    *ngIf="error"
+    class="balance-error"
+  >
+    {{ error }}
+  </div>
+
+
+  <div
+    *ngIf="cargando"
+    class="balance-loading"
+  >
+    Cargando balance...
+  </div>
+
+
+  <ng-container *ngIf="!cargando">
+
+    <section class="balance-cards">
+
+      <article class="balance-card">
+        <span>Ventas realizadas</span>
+        <strong>{{ cantidadVentas }}</strong>
+      </article>
+
+      <article class="balance-card highlight">
+        <span>Total vendido</span>
+        <strong>
+          {{ totalVentas | currency:'COP':'symbol':'1.0-0' }}
+        </strong>
+      </article>
+
+      <article class="balance-card">
+        <span>Ventas contado</span>
+        <strong>
+          {{ ventasContado | currency:'COP':'symbol':'1.0-0' }}
+        </strong>
+      </article>
+
+      <article class="balance-card">
+        <span>Ventas fiadas</span>
+        <strong>
+          {{ ventasFiado | currency:'COP':'symbol':'1.0-0' }}
+        </strong>
+      </article>
+
+    </section>
+
+
+    <section class="balance-table-card">
+
+      <div class="balance-table-header">
+
+        <div>
+          <h2>Historial de ventas</h2>
+          <span>{{ cantidadVentas }} operación(es)</span>
+        </div>
+
+        <a routerLink="/ventas" class="balance-sell-link">
+          Ir a vender →
+        </a>
+
+      </div>
+
+
+      <div
+        *ngIf="ventas.length === 0"
+        class="balance-empty"
+      >
+        <strong>No hay ventas registradas</strong>
+        <span>Cuando realices una venta aparecerá aquí.</span>
+      </div>
+
+
+      <div
+        *ngIf="ventas.length > 0"
+        class="balance-table-wrapper"
+      >
+
+        <table>
+
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Pago</th>
+            <th>Productos</th>
+            <th>Total</th>
+          </tr>
+          </thead>
+
+          <tbody>
+
+          <tr *ngFor="let venta of ventas">
+
+            <td>#{{ venta.id }}</td>
+
+            <td>
+              {{ venta.fecha | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+
+            <td>
+              {{ venta.nombreCliente || 'Consumidor final' }}
+            </td>
+
+            <td>
+                <span
+                  class="payment"
+                  [class.fiado]="venta.tipoPago === 'FIADO'"
+                >
+                  {{ venta.tipoPago }}
+                </span>
+            </td>
+
+            <td>
+              {{ venta.detalles.length }}
+            </td>
+
+            <td class="money">
+              {{ venta.total | currency:'COP':'symbol':'1.0-0' }}
+            </td>
+
+          </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </ng-container>
+
+</div>

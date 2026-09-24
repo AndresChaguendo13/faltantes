@@ -1,502 +1,543 @@
-<div class="erp-page">
+<div class="ventas-pos-page">
 
-  <!-- ENCABEZADO -->
-  <div class="erp-page-header">
+  <!-- =====================================================
+       HEADER
+       ===================================================== -->
 
-    <div>
-      <h1>Ventas</h1>
+  <header class="ventas-pos-header">
 
-      <p>
-        Gestiona las ventas realizadas y registra nuevas operaciones.
-      </p>
-    </div>
+    <div class="ventas-pos-brand">
 
-    <button
-      class="erp-btn erp-btn-primary"
-      type="button"
-      (click)="abrirNuevaVenta()"
-    >
-      + Nueva venta
-    </button>
-
-  </div>
-
-
-  <!-- ERROR -->
-  <div
-    *ngIf="error"
-    class="form-error"
-  >
-    {{ error }}
-  </div>
-
-
-  <!-- CARGANDO -->
-  <div
-    *ngIf="cargando"
-    class="erp-empty-state"
-  >
-    <p>Cargando ventas...</p>
-  </div>
-
-
-  <!-- TABLA -->
-  <div
-    *ngIf="!cargando"
-    class="erp-card"
-  >
-
-    <div class="erp-card-header">
+      <div class="ventas-pos-icon">
+        $
+      </div>
 
       <div>
-        <h2>Historial de ventas</h2>
-
-        <span>
-          {{ ventas.length }} venta(s)
-        </span>
+        <h1>Nueva venta</h1>
+        <span>Selecciona productos o utiliza el escáner</span>
       </div>
 
     </div>
 
 
-    <div
-      *ngIf="ventas.length === 0"
-      class="erp-empty-state"
-    >
+    <div class="ventas-pos-header-actions">
 
-      <h3>No hay ventas registradas</h3>
+      <a
+        routerLink="/dashboard"
+        class="ventas-pos-back"
+      >
+        ← Dashboard
+      </a>
 
-      <p>
-        Cuando realices una venta aparecerá aquí.
-      </p>
-
-    </div>
-
-
-    <div
-      *ngIf="ventas.length > 0"
-      class="erp-table-wrapper"
-    >
-
-      <table class="erp-table">
-
-        <thead>
-
-        <tr>
-
-          <th>ID</th>
-          <th>Fecha</th>
-          <th>Cliente</th>
-          <th>Tipo de pago</th>
-          <th>Productos</th>
-          <th>Total</th>
-          <th>Acciones</th>
-
-        </tr>
-
-        </thead>
-
-
-        <tbody>
-
-        <tr
-          *ngFor="let venta of ventas"
-        >
-
-          <td>
-            #{{ venta.id }}
-          </td>
-
-          <td>
-            {{ venta.fecha | date:'dd/MM/yyyy HH:mm' }}
-          </td>
-
-          <td>
-            {{ venta.nombreCliente || 'Consumidor final' }}
-          </td>
-
-          <td>
-
-              <span
-                class="tipo-pago"
-                [class.fiado]="venta.tipoPago === 'FIADO'"
-              >
-                {{ venta.tipoPago }}
-              </span>
-
-          </td>
-
-          <td>
-            {{ venta.detalles.length }}
-          </td>
-
-          <td class="price">
-            ${{ venta.total | number:'1.0-0' }}
-          </td>
-
-          <td>
-
-            <button
-              type="button"
-              class="erp-btn erp-btn-secondary erp-btn-small"
-              (click)="verVenta(venta)"
-            >
-              Ver
-            </button>
-
-          </td>
-
-        </tr>
-
-        </tbody>
-
-      </table>
+      <a
+        routerLink="/balance"
+        class="ventas-pos-balance"
+      >
+        📊 Balance
+      </a>
 
     </div>
 
-  </div>
+  </header>
 
 
   <!-- =====================================================
-       NUEVA VENTA
-  ====================================================== -->
+       CUERPO PRINCIPAL
+       ===================================================== -->
 
-  <div
-    *ngIf="mostrarFormulario"
-    class="erp-modal-overlay"
-  >
+  <div class="ventas-pos-body">
 
-    <div class="erp-modal venta-modal">
 
-      <!-- CABECERA -->
+    <!-- ===================================================
+         PRODUCTOS
+         =================================================== -->
 
-      <div class="erp-modal-header">
+    <main class="ventas-pos-products">
 
-        <div>
 
-          <h2>Nueva venta</h2>
+      <!-- =================================================
+           BUSCADOR
+           ================================================= -->
 
-          <p>
-            Agrega productos al carrito.
-          </p>
+      <div class="pos-search">
 
+        <div class="pos-search-icon">
+          🔎
         </div>
+
+
+        <input
+          id="codigoBusqueda"
+          type="text"
+          [(ngModel)]="codigoBusqueda"
+          placeholder="Buscar producto, código o proveedor..."
+          autocomplete="off"
+          (input)="buscarMientrasEscribe()"
+          (keydown.enter)="buscarProducto()"
+        />
+
 
         <button
           type="button"
-          class="erp-modal-close"
-          (click)="cerrarFormulario()"
+          class="pos-search-button"
+          (click)="buscarProducto()"
+          [disabled]="buscandoProducto"
         >
-          ×
+
+          <span *ngIf="!buscandoProducto">
+            Buscar
+          </span>
+
+          <span *ngIf="buscandoProducto">
+            ...
+          </span>
+
         </button>
 
-      </div>
 
-
-      <!-- CUERPO -->
-
-      <div class="erp-modal-body">
-
-
-        <!-- BUSCADOR -->
-
-        <div class="venta-buscador">
-
-          <label>
-            Código de barras
-          </label>
-
-          <div class="buscador-row">
-
-            <input
-              type="text"
-              [(ngModel)]="codigoBusqueda"
-              placeholder="Escanea o escribe el código..."
-              (keydown.enter)="buscarProducto()"
-              autofocus
-            >
-
-            <button
-              type="button"
-              class="erp-btn erp-btn-primary"
-              (click)="buscarProducto()"
-              [disabled]="buscandoProducto"
-            >
-              {{ buscandoProducto ? 'Buscando...' : 'Buscar' }}
-            </button>
-
-          </div>
-
-          <small>
-            Presiona Enter después de escanear el código.
-          </small>
-
-        </div>
-
-
-        <!-- PRODUCTO ENCONTRADO -->
+        <!-- ===============================================
+             RESULTADOS DE BÚSQUEDA
+             =============================================== -->
 
         <div
-          *ngIf="productoEncontrado"
-          class="producto-encontrado"
+          class="resultados-busqueda"
+          *ngIf="
+            mostrarResultadosBusqueda &&
+            resultadosBusqueda.length > 0
+          "
         >
 
-          <div class="producto-info">
+          <button
+            type="button"
+            class="resultado-item"
+            *ngFor="let producto of resultadosBusqueda"
+            (click)="seleccionarProducto(producto)"
+          >
 
-            <div>
+            <div class="resultado-info">
 
               <strong>
-                {{ productoEncontrado.nombre }}
+                {{ producto.nombre }}
               </strong>
 
               <span>
-                Código: {{ productoEncontrado.codigoBarras }}
+                Código: {{ producto.codigoBarras }}
+              </span>
+
+              <span *ngIf="producto.proveedor">
+                Proveedor: {{ producto.proveedor }}
               </span>
 
             </div>
 
-            <div class="producto-precio">
 
-              $
-              {{
-              (
-              productoEncontrado.precioVenta ??
-              productoEncontrado.precio ??
-              0
-              ) | number:'1.0-0'
-              }}
+            <div class="resultado-datos">
+
+              <strong>
+                {{
+                (producto.precioVenta ?? producto.precio ?? 0)
+                | currency:'COP':'symbol':'1.0-0'
+                }}
+              </strong>
+
+              <span>
+                Stock: {{ producto.cantidad }}
+              </span>
 
             </div>
 
-          </div>
+          </button>
+
+        </div>
+
+      </div>
 
 
-          <div class="producto-stock">
+      <!-- =================================================
+           CATEGORÍAS
+           ================================================= -->
 
-            <span>
-              Stock disponible:
+      <div class="pos-categories">
+
+        <button
+          type="button"
+          class="pos-category"
+          [class.active]="categoriaSeleccionada === null"
+          (click)="seleccionarCategoria(null)"
+        >
+          Todos
+        </button>
+
+
+        <button
+          type="button"
+          class="pos-category"
+          *ngFor="let categoria of categorias"
+          [class.active]="categoriaSeleccionada === categoria.id"
+          (click)="seleccionarCategoria(categoria.id)"
+        >
+          {{ categoria.nombre }}
+        </button>
+
+      </div>
+
+
+      <!-- =================================================
+           TOOLBAR PRODUCTOS
+           ================================================= -->
+
+      <div class="pos-products-toolbar">
+
+        <div>
+
+          <strong>
+            Productos
+          </strong>
+
+          <span>
+            {{ productosVisibles.length }} disponibles
+          </span>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="pos-clear-filter"
+          *ngIf="
+            codigoBusqueda ||
+            categoriaSeleccionada !== null
+          "
+          (click)="limpiarFiltros()"
+        >
+          Limpiar filtros
+        </button>
+
+      </div>
+
+
+      <!-- =================================================
+           CARGANDO
+           ================================================= -->
+
+      <div
+        *ngIf="cargandoProductos"
+        class="pos-loading"
+      >
+
+        <div class="pos-loading-spinner"></div>
+
+        <span>
+          Cargando productos...
+        </span>
+
+      </div>
+
+
+      <!-- =================================================
+           SIN PRODUCTOS
+           ================================================= -->
+
+      <div
+        *ngIf="
+          !cargandoProductos &&
+          productosVisibles.length === 0
+        "
+        class="pos-no-products"
+      >
+
+        <div class="pos-no-products-icon">
+          📦
+        </div>
+
+        <strong>
+          No encontramos productos
+        </strong>
+
+        <span>
+          Prueba con otro nombre, código o categoría.
+        </span>
+
+      </div>
+
+
+      <!-- =================================================
+           GRID DE PRODUCTOS
+           ================================================= -->
+
+      <div
+        *ngIf="
+          !cargandoProductos &&
+          productosVisibles.length > 0
+        "
+        class="pos-products-grid"
+      >
+
+
+        <button
+          type="button"
+          class="pos-product-card"
+          *ngFor="let producto of productosVisibles"
+          [disabled]="producto.cantidad <= 0"
+          (click)="seleccionarProducto(producto)"
+        >
+
+
+          <div class="pos-product-top">
+
+            <span class="pos-product-category">
+              {{ obtenerNombreCategoria(producto) }}
             </span>
 
-            <strong>
-              {{ productoEncontrado.cantidad }}
-            </strong>
+
+            <span
+              class="pos-stock"
+              [class]="obtenerClaseStock(producto)"
+            >
+              {{ obtenerTextoStock(producto) }}
+            </span>
 
           </div>
 
 
-          <div class="producto-agregar">
+          <div class="pos-product-name">
+            {{ producto.nombre }}
+          </div>
 
-            <div class="cantidad-control">
 
-              <label>
-                Cantidad
-              </label>
+          <div class="pos-product-code">
+            {{ producto.codigoBarras }}
+          </div>
 
-              <input
-                type="number"
-                min="1"
-                [max]="productoEncontrado.cantidad"
-                [(ngModel)]="cantidadProducto"
-              >
+
+          <div class="pos-product-bottom">
+
+            <strong>
+              {{
+              (producto.precioVenta ?? producto.precio ?? 0)
+              | currency:'COP':'symbol':'1.0-0'
+              }}
+            </strong>
+
+
+            <span class="pos-add">
+              +
+            </span>
+
+          </div>
+
+        </button>
+
+      </div>
+
+    </main>
+
+
+    <!-- ===================================================
+         CARRITO
+         =================================================== -->
+
+    <aside class="pos-cart">
+
+
+      <!-- =================================================
+           CABECERA CARRITO
+           ================================================= -->
+
+      <div class="pos-cart-header">
+
+        <div>
+
+          <h3>
+            Carrito
+          </h3>
+
+          <span>
+            {{ obtenerCantidadCarrito() }} unidad(es)
+          </span>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="pos-empty-cart"
+          [disabled]="carrito.length === 0"
+          (click)="vaciarCarrito()"
+        >
+          Vaciar
+        </button>
+
+      </div>
+
+
+      <!-- =================================================
+           CARRITO VACÍO
+           ================================================= -->
+
+      <div
+        *ngIf="carrito.length === 0"
+        class="pos-cart-empty"
+      >
+
+        <div class="pos-cart-empty-icon">
+          🛒
+        </div>
+
+        <strong>
+          Carrito vacío
+        </strong>
+
+        <span>
+          Selecciona un producto para comenzar.
+        </span>
+
+      </div>
+
+
+      <!-- =================================================
+           PRODUCTOS DEL CARRITO
+           ================================================= -->
+
+      <div
+        *ngIf="carrito.length > 0"
+        class="pos-cart-items"
+      >
+
+        <div
+          class="pos-cart-item"
+          *ngFor="let item of carrito"
+        >
+
+
+          <div class="pos-cart-item-main">
+
+            <div class="pos-cart-item-info">
+
+              <strong>
+                {{ item.producto.nombre }}
+              </strong>
+
+              <span>
+                {{
+                  item.precioUnitario
+                  | currency:'COP':'symbol':'1.0-0'
+                }}
+                unidad
+              </span>
 
             </div>
+
 
             <button
               type="button"
-              class="erp-btn erp-btn-primary"
-              (click)="agregarAlCarrito()"
+              class="pos-remove-item"
+              title="Eliminar"
+              (click)="eliminarDelCarrito(item)"
             >
-              + Agregar al carrito
+              ×
             </button>
 
           </div>
 
-        </div>
 
+          <!-- =============================================
+               CANTIDAD
+               ============================================= -->
 
-        <!-- CARRITO -->
+          <div class="pos-cart-item-bottom">
 
-        <div class="carrito-section">
+            <div class="pos-quantity">
 
-          <div class="carrito-header">
-
-            <div>
-
-              <h3>
-                Carrito
-              </h3>
-
-              <span>
-                {{ carrito.length }} producto(s)
-              </span>
-
-            </div>
-
-          </div>
-
-
-          <!-- CARRITO VACÍO -->
-
-          <div
-            *ngIf="carrito.length === 0"
-            class="carrito-vacio"
-          >
-
-            <div class="carrito-vacio-icon">
-              🛒
-            </div>
-
-            <strong>
-              El carrito está vacío
-            </strong>
-
-            <span>
-              Busca un producto para comenzar la venta.
-            </span>
-
-          </div>
-
-
-          <!-- CARRITO CON PRODUCTOS -->
-
-          <div
-            *ngIf="carrito.length > 0"
-            class="carrito-table-wrapper"
-          >
-
-            <table class="carrito-table">
-
-              <thead>
-
-              <tr>
-
-                <th>Producto</th>
-                <th>Precio</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th></th>
-
-              </tr>
-
-              </thead>
-
-              <tbody>
-
-              <tr
-                *ngFor="let item of carrito"
+              <button
+                type="button"
+                (click)="disminuirCantidad(item)"
               >
-
-                <td>
-
-                  <strong>
-                    {{ item.producto.nombre }}
-                  </strong>
-
-                  <small>
-                    {{ item.producto.codigoBarras }}
-                  </small>
-
-                </td>
-
-                <td>
-                  ${{ item.precioUnitario | number:'1.0-0' }}
-                </td>
-
-                <td>
-
-                  <div class="cantidad-carrito">
-
-                    <button
-                      type="button"
-                      (click)="disminuirCantidad(item)"
-                    >
-                      −
-                    </button>
-
-                    <strong>
-                      {{ item.cantidad }}
-                    </strong>
-
-                    <button
-                      type="button"
-                      (click)="aumentarCantidad(item)"
-                    >
-                      +
-                    </button>
-
-                  </div>
-
-                </td>
-
-                <td class="subtotal">
-                  ${{ item.subtotal | number:'1.0-0' }}
-                </td>
-
-                <td>
-
-                  <button
-                    type="button"
-                    class="eliminar-item"
-                    title="Eliminar"
-                    (click)="eliminarDelCarrito(item)"
-                  >
-                    ×
-                  </button>
-
-                </td>
-
-              </tr>
-
-              </tbody>
-
-            </table>
-
-          </div>
+                −
+              </button>
 
 
-          <!-- TOTAL -->
+              <strong>
+                {{ item.cantidad }}
+              </strong>
 
-          <div class="venta-total">
 
-            <span>
-              TOTAL
-            </span>
+              <button
+                type="button"
+                (click)="aumentarCantidad(item)"
+              >
+                +
+              </button>
 
-            <strong>
-              ${{ obtenerTotalCarrito() | number:'1.0-0' }}
+            </div>
+
+
+            <strong class="pos-item-subtotal">
+
+              {{
+              item.subtotal
+              | currency:'COP':'symbol':'1.0-0'
+              }}
+
             </strong>
 
           </div>
 
         </div>
 
-
       </div>
 
 
-      <!-- PIE -->
+      <!-- =================================================
+           RESUMEN DEL CARRITO
+           ================================================= -->
 
-      <div class="venta-modal-footer">
+      <div class="pos-cart-summary">
+
+
+        <div class="pos-summary-row">
+
+          <span>
+            Productos
+          </span>
+
+          <strong>
+            {{ obtenerCantidadCarrito() }}
+          </strong>
+
+        </div>
+
+
+        <div class="pos-summary-total">
+
+          <span>
+            Total
+          </span>
+
+          <strong>
+
+            {{
+            obtenerTotalCarrito()
+            | currency:'COP':'symbol':'1.0-0'
+            }}
+
+          </strong>
+
+        </div>
+
 
         <button
           type="button"
-          class="erp-btn erp-btn-secondary"
-          (click)="cerrarFormulario()"
+          class="pos-continue"
+          [disabled]="carrito.length === 0"
+          title="El flujo de pago se conectará en el siguiente paso"
         >
-          Cancelar
-        </button>
-
-        <button
-          type="button"
-          class="erp-btn erp-btn-primary"
-          disabled
-        >
-          Registrar venta
+          Continuar
         </button>
 
       </div>
 
-    </div>
+    </aside>
 
   </div>
 

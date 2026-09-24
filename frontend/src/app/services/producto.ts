@@ -44,6 +44,18 @@ export class ProductoService {
     return this.http.get<ProductoPage>(this.apiUrl);
   }
 
+  listarParaVenta(): Observable<ProductoPage> {
+    return this.http.get<ProductoPage>(
+      this.apiUrl,
+      {
+        params: {
+          page: 0,
+          size: 1000
+        }
+      }
+    );
+  }
+
   buscarPorId(id: number): Observable<Producto> {
     return this.http.get<Producto>(
       `${this.apiUrl}/${id}`
@@ -59,6 +71,21 @@ export class ProductoService {
   buscarPorProveedor(proveedor: string): Observable<ProductoPage> {
     return this.http.get<ProductoPage>(
       `${this.apiUrl}/proveedor/${encodeURIComponent(proveedor)}`
+    );
+  }
+
+  buscarParaVenta(termino: string): Observable<ProductoPage> {
+    return this.http.get<ProductoPage>(
+      `${this.apiUrl}/buscar-venta`,
+      {
+        params: { termino }
+      }
+    );
+  }
+
+  listarAleatoriosParaVenta(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(
+      `${this.apiUrl}/aleatorios-venta`
     );
   }
 
