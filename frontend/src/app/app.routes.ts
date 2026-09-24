@@ -7,6 +7,7 @@ import { Categorias } from './pages/categorias/categorias';
 import { ProveedoresComponent } from './proveedores/proveedores';
 import { ClientesComponent } from './pages/clientes/clientes';
 import { Compras } from './pages/compras/compras';
+import { Ventas } from './pages/ventas/ventas';
 export const routes: Routes = [
 
   {
@@ -55,6 +56,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
+  {
+    path: 'ventas',
+    component: Ventas,
+    canActivate: [authGuard]
+  },
 
 
   {

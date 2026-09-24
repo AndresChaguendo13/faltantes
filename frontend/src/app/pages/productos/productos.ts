@@ -104,6 +104,7 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
     codigoBarras: '',
     cantidad: 0,
     precio: 0,
+    porcentajeGanancia: 20,
     stockMinimo: 0,
     costoCompra: 0,
     precioVenta: 0,
@@ -483,6 +484,19 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
+  calcularPrecioVenta(): void {
+    const costo = Number(this.productoNuevo.costoCompra) || 0;
+    const porcentaje = Number(this.productoNuevo.porcentajeGanancia) || 0;
+
+    this.productoNuevo.precioVenta =
+      costo + (costo * porcentaje / 100);
+
+    this.productoNuevo.precio =
+      this.productoNuevo.precioVenta;
+
+    this.cdr.detectChanges();
+  }
+
   // =====================================================
 // ESTADO DE VENCIMIENTO
 // =====================================================
@@ -791,14 +805,42 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
       nombre: producto.nombre || '',
       codigoBarras: producto.codigoBarras || '',
       cantidad: producto.cantidad ?? 0,
-      precio: producto.precio ?? producto.precioVenta ?? 0,
-      stockMinimo: producto.stockMinimo ?? 0,
-      costoCompra: producto.costoCompra ?? 0,
-      precioVenta: producto.precioVenta ?? producto.precio ?? 0,
+
+      precio: Number(
+        producto.precioVenta ?? producto.precio ?? 0
+      ),
+
+      porcentajeGanancia:
+        producto.costoCompra && Number(producto.costoCompra) > 0
+          ? Number(
+            (
+              (
+                (
+                  Number(producto.precioVenta ?? producto.precio ?? 0)
+                  - Number(producto.costoCompra)
+                ) / Number(producto.costoCompra)
+              ) * 100
+            ).toFixed(2)
+          )
+          : 0,
+
+      precioVenta: Number(
+        producto.precioVenta ?? producto.precio ?? 0
+      ),
+
+      stockMinimo: Number(
+        producto.stockMinimo ?? 0
+      ),
+
+      costoCompra: Number(
+        producto.costoCompra ?? 0
+      ),
+
       categoriaId:
         (producto as any).categoriaId ??
         producto.categoria?.id ??
         null,
+
       proveedor: producto.proveedor || '',
       fechaVencimiento: producto.fechaVencimiento || ''
     };
@@ -835,6 +877,7 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
       codigoBarras: '',
       cantidad: 0,
       precio: 0,
+      porcentajeGanancia: 20,
       stockMinimo: 0,
       costoCompra: 0,
       precioVenta: 0,
@@ -930,8 +973,8 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if (this.productoNuevo.precio <= 0) {
-      this.error = 'El precio debe ser mayor que cero.';
+    if (this.productoNuevo.porcentajeGanancia < 0) {
+      this.error = 'El porcentaje de ganancia no puede ser negativo.';
       return;
     }
 
@@ -1073,8 +1116,8 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if (this.productoNuevo.precio <= 0) {
-      this.error = 'El precio debe ser mayor que cero.';
+    if (this.productoNuevo.porcentajeGanancia < 0) {
+      this.error = 'El porcentaje de ganancia no puede ser negativo.';
       return;
     }
 
@@ -1276,6 +1319,10 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
             'ERROR AL ELIMINAR PRODUCTO:',
             error
           );
+
+          console.log('STATUS:', error?.status);
+          console.log('ERROR BACKEND:', error?.error);
+          console.log('MENSAJE BACKEND:', error?.error?.message);
 
           let mensajeError =
             'No se pudo eliminar el producto.';

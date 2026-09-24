@@ -1,0 +1,503 @@
+<div class="erp-page">
+
+  <!-- ENCABEZADO -->
+  <div class="erp-page-header">
+
+    <div>
+      <h1>Ventas</h1>
+
+      <p>
+        Gestiona las ventas realizadas y registra nuevas operaciones.
+      </p>
+    </div>
+
+    <button
+      class="erp-btn erp-btn-primary"
+      type="button"
+      (click)="abrirNuevaVenta()"
+    >
+      + Nueva venta
+    </button>
+
+  </div>
+
+
+  <!-- ERROR -->
+  <div
+    *ngIf="error"
+    class="form-error"
+  >
+    {{ error }}
+  </div>
+
+
+  <!-- CARGANDO -->
+  <div
+    *ngIf="cargando"
+    class="erp-empty-state"
+  >
+    <p>Cargando ventas...</p>
+  </div>
+
+
+  <!-- TABLA -->
+  <div
+    *ngIf="!cargando"
+    class="erp-card"
+  >
+
+    <div class="erp-card-header">
+
+      <div>
+        <h2>Historial de ventas</h2>
+
+        <span>
+          {{ ventas.length }} venta(s)
+        </span>
+      </div>
+
+    </div>
+
+
+    <div
+      *ngIf="ventas.length === 0"
+      class="erp-empty-state"
+    >
+
+      <h3>No hay ventas registradas</h3>
+
+      <p>
+        Cuando realices una venta aparecerá aquí.
+      </p>
+
+    </div>
+
+
+    <div
+      *ngIf="ventas.length > 0"
+      class="erp-table-wrapper"
+    >
+
+      <table class="erp-table">
+
+        <thead>
+
+        <tr>
+
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Tipo de pago</th>
+          <th>Productos</th>
+          <th>Total</th>
+          <th>Acciones</th>
+
+        </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        <tr
+          *ngFor="let venta of ventas"
+        >
+
+          <td>
+            #{{ venta.id }}
+          </td>
+
+          <td>
+            {{ venta.fecha | date:'dd/MM/yyyy HH:mm' }}
+          </td>
+
+          <td>
+            {{ venta.nombreCliente || 'Consumidor final' }}
+          </td>
+
+          <td>
+
+              <span
+                class="tipo-pago"
+                [class.fiado]="venta.tipoPago === 'FIADO'"
+              >
+                {{ venta.tipoPago }}
+              </span>
+
+          </td>
+
+          <td>
+            {{ venta.detalles.length }}
+          </td>
+
+          <td class="price">
+            ${{ venta.total | number:'1.0-0' }}
+          </td>
+
+          <td>
+
+            <button
+              type="button"
+              class="erp-btn erp-btn-secondary erp-btn-small"
+              (click)="verVenta(venta)"
+            >
+              Ver
+            </button>
+
+          </td>
+
+        </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       NUEVA VENTA
+  ====================================================== -->
+
+  <div
+    *ngIf="mostrarFormulario"
+    class="erp-modal-overlay"
+  >
+
+    <div class="erp-modal venta-modal">
+
+      <!-- CABECERA -->
+
+      <div class="erp-modal-header">
+
+        <div>
+
+          <h2>Nueva venta</h2>
+
+          <p>
+            Agrega productos al carrito.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="erp-modal-close"
+          (click)="cerrarFormulario()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- CUERPO -->
+
+      <div class="erp-modal-body">
+
+
+        <!-- BUSCADOR -->
+
+        <div class="venta-buscador">
+
+          <label>
+            Código de barras
+          </label>
+
+          <div class="buscador-row">
+
+            <input
+              type="text"
+              [(ngModel)]="codigoBusqueda"
+              placeholder="Escanea o escribe el código..."
+              (keydown.enter)="buscarProducto()"
+              autofocus
+            >
+
+            <button
+              type="button"
+              class="erp-btn erp-btn-primary"
+              (click)="buscarProducto()"
+              [disabled]="buscandoProducto"
+            >
+              {{ buscandoProducto ? 'Buscando...' : 'Buscar' }}
+            </button>
+
+          </div>
+
+          <small>
+            Presiona Enter después de escanear el código.
+          </small>
+
+        </div>
+
+
+        <!-- PRODUCTO ENCONTRADO -->
+
+        <div
+          *ngIf="productoEncontrado"
+          class="producto-encontrado"
+        >
+
+          <div class="producto-info">
+
+            <div>
+
+              <strong>
+                {{ productoEncontrado.nombre }}
+              </strong>
+
+              <span>
+                Código: {{ productoEncontrado.codigoBarras }}
+              </span>
+
+            </div>
+
+            <div class="producto-precio">
+
+              $
+              {{
+              (
+              productoEncontrado.precioVenta ??
+              productoEncontrado.precio ??
+              0
+              ) | number:'1.0-0'
+              }}
+
+            </div>
+
+          </div>
+
+
+          <div class="producto-stock">
+
+            <span>
+              Stock disponible:
+            </span>
+
+            <strong>
+              {{ productoEncontrado.cantidad }}
+            </strong>
+
+          </div>
+
+
+          <div class="producto-agregar">
+
+            <div class="cantidad-control">
+
+              <label>
+                Cantidad
+              </label>
+
+              <input
+                type="number"
+                min="1"
+                [max]="productoEncontrado.cantidad"
+                [(ngModel)]="cantidadProducto"
+              >
+
+            </div>
+
+            <button
+              type="button"
+              class="erp-btn erp-btn-primary"
+              (click)="agregarAlCarrito()"
+            >
+              + Agregar al carrito
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- CARRITO -->
+
+        <div class="carrito-section">
+
+          <div class="carrito-header">
+
+            <div>
+
+              <h3>
+                Carrito
+              </h3>
+
+              <span>
+                {{ carrito.length }} producto(s)
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- CARRITO VACÍO -->
+
+          <div
+            *ngIf="carrito.length === 0"
+            class="carrito-vacio"
+          >
+
+            <div class="carrito-vacio-icon">
+              🛒
+            </div>
+
+            <strong>
+              El carrito está vacío
+            </strong>
+
+            <span>
+              Busca un producto para comenzar la venta.
+            </span>
+
+          </div>
+
+
+          <!-- CARRITO CON PRODUCTOS -->
+
+          <div
+            *ngIf="carrito.length > 0"
+            class="carrito-table-wrapper"
+          >
+
+            <table class="carrito-table">
+
+              <thead>
+
+              <tr>
+
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
+
+              </tr>
+
+              </thead>
+
+              <tbody>
+
+              <tr
+                *ngFor="let item of carrito"
+              >
+
+                <td>
+
+                  <strong>
+                    {{ item.producto.nombre }}
+                  </strong>
+
+                  <small>
+                    {{ item.producto.codigoBarras }}
+                  </small>
+
+                </td>
+
+                <td>
+                  ${{ item.precioUnitario | number:'1.0-0' }}
+                </td>
+
+                <td>
+
+                  <div class="cantidad-carrito">
+
+                    <button
+                      type="button"
+                      (click)="disminuirCantidad(item)"
+                    >
+                      −
+                    </button>
+
+                    <strong>
+                      {{ item.cantidad }}
+                    </strong>
+
+                    <button
+                      type="button"
+                      (click)="aumentarCantidad(item)"
+                    >
+                      +
+                    </button>
+
+                  </div>
+
+                </td>
+
+                <td class="subtotal">
+                  ${{ item.subtotal | number:'1.0-0' }}
+                </td>
+
+                <td>
+
+                  <button
+                    type="button"
+                    class="eliminar-item"
+                    title="Eliminar"
+                    (click)="eliminarDelCarrito(item)"
+                  >
+                    ×
+                  </button>
+
+                </td>
+
+              </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          <!-- TOTAL -->
+
+          <div class="venta-total">
+
+            <span>
+              TOTAL
+            </span>
+
+            <strong>
+              ${{ obtenerTotalCarrito() | number:'1.0-0' }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+      <!-- PIE -->
+
+      <div class="venta-modal-footer">
+
+        <button
+          type="button"
+          class="erp-btn erp-btn-secondary"
+          (click)="cerrarFormulario()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="erp-btn erp-btn-primary"
+          disabled
+        >
+          Registrar venta
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
