@@ -545,11 +545,11 @@
           <div>
 
             <strong>
-              08 Sep 2026
+              {{ fechaActual | date:'dd MMM yyyy' }}
             </strong>
 
             <small>
-              10:24 AM
+              {{ fechaActual | date:'hh:mm:ss a' }}
             </small>
 
           </div>
@@ -557,20 +557,7 @@
         </div>
 
 
-        <button
-          type="button"
-          class="notification-button"
-        >
 
-          <svg>
-            <use href="#icon-bell"></use>
-          </svg>
-
-          <span class="notification-badge">
-            5
-          </span>
-
-        </button>
 
 
         <div class="user-container">
@@ -800,24 +787,12 @@
         </div>
 
 
-        <button
-          type="button"
-          class="refresh-button"
 
-        >
-
-          <svg>
-            <use href="#icon-refresh"></use>
-          </svg>
-
-          Actualizar
-
-        </button>
 
       </div>
 
-
-      <div class="stats-grid">
+      <div class="dashboard-top-layout">
+        <div class="stats-grid">
 
 
         <div class="stat-card card-blue">
@@ -1024,6 +999,154 @@
         </div>
 
       </div>
+
+
+        <!-- =====================================================
+             NOTAS RÁPIDAS
+        ===================================================== -->
+
+        <aside class="quick-notes">
+
+          <div class="quick-notes-header">
+
+            <div>
+
+              <h2>
+                Notas rápidas
+              </h2>
+
+              <p>
+                Recordatorios y tareas
+              </p>
+
+            </div>
+
+            <button
+              type="button"
+              class="quick-note-add"
+              (click)="abrirNuevaNota()"
+              title="Nueva nota"
+            >
+              +
+            </button>
+
+          </div>
+
+
+          <div
+            class="quick-notes-list"
+            *ngIf="notas.length > 0"
+          >
+
+            <div
+              class="quick-note"
+              *ngFor="let nota of notas"
+              [class.completed]="nota.completada"
+            >
+
+              <div class="quick-note-check">
+
+                <button
+                  type="button"
+                  (click)="alternarNota(nota)"
+                  [title]="
+            nota.completada
+              ? 'Marcar como pendiente'
+              : 'Marcar como completada'
+          "
+                >
+
+          <span *ngIf="nota.completada">
+            ✓
+          </span>
+
+                  <span *ngIf="!nota.completada">
+          </span>
+
+                </button>
+
+              </div>
+
+
+              <div class="quick-note-content">
+
+                <strong>
+                  {{ nota.titulo }}
+                </strong>
+
+                <p *ngIf="nota.contenido">
+                  {{ nota.contenido }}
+                </p>
+
+
+                <small *ngIf="nota.recordatorio">
+
+                  📅
+                  {{ nota.recordatorio | date:'dd/MM/yyyy HH:mm' }}
+
+                </small>
+
+              </div>
+
+
+              <div class="quick-note-actions">
+
+                <button
+                  type="button"
+                  (click)="editarNota(nota)"
+                  title="Editar"
+                >
+                  ✎
+                </button>
+
+                <button
+                  type="button"
+                  (click)="eliminarNota(nota.id)"
+                  title="Eliminar"
+                >
+                  🗑
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div
+            class="quick-notes-empty"
+            *ngIf="notas.length === 0"
+          >
+
+            <div class="quick-notes-empty-icon">
+              📝
+            </div>
+
+            <strong>
+              No tienes notas
+            </strong>
+
+            <span>
+      Crea un recordatorio para tenerlo a mano.
+    </span>
+
+            <button
+              type="button"
+              (click)="abrirNuevaNota()"
+            >
+              Crear primera nota
+            </button>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+
+
+
 
 
       <div class="charts-grid">
@@ -1825,5 +1948,137 @@
 
 
   </main>
+
+
+
+
+
+  <!-- =====================================================
+       MODAL NOTA
+  ===================================================== -->
+
+  <div
+    class="note-modal-overlay"
+    *ngIf="mostrarModalNota"
+    (click)="cerrarModalNota()"
+  >
+
+    <div
+      class="note-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="note-modal-header">
+
+        <div>
+
+          <h2>
+            {{
+            modoEdicionNota
+            ? 'Editar nota'
+            : 'Nueva nota'
+            }}
+          </h2>
+
+          <p>
+            Crea un recordatorio para tu negocio.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="note-modal-close"
+          (click)="cerrarModalNota()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="note-form">
+
+        <label>
+
+        <span>
+          Título
+        </span>
+
+          <input
+            type="text"
+            [(ngModel)]="notaFormulario.titulo"
+            placeholder="Ej. Llamar al proveedor"
+            maxlength="80"
+            autofocus
+          >
+
+        </label>
+
+
+        <label>
+
+        <span>
+          Nota
+        </span>
+
+          <textarea
+            [(ngModel)]="notaFormulario.contenido"
+            rows="4"
+            maxlength="300"
+            placeholder="Escribe aquí el recordatorio..."
+          ></textarea>
+
+        </label>
+
+
+        <label>
+
+        <span>
+          Recordatorio
+        </span>
+
+          <input
+            type="datetime-local"
+            [(ngModel)]="notaFormulario.recordatorio"
+          >
+
+        </label>
+
+      </div>
+
+
+      <div class="note-modal-actions">
+
+        <button
+          type="button"
+          class="note-cancel-button"
+          (click)="cerrarModalNota()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="button"
+          class="note-save-button"
+          (click)="guardarNota()"
+          [disabled]="!notaFormulario.titulo.trim()"
+        >
+          {{
+          modoEdicionNota
+          ? 'Guardar cambios'
+          : 'Crear nota'
+          }}
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+
 
 </div>

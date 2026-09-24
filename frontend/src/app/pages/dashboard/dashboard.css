@@ -1574,3 +1574,589 @@
   }
 
 }
+
+
+/* =========================================================
+   DASHBOARD SUPERIOR + NOTAS RÁPIDAS
+========================================================= */
+
+.dashboard-top-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 0.85fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+
+/* =========================================================
+   NOTAS RÁPIDAS
+========================================================= */
+
+.quick-notes {
+  background: #ffffff;
+  border: 1px solid #e6eaf0;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+  min-height: 278px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.quick-notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+
+.quick-notes-header h2 {
+  margin: 0;
+  color: #182c40;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+
+.quick-notes-header p {
+  margin: 4px 0 0;
+  color: #8994a2;
+  font-size: 10px;
+}
+
+
+.quick-note-add {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: #168df0;
+  color: #ffffff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+
+.quick-note-add:hover {
+  background: #0865e5;
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   LISTA
+========================================================= */
+
+.quick-notes-list {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 8px;
+  max-height: 225px;
+}
+
+
+.quick-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 3px;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+
+.quick-note:last-child {
+  border-bottom: 0;
+}
+
+
+.quick-note-check button {
+  width: 19px;
+  height: 19px;
+  margin-top: 1px;
+  padding: 0;
+  border: 1.5px solid #b7c0cc;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.quick-note.completed .quick-note-check button {
+  border-color: #18a957;
+  background: #18a957;
+}
+
+
+.quick-note-content {
+  flex: 1;
+  min-width: 0;
+}
+
+
+.quick-note-content strong {
+  display: block;
+  color: #27364a;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+
+.quick-note-content p {
+  margin: 3px 0 0;
+  color: #7b8795;
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+
+.quick-note-content small {
+  display: block;
+  margin-top: 5px;
+  color: #168df0;
+  font-size: 9px;
+}
+
+
+.quick-note.completed .quick-note-content strong {
+  color: #8b96a3;
+  text-decoration: line-through;
+}
+
+
+.quick-note-actions {
+  display: flex;
+  gap: 3px;
+}
+
+
+.quick-note-actions button {
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #7d8996;
+  cursor: pointer;
+}
+
+
+.quick-note-actions button:hover {
+  background: #f1f4f8;
+  color: #1768b5;
+}
+
+
+/* =========================================================
+   ESTADO VACÍO
+========================================================= */
+
+.quick-notes-empty {
+  flex: 1;
+  min-height: 205px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+
+.quick-notes-empty-icon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 9px;
+  border-radius: 50%;
+  background: #eef6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+
+.quick-notes-empty strong {
+  color: #35445a;
+  font-size: 12px;
+}
+
+
+.quick-notes-empty span {
+  max-width: 200px;
+  margin-top: 4px;
+  color: #8b96a3;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+
+.quick-notes-empty button {
+  margin-top: 12px;
+  padding: 7px 11px;
+  border: 1px solid #d5e7fa;
+  border-radius: 7px;
+  background: #f4f9ff;
+  color: #1674c5;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.note-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+
+.note-modal {
+  width: min(500px, 100%);
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+
+.note-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 19px 20px;
+  border-bottom: 1px solid #edf0f4;
+}
+
+
+.note-modal-header h2 {
+  margin: 0;
+  color: #182c40;
+  font-size: 17px;
+}
+
+
+.note-modal-header p {
+  margin: 4px 0 0;
+  color: #84909e;
+  font-size: 11px;
+}
+
+
+.note-modal-close {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 7px;
+  background: #f4f6f8;
+  color: #6e7a88;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+
+.note-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+}
+
+
+.note-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+.note-form label span {
+  color: #344054;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+.note-form input,
+.note-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 11px;
+  border: 1px solid #d8dee7;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #27364a;
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  resize: vertical;
+}
+
+
+.note-form input:focus,
+.note-form textarea:focus {
+  border-color: #168df0;
+  box-shadow: 0 0 0 3px rgba(22, 141, 240, 0.10);
+}
+
+
+.note-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 15px 20px;
+  border-top: 1px solid #edf0f4;
+  background: #fafbfc;
+}
+
+
+.note-cancel-button,
+.note-save-button {
+  padding: 9px 15px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+.note-cancel-button {
+  border: 1px solid #d8dee7;
+  background: #ffffff;
+  color: #526071;
+}
+
+
+.note-save-button {
+  border: 0;
+  background: #168df0;
+  color: #ffffff;
+}
+
+
+.note-save-button:hover {
+  background: #0865e5;
+}
+
+
+.note-save-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+  .dashboard-top-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-notes {
+    min-height: 250px;
+  }
+
+}
+
+
+@media (max-width: 700px) {
+
+  .quick-notes {
+    min-height: 230px;
+  }
+
+  .note-modal-overlay {
+    padding: 12px;
+  }
+
+}
+
+/* =========================================================
+   DISTRIBUCIÓN FINAL DEL DASHBOARD
+   6 TARJETAS = 2 COLUMNAS x 3 FILAS
+   NOTAS RÁPIDAS = COLUMNA DERECHA
+========================================================= */
+
+
+/* CONTENEDOR SUPERIOR */
+.dashboard-top-layout {
+  display: grid !important;
+
+  /*
+   * IZQUIERDA:
+   * tarjetas
+   *
+   * DERECHA:
+   * notas rápidas
+   */
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(300px, 1fr) !important;
+
+  column-gap: 16px !important;
+
+  align-items: stretch !important;
+
+  margin-bottom: 22px !important;
+}
+
+
+/* =========================================================
+   6 TARJETAS
+   2 COLUMNAS
+   3 FILAS
+========================================================= */
+
+.dashboard-top-layout > .stats-grid {
+  display: grid !important;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr)) !important;
+
+  grid-template-rows:
+    repeat(3, minmax(130px, 1fr)) !important;
+
+  gap: 16px !important;
+
+  width: 100% !important;
+
+  margin: 0 !important;
+}
+
+
+/* =========================================================
+   TARJETAS INDIVIDUALES
+========================================================= */
+
+.dashboard-top-layout > .stats-grid > .stat-card {
+  width: 100% !important;
+
+  min-width: 0 !important;
+
+  min-height: 130px !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   NOTAS RÁPIDAS
+   NO CAMBIAMOS SU DISEÑO
+========================================================= */
+
+.dashboard-top-layout > .quick-notes-card {
+  /*
+   * Ocupa exactamente la altura
+   * de las 3 filas de tarjetas.
+   */
+  grid-column: 2 !important;
+
+  grid-row: 1 / 4 !important;
+
+  width: 100% !important;
+
+  min-width: 0 !important;
+
+  height: 100% !important;
+
+  box-sizing: border-box !important;
+
+  /*
+   * MUY IMPORTANTE:
+   * no modificamos colores,
+   * pseudo-elementos, padding,
+   * header, board ni footer.
+   */
+}
+
+
+/* =========================================================
+   ESPACIO ENTRE ZONA SUPERIOR Y GRÁFICOS
+========================================================= */
+
+.dashboard-top-layout + .charts-grid {
+  margin-top: 22px !important;
+}
+
+
+/* =========================================================
+   TABLAS INFERIORES
+========================================================= */
+
+.charts-grid + .tables-grid {
+  margin-top: 16px !important;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1050px) {
+
+  .dashboard-top-layout {
+    grid-template-columns: 1fr !important;
+
+    row-gap: 16px !important;
+  }
+
+  .dashboard-top-layout > .stats-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr)) !important;
+
+    grid-template-rows:
+      repeat(3, minmax(130px, 1fr)) !important;
+  }
+
+  .dashboard-top-layout > .quick-notes-card {
+    grid-column: 1 !important;
+
+    grid-row: auto !important;
+
+    height: auto !important;
+
+    min-height: 330px !important;
+  }
+
+}
+
+
+/* =========================================================
+   CELULAR
+========================================================= */
+
+@media (max-width: 600px) {
+
+  .dashboard-top-layout > .stats-grid {
+    grid-template-columns: 1fr !important;
+
+    grid-template-rows:
+      repeat(6, minmax(130px, auto)) !important;
+  }
+
+  .dashboard-top-layout > .quick-notes-card {
+    min-height: 320px !important;
+  }
+
+}
