@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
+
 import { Login } from './pages/login/login';
+import { AppLayout } from './layout/app-layout';
 import { Dashboard } from './pages/dashboard/dashboard';
-import { authGuard } from './guards/auth-guard';
 import { Productos } from './pages/productos/productos';
 import { Categorias } from './pages/categorias/categorias';
 import { ProveedoresComponent } from './proveedores/proveedores';
@@ -9,17 +10,76 @@ import { ClientesComponent } from './pages/clientes/clientes';
 import { Compras } from './pages/compras/compras';
 import { Ventas } from './pages/ventas/ventas';
 import { Balance } from './pages/balance/balance';
+import { authGuard } from './guards/auth-guard';
+
 export const routes: Routes = [
+
+  // =====================================================
+  // LOGIN
+  // =====================================================
 
   {
     path: '',
     component: Login
   },
 
+
+  // =====================================================
+  // LAYOUT PRINCIPAL DEL ERP
+  // =====================================================
+
   {
-    path: 'dashboard',
-    component: Dashboard,
-    canActivate: [authGuard]
+    path: '',
+    component: AppLayout,
+    canActivate: [authGuard],
+
+    children: [
+
+      {
+        path: 'dashboard',
+        component: Dashboard
+      },
+
+      {
+        path: 'productos',
+        component: Productos
+      },
+
+      {
+        path: 'categorias',
+        component: Categorias
+      },
+
+      {
+        path: 'proveedores',
+        component: ProveedoresComponent
+      },
+
+      {
+        path: 'clientes',
+        component: ClientesComponent
+      },
+
+      {
+        path: 'compras',
+        component: Compras
+      },
+
+      {
+        path: 'ventas',
+        component: Ventas
+      },
+
+      { path: 'balance', component: Balance },
+
+
+      /*
+       * Balance se conectará aquí cuando confirmemos
+       * el nombre exacto de su clase exportada.
+       *
+       * No lo inventamos para evitar romper compilación.
+       */
+    ]
   },
 
 
@@ -27,53 +87,13 @@ export const routes: Routes = [
 
 
 
-  {
-    path: 'productos',
-    component: Productos,
-    canActivate: [authGuard]
-  },
-
-  {
-    path: 'categorias',
-    component: Categorias,
-    canActivate: [authGuard]
-  },
-
-  {
-    path: 'proveedores',
-    component: ProveedoresComponent,
-    canActivate: [authGuard]
-  },
-
-  {
-    path: 'compras',
-    component: Compras,
-    canActivate: [authGuard]
-  },
-
-  {
-    path: 'clientes',
-    component: ClientesComponent,
-    canActivate: [authGuard]
-  },
-
-  {
-    path: 'ventas',
-    component: Ventas,
-    canActivate: [authGuard]
-  },
-
-  {
-    path: 'balance',
-    component: Balance,
-    canActivate: [authGuard]
-  },
-
+  // =====================================================
+  // RUTA DESCONOCIDA
+  // =====================================================
 
   {
     path: '**',
     redirectTo: ''
   }
-
 
 ];
