@@ -74,4 +74,7 @@ export class VentaService {
       `${this.apiUrl}/total-fiado-hoy`
     );
   }
+
+
+
 }

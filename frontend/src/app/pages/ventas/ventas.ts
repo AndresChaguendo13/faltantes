@@ -9,7 +9,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import {
-  VentaService
+  VentaService,
+  VentaRequest
+
 } from '../../services/ventas';
 
 import {
@@ -21,6 +23,11 @@ import {
   CategoriaService,
   Categoria
 } from '../../services/categoria';
+
+import {
+  ClienteService,
+  Cliente
+} from '../../services/cliente.service';
 
 
 
@@ -58,16 +65,31 @@ export class Ventas implements OnInit {
 
   codigoBusqueda = '';
   buscandoProducto = false;
-  resultadosBusqueda: Producto[] = [];
-  mostrarResultadosBusqueda = false;
+
 
   private temporizadorBusqueda: any;
 
   carrito: ProductoCarrito[] = [];
 
+  mostrarFinalizarVenta = false;
+
+  tipoPago: 'CONTADO' | 'FIADO' = 'CONTADO';
+
+  montoRecibido = 0;
+
+  clienteSeleccionadoId: number | null = null;
+
+  clientes: Cliente[] = [];
+
+  cargandoClientes = false;
+
+  guardandoVenta = false;
+
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
+    private clienteService: ClienteService,
+    private ventaService: VentaService,
     private notification: NotificationService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -212,17 +234,20 @@ export class Ventas implements OnInit {
 
     const termino = this.codigoBusqueda.trim();
 
-    // Si está vacío, ocultamos resultados
+    // Si se borra la búsqueda,
+    // volvemos a mostrar los productos iniciales.
     if (!termino) {
-      this.resultadosBusqueda = [];
-      this.mostrarResultadosBusqueda = false;
+
+      this.productosVisibles = [...this.productos];
+
+      this.cdr.detectChanges();
+
       return;
     }
 
-    // Con una sola letra no buscamos todavía
+    // Comenzamos a buscar desde 2 caracteres.
     if (termino.length < 2) {
-      this.resultadosBusqueda = [];
-      this.mostrarResultadosBusqueda = false;
+
       return;
     }
 
@@ -232,11 +257,8 @@ export class Ventas implements OnInit {
 
         next: (respuesta) => {
 
-          this.resultadosBusqueda =
-            (respuesta.content || []).slice(0, 8);
-
-          this.mostrarResultadosBusqueda =
-            this.resultadosBusqueda.length > 0;
+          this.productosVisibles =
+            (respuesta.content || []).slice(0, 20);
 
           this.cdr.detectChanges();
 
@@ -249,8 +271,7 @@ export class Ventas implements OnInit {
             error
           );
 
-          this.resultadosBusqueda = [];
-          this.mostrarResultadosBusqueda = false;
+          this.productosVisibles = [];
 
           this.cdr.detectChanges();
 
@@ -340,51 +361,48 @@ export class Ventas implements OnInit {
   // =========================
 
   buscarProducto(): void {
+
     const termino = this.codigoBusqueda.trim();
 
     if (!termino) {
       return;
     }
 
-    // Cancelamos cualquier búsqueda automática pendiente
     clearTimeout(this.temporizadorBusqueda);
-
-    // Ocultamos inmediatamente los resultados del buscador
-    this.resultadosBusqueda = [];
-    this.mostrarResultadosBusqueda = false;
 
     this.buscandoProducto = true;
 
+    // Primero intentamos código exacto.
     this.productoService.buscarPorCodigo(termino).subscribe({
 
       next: (producto) => {
 
         this.buscandoProducto = false;
 
-        // Agrega directamente al carrito
+        // Código de barras exacto:
+        // entra directamente al carrito.
         this.agregarProductoDirectamente(producto);
 
       },
 
       error: (error) => {
 
-        this.buscandoProducto = false;
-
         if (error.status === 404) {
 
-          // Si no es código exacto, entonces sí hacemos
-          // búsqueda normal por nombre/código/proveedor
+          // No es código exacto.
+          // Buscamos por nombre, código parcial o proveedor.
           this.productoService.buscarParaVenta(termino).subscribe({
 
             next: (respuesta) => {
 
-              this.resultadosBusqueda =
-                (respuesta.content || []).slice(0, 8);
+              this.buscandoProducto = false;
 
-              this.mostrarResultadosBusqueda =
-                this.resultadosBusqueda.length > 0;
+              const productos =
+                (respuesta.content || []).slice(0, 20);
 
-              if (!this.mostrarResultadosBusqueda) {
+              this.productosVisibles = productos;
+
+              if (productos.length === 0) {
 
                 this.notification.warning(
                   `No encontramos productos para "${termino}".`,
@@ -399,10 +417,16 @@ export class Ventas implements OnInit {
 
             error: () => {
 
+              this.buscandoProducto = false;
+
+              this.productosVisibles = [];
+
               this.notification.error(
                 'No fue posible buscar el producto.',
                 'Error de búsqueda'
               );
+
+              this.cdr.detectChanges();
 
             }
 
@@ -411,10 +435,14 @@ export class Ventas implements OnInit {
           return;
         }
 
+        this.buscandoProducto = false;
+
         this.notification.error(
           'No fue posible buscar el producto.',
           'Error de búsqueda'
         );
+
+        this.cdr.detectChanges();
 
       }
 
@@ -488,21 +516,12 @@ export class Ventas implements OnInit {
 
   private limpiarBusqueda(): void {
 
-    // Cancelar búsqueda pendiente
     clearTimeout(this.temporizadorBusqueda);
 
-    // Limpiar texto
     this.codigoBusqueda = '';
 
-    // Limpiar resultados del dropdown
-    this.resultadosBusqueda = [];
-
-    // Ocultar dropdown
-    this.mostrarResultadosBusqueda = false;
-
-    // IMPORTANTE:
-    // NO volver a cargar los productos.
-    // La grilla debe quedarse exactamente como estaba.
+    // Volver a mostrar los productos iniciales.
+    this.productosVisibles = [...this.productos];
 
     setTimeout(() => {
       this.enfocarBuscador();
@@ -590,6 +609,60 @@ export class Ventas implements OnInit {
     );
   }
 
+  continuarVenta(): void {
+
+    if (this.carrito.length === 0) {
+      return;
+    }
+
+    this.tipoPago = 'CONTADO';
+
+    this.montoRecibido =
+      this.obtenerTotalCarrito();
+
+    this.clienteSeleccionadoId = null;
+
+    // Cargar clientes para tenerlos listos
+    // si el usuario selecciona FIADO.
+    this.cargarClientes();
+
+    this.mostrarFinalizarVenta = true;
+
+    this.cdr.detectChanges();
+  }
+
+  volverAlCarrito(): void {
+    this.mostrarFinalizarVenta = false;
+
+    this.cdr.detectChanges();
+  }
+
+  seleccionarTipoPago(tipo: 'CONTADO' | 'FIADO'): void {
+    this.tipoPago = tipo;
+
+    if (tipo === 'CONTADO') {
+      this.montoRecibido = this.obtenerTotalCarrito();
+      this.clienteSeleccionadoId = null;
+    } else {
+      this.montoRecibido = 0;
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  obtenerCambio(): number {
+    const total = this.obtenerTotalCarrito();
+
+    return Math.max(
+      0,
+      Number(this.montoRecibido || 0) - total
+    );
+  }
+
+
+
+
+
   obtenerClaseStock(producto: Producto): string {
 
     if (producto.cantidad <= 0) {
@@ -614,4 +687,162 @@ export class Ventas implements OnInit {
 
     return `${producto.cantidad} disponibles`;
   }
+
+
+  // ======================================================
+// FINALIZAR VENTA
+// ======================================================
+
+
+
+
+  cargarClientes(): void {
+    this.cargandoClientes = true;
+
+    this.clienteService.listar().subscribe({
+      next: (clientes) => {
+        this.clientes = clientes.filter(cliente => cliente.activo);
+        this.cargandoClientes = false;
+
+        this.cdr.detectChanges();
+      },
+
+      error: (error) => {
+        console.error('ERROR CARGANDO CLIENTES:', error);
+
+        this.clientes = [];
+        this.cargandoClientes = false;
+
+        this.notification.error(
+          'No fue posible cargar los clientes.',
+          'Error'
+        );
+
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+
+  confirmarVenta(): void {
+
+    if (this.carrito.length === 0) {
+      return;
+    }
+
+    const total = this.obtenerTotalCarrito();
+
+    // -----------------------------------------
+    // VALIDACIÓN CONTADO
+    // -----------------------------------------
+
+    if (this.tipoPago === 'CONTADO') {
+
+      if (Number(this.montoRecibido || 0) < total) {
+
+        this.notification.warning(
+          'El dinero recibido no puede ser menor al total de la venta.',
+          'Dinero insuficiente'
+        );
+
+        return;
+      }
+    }
+
+    // -----------------------------------------
+    // VALIDACIÓN FIADO
+    // -----------------------------------------
+
+    if (
+      this.tipoPago === 'FIADO' &&
+      this.clienteSeleccionadoId === null
+    ) {
+
+      this.notification.warning(
+        'Debes seleccionar un cliente para registrar una venta fiada.',
+        'Cliente requerido'
+      );
+
+      return;
+    }
+
+    // -----------------------------------------
+    // PREPARAR VENTA
+    // -----------------------------------------
+
+    const venta: VentaRequest = {
+
+      tipoPago: this.tipoPago,
+
+      clienteId:
+        this.tipoPago === 'FIADO'
+          ? this.clienteSeleccionadoId
+          : null,
+
+      detalles: this.carrito.map(item => ({
+        productoId: item.producto.id,
+        cantidad: item.cantidad
+      }))
+    };
+
+    this.guardandoVenta = true;
+
+    // -----------------------------------------
+    // GUARDAR EN BACKEND
+    // -----------------------------------------
+
+    this.ventaService.crear(venta).subscribe({
+
+      next: (respuesta) => {
+
+        console.log('VENTA REGISTRADA:', respuesta);
+
+        this.guardandoVenta = false;
+
+        this.mostrarFinalizarVenta = false;
+
+        this.carrito = [];
+
+        this.codigoBusqueda = '';
+
+        this.montoRecibido = 0;
+
+        this.clienteSeleccionadoId = null;
+
+        this.tipoPago = 'CONTADO';
+
+        this.notification.success(
+          `Venta #${respuesta.id} registrada correctamente.`,
+          'Venta realizada'
+        );
+
+        this.cargarProductosPOS();
+
+        this.cdr.detectChanges();
+      },
+
+      error: (error) => {
+
+        console.error('ERROR REGISTRANDO VENTA:', error);
+
+        this.guardandoVenta = false;
+
+        let mensaje =
+          'No fue posible registrar la venta.';
+
+        if (error?.error?.message) {
+          mensaje = error.error.message;
+        }
+
+        this.notification.error(
+          mensaje,
+          'Error al registrar venta'
+        );
+
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+
 }

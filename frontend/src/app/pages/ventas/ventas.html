@@ -99,57 +99,6 @@
              RESULTADOS DE BÚSQUEDA
              =============================================== -->
 
-        <div
-          class="resultados-busqueda"
-          *ngIf="
-            mostrarResultadosBusqueda &&
-            resultadosBusqueda.length > 0
-          "
-        >
-
-          <button
-            type="button"
-            class="resultado-item"
-            *ngFor="let producto of resultadosBusqueda"
-            (click)="seleccionarProducto(producto)"
-          >
-
-            <div class="resultado-info">
-
-              <strong>
-                {{ producto.nombre }}
-              </strong>
-
-              <span>
-                Código: {{ producto.codigoBarras }}
-              </span>
-
-              <span *ngIf="producto.proveedor">
-                Proveedor: {{ producto.proveedor }}
-              </span>
-
-            </div>
-
-
-            <div class="resultado-datos">
-
-              <strong>
-                {{
-                (producto.precioVenta ?? producto.precio ?? 0)
-                | currency:'COP':'symbol':'1.0-0'
-                }}
-              </strong>
-
-              <span>
-                Stock: {{ producto.cantidad }}
-              </span>
-
-            </div>
-
-          </button>
-
-        </div>
-
       </div>
 
 
@@ -186,34 +135,31 @@
            TOOLBAR PRODUCTOS
            ================================================= -->
 
-      <div class="pos-products-toolbar">
+        <div class="pos-products-toolbar">
 
-        <div>
+          <div>
 
-          <strong>
-            Productos
-          </strong>
+            <strong>
+              {{ codigoBusqueda ? 'Resultados de búsqueda' : 'Productos' }}
+            </strong>
 
-          <span>
-            {{ productosVisibles.length }} disponibles
-          </span>
+            <span>
+      {{ productosVisibles.length }}
+      {{ productosVisibles.length === 1 ? 'resultado' : 'resultados' }}
+    </span>
+
+          </div>
+
+          <button
+            type="button"
+            class="pos-clear-filter"
+            *ngIf="codigoBusqueda || categoriaSeleccionada !== null"
+            (click)="limpiarFiltros()"
+          >
+            Limpiar filtros
+          </button>
 
         </div>
-
-
-        <button
-          type="button"
-          class="pos-clear-filter"
-          *ngIf="
-            codigoBusqueda ||
-            categoriaSeleccionada !== null
-          "
-          (click)="limpiarFiltros()"
-        >
-          Limpiar filtros
-        </button>
-
-      </div>
 
 
       <!-- =================================================
@@ -238,27 +184,26 @@
            SIN PRODUCTOS
            ================================================= -->
 
-      <div
-        *ngIf="
-          !cargandoProductos &&
-          productosVisibles.length === 0
-        "
-        class="pos-no-products"
-      >
+        <div
+          *ngIf="
+    !cargandoProductos &&
+    productosVisibles.length === 0 &&
+    codigoBusqueda.trim()
+  "
+          class="pos-no-products"
+        >
+          <div class="pos-no-products-icon">
+            📦
+          </div>
 
-        <div class="pos-no-products-icon">
-          📦
+          <strong>
+            No encontramos productos
+          </strong>
+
+          <span>
+    Prueba con otro nombre, código o categoría.
+  </span>
         </div>
-
-        <strong>
-          No encontramos productos
-        </strong>
-
-        <span>
-          Prueba con otro nombre, código o categoría.
-        </span>
-
-      </div>
 
 
       <!-- =================================================
@@ -530,7 +475,7 @@
           type="button"
           class="pos-continue"
           [disabled]="carrito.length === 0"
-          title="El flujo de pago se conectará en el siguiente paso"
+          (click)="continuarVenta()"
         >
           Continuar
         </button>
@@ -540,5 +485,339 @@
     </aside>
 
   </div>
+
+
+  <!-- ========================================================= -->
+  <!-- FINALIZAR VENTA -->
+  <!-- ========================================================= -->
+
+  <div
+    *ngIf="mostrarFinalizarVenta"
+    class="pos-checkout-overlay"
+  >
+
+    <div class="pos-checkout">
+
+
+      <!-- ===================================================== -->
+      <!-- HEADER -->
+      <!-- ===================================================== -->
+
+      <div class="pos-checkout-header">
+
+        <div>
+
+          <span class="pos-checkout-kicker">
+            Finalizar venta
+          </span>
+
+          <h2>
+            Confirmar pago
+          </h2>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="pos-checkout-close"
+          (click)="volverAlCarrito()"
+          [disabled]="guardandoVenta"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- ===================================================== -->
+      <!-- TOTAL -->
+      <!-- ===================================================== -->
+
+      <div class="pos-checkout-total">
+
+        <span>
+          Total a pagar
+        </span>
+
+        <strong>
+          {{
+          obtenerTotalCarrito()
+          | currency:'COP':'symbol':'1.0-0'
+          }}
+        </strong>
+
+      </div>
+
+
+      <!-- ===================================================== -->
+      <!-- MÉTODO DE PAGO -->
+      <!-- ===================================================== -->
+
+      <div class="pos-payment-section">
+
+        <label class="pos-section-label">
+          Método de pago
+        </label>
+
+
+        <div class="pos-payment-options">
+
+
+          <!-- CONTADO -->
+
+          <button
+            type="button"
+            class="pos-payment-option"
+            [class.active]="tipoPago === 'CONTADO'"
+            (click)="seleccionarTipoPago('CONTADO')"
+            [disabled]="guardandoVenta"
+          >
+
+            <span class="pos-payment-icon">
+              💵
+            </span>
+
+            <span class="pos-payment-text">
+
+              <strong>
+                Contado
+              </strong>
+
+              <small>
+                Pago inmediato
+              </small>
+
+            </span>
+
+          </button>
+
+
+          <!-- FIADO -->
+
+          <button
+            type="button"
+            class="pos-payment-option"
+            [class.active]="tipoPago === 'FIADO'"
+            (click)="seleccionarTipoPago('FIADO')"
+            [disabled]="guardandoVenta"
+          >
+
+            <span class="pos-payment-icon">
+              👤
+            </span>
+
+            <span class="pos-payment-text">
+
+              <strong>
+                Fiado
+              </strong>
+
+              <small>
+                Registrar crédito
+              </small>
+
+            </span>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================== -->
+      <!-- CONTADO -->
+      <!-- ===================================================== -->
+
+      <div
+        *ngIf="tipoPago === 'CONTADO'"
+        class="pos-payment-detail"
+      >
+
+        <label for="montoRecibido">
+          Dinero recibido
+        </label>
+
+
+        <div class="pos-money-input">
+
+          <span>
+            $
+          </span>
+
+          <input
+            id="montoRecibido"
+            type="number"
+            min="0"
+            [(ngModel)]="montoRecibido"
+            [disabled]="guardandoVenta"
+          />
+
+        </div>
+
+
+        <div class="pos-change">
+
+          <span>
+            Cambio
+          </span>
+
+          <strong>
+            {{
+            obtenerCambio()
+            | currency:'COP':'symbol':'1.0-0'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================== -->
+      <!-- FIADO -->
+      <!-- ===================================================== -->
+
+      <div
+        *ngIf="tipoPago === 'FIADO'"
+        class="pos-payment-detail"
+      >
+
+        <label for="clienteVenta">
+          Cliente
+        </label>
+
+
+        <select
+          id="clienteVenta"
+          [(ngModel)]="clienteSeleccionadoId"
+          [disabled]="guardandoVenta || cargandoClientes"
+        >
+
+          <option [ngValue]="null">
+            Selecciona un cliente
+          </option>
+
+
+          <option
+            *ngFor="let cliente of clientes"
+            [ngValue]="cliente.id"
+          >
+
+            {{ cliente.nombre }}
+            —
+            {{ cliente.documento }}
+
+          </option>
+
+        </select>
+
+
+        <div
+          *ngIf="cargandoClientes"
+          class="pos-loading-clientes"
+        >
+          Cargando clientes...
+        </div>
+
+
+        <div
+          *ngIf="!cargandoClientes && clientes.length === 0"
+          class="pos-no-clientes"
+        >
+          No hay clientes activos disponibles.
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================== -->
+      <!-- RESUMEN -->
+      <!-- ===================================================== -->
+
+      <div class="pos-checkout-summary">
+
+        <div>
+
+          <span>
+            Productos
+          </span>
+
+          <strong>
+            {{ obtenerCantidadCarrito() }}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Forma de pago
+          </span>
+
+          <strong>
+            {{
+            tipoPago === 'CONTADO'
+            ? 'Contado'
+            : 'Fiado'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================== -->
+      <!-- BOTONES -->
+      <!-- ===================================================== -->
+
+      <div class="pos-checkout-actions">
+
+        <button
+          type="button"
+          class="pos-checkout-back"
+          (click)="volverAlCarrito()"
+          [disabled]="guardandoVenta"
+        >
+          Volver
+        </button>
+
+
+        <button
+          type="button"
+          class="pos-checkout-confirm"
+          (click)="confirmarVenta()"
+          [disabled]="
+            guardandoVenta ||
+            (
+              tipoPago === 'CONTADO' &&
+              montoRecibido < obtenerTotalCarrito()
+            ) ||
+            (
+              tipoPago === 'FIADO' &&
+              clienteSeleccionadoId === null
+            )
+          "
+        >
+
+          <span *ngIf="!guardandoVenta">
+            Confirmar venta
+          </span>
+
+          <span *ngIf="guardandoVenta">
+            Registrando...
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
 
 </div>
