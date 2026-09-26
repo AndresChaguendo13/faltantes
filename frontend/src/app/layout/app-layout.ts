@@ -12,6 +12,14 @@ import {
   RouterOutlet
 } from '@angular/router';
 
+
+
+import { ProductLookupService }
+  from '../shared/services/product-lookup.service';
+
+import { ProductoService }
+  from '../services/producto';
+
 @Component({
   selector: 'app-layout',
   standalone: true,
@@ -76,20 +84,27 @@ export class AppLayout implements OnInit, OnDestroy {
     this.menuUsuarioAbierto = false;
   }
 
-  buscarDesdeMenu(texto: string): void {
-    const termino = texto.trim();
+  buscarDesdeMenu(
+    termino: string,
+    input: HTMLInputElement
+  ): void {
 
-    if (!termino) {
+    const codigo = termino.trim();
+
+    if (!codigo) {
       return;
     }
 
-    /*
-     * Por ahora el buscador global lleva al módulo Productos.
-     * Después podremos conectar aquí búsqueda por código,
-     * producto, cliente, proveedor, etc.
-     */
-    this.router.navigate(['/productos'], {
-      queryParams: { q: termino }
+    // Limpiar inmediatamente la barra
+    input.value = '';
+
+    this.productoService.buscarPorCodigo(codigo).subscribe({
+      next: producto => {
+        this.productLookup.mostrarProducto(producto);
+      },
+      error: () => {
+        this.productLookup.mostrarError(codigo);
+      }
     });
   }
 
@@ -101,6 +116,8 @@ export class AppLayout implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private productoService: ProductoService,
+    private productLookup: ProductLookupService
   ) {}
 }

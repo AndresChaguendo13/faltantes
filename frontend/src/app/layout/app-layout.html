@@ -154,22 +154,7 @@
     </div>
 
 
-    <div class="erp-sidebar-search">
 
-      <span>
-        <svg>
-          <use href="#icon-search"></use>
-        </svg>
-      </span>
-
-      <input
-        type="text"
-        placeholder="Buscar por código de barras..."
-        #busquedaMenu
-        (keydown.enter)="buscarDesdeMenu(busquedaMenu.value)"
-      />
-
-    </div>
 
 
     <nav class="erp-sidebar-menu">
@@ -379,7 +364,7 @@
             type="text"
             placeholder="Buscar por código de barras..."
             #busquedaGlobal
-            (keydown.enter)="buscarDesdeMenu(busquedaGlobal.value)"
+            (keydown.enter)="buscarDesdeMenu(busquedaGlobal.value, busquedaGlobal)"
           />
 
         </div>

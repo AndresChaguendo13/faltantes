@@ -1,0 +1,238 @@
+@if (visible) {
+
+<div
+  class="product-lookup-overlay"
+  (click)="cerrar()"
+>
+
+  <div
+    class="product-lookup-modal"
+    (click)="$event.stopPropagation()"
+  >
+
+    @if (producto) {
+
+    <!-- HEADER -->
+    <div class="lookup-header">
+
+      <div class="lookup-title">
+
+        <div class="lookup-icon">
+          🔎
+        </div>
+
+        <div>
+          <h2>Producto encontrado</h2>
+          <p>Información del producto</p>
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="lookup-close"
+        (click)="cerrar()"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- PRODUCTO PRINCIPAL -->
+    <div class="lookup-product-main">
+
+      <div class="lookup-product-name">
+        {{ producto.nombre }}
+      </div>
+
+      <div class="lookup-barcode">
+        Código de barras:
+        <strong>{{ producto.codigoBarras }}</strong>
+      </div>
+
+    </div>
+
+
+    <!-- INFORMACIÓN -->
+    <div class="lookup-info-grid">
+
+      <!-- STOCK -->
+      <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              STOCK ACTUAL
+            </span>
+
+        <strong
+          [class.lookup-stock]="producto.cantidad > producto.stockMinimo"
+          [class.lookup-stock-low]="producto.cantidad <= producto.stockMinimo"
+        >
+          {{ producto.cantidad }} unidades
+        </strong>
+
+      </div>
+
+
+      <!-- PRECIO -->
+      <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              PRECIO DE VENTA
+            </span>
+
+        <strong class="lookup-price">
+          {{ (producto.precioVenta ?? producto.precio) | currency:'COP':'symbol':'1.0-0' }}
+        </strong>
+
+      </div>
+
+
+      <!-- COSTO -->
+      <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              COSTO DE COMPRA
+            </span>
+
+        <strong>
+          {{ producto.costoCompra | currency:'COP':'symbol':'1.0-0' }}
+        </strong>
+
+      </div>
+
+
+      <!-- PROVEEDOR -->
+      <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              PROVEEDOR
+            </span>
+
+        <strong>
+          {{ producto.proveedor || 'Sin proveedor' }}
+        </strong>
+
+      </div>
+
+
+      <!-- CATEGORÍA -->
+      <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              CATEGORÍA
+            </span>
+
+        <strong>
+          {{ producto.categoria?.nombre || producto.categoriaNombre || 'Sin categoría' }}
+        </strong>
+
+      </div>
+
+
+      <!-- VENCIMIENTO -->
+      <div class="lookup-info-card">
+
+            <span class="lookup-label">
+              FECHA DE VENCIMIENTO
+            </span>
+
+        <strong>
+          {{ producto.fechaVencimiento || 'Sin fecha registrada' }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+    <div class="lookup-footer">
+
+          <span>
+            Código consultado mediante lector
+          </span>
+
+      <button
+        type="button"
+        class="lookup-ok-button"
+        (click)="cerrar()"
+      >
+        Cerrar
+      </button>
+
+    </div>
+
+    } @else {
+
+    <!-- PRODUCTO NO ENCONTRADO -->
+    <div class="lookup-header">
+
+      <div class="lookup-title">
+
+        <div class="lookup-icon">
+          ⚠
+        </div>
+
+        <div>
+          <h2>Producto no encontrado</h2>
+          <p>Consulta de código de barras</p>
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        class="lookup-close"
+        (click)="cerrar()"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="lookup-product-main lookup-not-found">
+
+      <div class="not-found-icon">
+        !
+      </div>
+
+      <h2>Producto no encontrado</h2>
+
+      <p>
+        No existe un producto asociado al código:
+      </p>
+
+      <strong>
+        {{ error }}
+      </strong>
+
+    </div>
+
+
+    <div class="lookup-footer">
+
+          <span>
+            Verifica el código de barras.
+          </span>
+
+      <button
+        type="button"
+        class="lookup-ok-button"
+        (click)="cerrar()"
+      >
+        Cerrar
+      </button>
+
+    </div>
+
+    }
+
+  </div>
+
+</div>
+
+}
