@@ -37,6 +37,8 @@ export class Balance implements OnInit {
   // =========================
   // VENTAS
   // =========================
+  Math = Math;
+
 
   ventas: VentaResponse[] = [];
 
@@ -85,6 +87,104 @@ export class Balance implements OnInit {
   cargandoDetalleCaja = false;
 
 
+
+// =========================
+// PAGINACIÓN
+// =========================
+
+  cajasPaginaActual = 1;
+  cajasPorPagina = 10;
+
+  ventasPaginaActual = 1;
+  ventasPorPagina = 10;
+
+
+// =========================
+// PAGINACIÓN CAJAS
+// =========================
+
+  get totalPaginasCajas(): number {
+    return Math.ceil(
+      this.historialCajas.length / this.cajasPorPagina
+    );
+  }
+
+  get paginasCajas(): number[] {
+    return Array.from(
+      { length: this.totalPaginasCajas },
+      (_, i) => i + 1
+    );
+  }
+
+  get historialCajasPaginadas(): Caja[] {
+
+    const inicio =
+      (this.cajasPaginaActual - 1) *
+      this.cajasPorPagina;
+
+    return this.historialCajas.slice(
+      inicio,
+      inicio + this.cajasPorPagina
+    );
+  }
+
+  cambiarPaginaCajas(pagina: number): void {
+
+    if (
+      pagina < 1 ||
+      pagina > this.totalPaginasCajas
+    ) {
+      return;
+    }
+
+    this.cajasPaginaActual = pagina;
+  }
+
+
+// =========================
+// PAGINACIÓN VENTAS
+// =========================
+
+  get totalPaginasVentas(): number {
+    return Math.ceil(
+      this.ventas.length / this.ventasPorPagina
+    );
+  }
+
+  get paginasVentas(): number[] {
+    return Array.from(
+      { length: this.totalPaginasVentas },
+      (_, i) => i + 1
+    );
+  }
+
+  get ventasPaginadas(): VentaResponse[] {
+
+    const inicio =
+      (this.ventasPaginaActual - 1) *
+      this.ventasPorPagina;
+
+    return this.ventas.slice(
+      inicio,
+      inicio + this.ventasPorPagina
+    );
+  }
+
+  cambiarPaginaVentas(pagina: number): void {
+
+    if (
+      pagina < 1 ||
+      pagina > this.totalPaginasVentas
+    ) {
+      return;
+    }
+
+    this.ventasPaginaActual = pagina;
+  }
+
+
+
+
   // =========================
   // CONSTRUCTOR
   // =========================
@@ -122,6 +222,7 @@ export class Balance implements OnInit {
       next: (ventas) => {
 
         this.ventas = ventas || [];
+        this.ventasPaginaActual = 1;
 
         this.cantidadVentas = this.ventas.length;
 
@@ -189,6 +290,7 @@ export class Balance implements OnInit {
       next: (cajas) => {
 
         this.historialCajas = cajas || [];
+        this.cajasPaginaActual = 1;
 
         this.cargandoHistorialCajas = false;
 
@@ -401,50 +503,50 @@ export class Balance implements OnInit {
     this.solicitarAbrirCaja();
   }
 
-    ejecutarAbrirCaja(): void {
+  ejecutarAbrirCaja(): void {
 
-      const monto = Number(this.montoInicial || 0);
+    const monto = Number(this.montoInicial || 0);
 
-      this.procesandoCaja = true;
-      this.errorCaja = '';
-      this.mensajeCaja = '';
+    this.procesandoCaja = true;
+    this.errorCaja = '';
+    this.mensajeCaja = '';
 
-      this.cajaService.abrirCaja(monto).subscribe({
+    this.cajaService.abrirCaja(monto).subscribe({
 
-        next: (caja) => {
+      next: (caja) => {
 
-          console.log('CAJA ABIERTA:', caja);
+        console.log('CAJA ABIERTA:', caja);
 
-          this.montoInicial = 0;
+        this.montoInicial = 0;
 
-          this.procesandoCaja = false;
+        this.procesandoCaja = false;
 
-          this.mensajeCaja =
-            'Caja abierta correctamente.';
+        this.mensajeCaja =
+          'Caja abierta correctamente.';
 
-          this.cargarCaja();
+        this.cargarCaja();
 
-          this.cdr.detectChanges();
-        },
+        this.cdr.detectChanges();
+      },
 
-        error: (error) => {
+      error: (error) => {
 
-          console.error(
-            'ERROR ABRIENDO CAJA:',
-            error
-          );
+        console.error(
+          'ERROR ABRIENDO CAJA:',
+          error
+        );
 
-          this.procesandoCaja = false;
+        this.procesandoCaja = false;
 
-          this.errorCaja =
-            error?.error?.message ||
-            'No fue posible abrir la caja.';
+        this.errorCaja =
+          error?.error?.message ||
+          'No fue posible abrir la caja.';
 
-          this.cdr.detectChanges();
-        }
+        this.cdr.detectChanges();
+      }
 
-      });
-    }
+    });
+  }
 
 
   // =========================

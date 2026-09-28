@@ -8,13 +8,9 @@
     </div>
 
     <div class="balance-actions">
-      <a routerLink="/ventas" class="balance-btn primary">
-        + Vender
-      </a>
 
-      <a routerLink="/dashboard" class="balance-btn secondary">
-        ← Dashboard
-      </a>
+
+
     </div>
 
   </header>
@@ -179,6 +175,7 @@
             >
 
           </label>
+
 
 
           <button
@@ -379,7 +376,7 @@
           <tbody>
 
           <tr
-            *ngFor="let cajaHistorial of historialCajas"
+            *ngFor="let cajaHistorial of historialCajasPaginadas"
           >
 
             <td>
@@ -513,6 +510,24 @@
 
         </table>
 
+      </div>
+
+      <div *ngIf="totalPaginasCajas > 1" class="table-footer">
+        <span class="results-text">
+          Mostrando <strong>{{ ((cajasPaginaActual - 1) * cajasPorPagina) + 1 }}</strong> -
+          <strong>{{ Math.min(cajasPaginaActual * cajasPorPagina, historialCajas.length) }}</strong>
+          de <strong>{{ historialCajas.length }}</strong> cajas
+        </span>
+
+        <div class="pagination">
+          <button type="button" (click)="cambiarPaginaCajas(cajasPaginaActual - 1)" [disabled]="cajasPaginaActual === 1" aria-label="Página anterior de cajas">‹</button>
+
+          <button *ngFor="let pagina of paginasCajas" type="button" [class.active-page]="cajasPaginaActual === pagina" (click)="cambiarPaginaCajas(pagina)">
+            {{ pagina }}
+          </button>
+
+          <button type="button" (click)="cambiarPaginaCajas(cajasPaginaActual + 1)" [disabled]="cajasPaginaActual === totalPaginasCajas" aria-label="Página siguiente de cajas">›</button>
+        </div>
       </div>
 
     </section>
@@ -771,7 +786,7 @@
 
           <tbody>
 
-          <tr *ngFor="let venta of ventas">
+          <tr *ngFor="let venta of ventasPaginadas">
 
             <td>#{{ venta.id }}</td>
 
@@ -806,6 +821,24 @@
 
         </table>
 
+      </div>
+
+      <div *ngIf="totalPaginasVentas > 1" class="table-footer">
+        <span class="results-text">
+          Mostrando <strong>{{ ((ventasPaginaActual - 1) * ventasPorPagina) + 1 }}</strong> -
+          <strong>{{ Math.min(ventasPaginaActual * ventasPorPagina, ventas.length) }}</strong>
+          de <strong>{{ ventas.length }}</strong> ventas
+        </span>
+
+        <div class="pagination">
+          <button type="button" (click)="cambiarPaginaVentas(ventasPaginaActual - 1)" [disabled]="ventasPaginaActual === 1" aria-label="Página anterior de ventas">‹</button>
+
+          <button *ngFor="let pagina of paginasVentas" type="button" [class.active-page]="ventasPaginaActual === pagina" (click)="cambiarPaginaVentas(pagina)">
+            {{ pagina }}
+          </button>
+
+          <button type="button" (click)="cambiarPaginaVentas(ventasPaginaActual + 1)" [disabled]="ventasPaginaActual === totalPaginasVentas" aria-label="Página siguiente de ventas">›</button>
+        </div>
       </div>
 
     </section>

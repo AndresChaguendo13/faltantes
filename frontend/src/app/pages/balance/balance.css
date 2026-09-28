@@ -1291,3 +1291,72 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================
+   PAGINACIÓN DE HISTORIALES
+   ========================================= */
+.table-footer {
+  min-height: 58px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #e8ecf1;
+  background: #fff;
+}
+.results-text {
+  color: #667085;
+  font-size: 11px;
+}
+.results-text strong {
+  color: #344054;
+  font-weight: 700;
+}
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.balance-cards {
+  margin-top: 14px;
+}
+
+
+.pagination button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 9px;
+  border: 1px solid #dfe5ec;
+  border-radius: 7px;
+  background: #fff;
+  color: #344054;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+.pagination button:hover:not(:disabled) {
+  background: #f6f8fb;
+  border-color: #cbd5e1;
+}
+.pagination button.active-page {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+.pagination button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.balance-table-card {
+  margin-top: 32px;
+}
+@media (max-width: 700px) {
+  .table-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

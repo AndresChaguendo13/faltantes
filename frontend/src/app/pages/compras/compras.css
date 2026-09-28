@@ -783,3 +783,171 @@
   }
 
 }
+
+/* =========================================================
+   REFINAMIENTO DE ESPACIADO Y ALINEACIÓN
+   ========================================================= */
+
+.compras-page {
+  padding-top: 4px;
+  padding-bottom: 40px;
+  box-sizing: border-box;
+}
+
+/* Breadcrumb separado visualmente del hero */
+.compras-page .erp-breadcrumb {
+  margin-bottom: 16px;
+  padding: 3px 2px 0;
+  line-height: 1.4;
+}
+
+/* Evita que el hero quede pegado al breadcrumb */
+.compras-page .compras-hero {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+/* =========================================================
+   TARJETA — NUEVA COMPRA
+   El contenido interno necesita aire lateral y vertical.
+   ========================================================= */
+
+.compras-page .erp-form-grid {
+  width: auto;
+  margin: 20px 26px 26px;
+  padding: 0;
+}
+
+.compras-page .erp-field {
+  width: min(100%, 420px);
+}
+
+.compras-page .erp-field label {
+  margin-bottom: 1px;
+}
+
+.compras-page .erp-field select {
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   TARJETA — AGREGAR PRODUCTOS
+   ========================================================= */
+
+.compras-page .product-search {
+  width: auto;
+  margin: 20px 26px 0;
+}
+
+.compras-page .product-search input {
+  box-sizing: border-box;
+  height: 44px;
+}
+
+.compras-page .product-results {
+  margin: 14px 26px 26px;
+}
+
+.compras-page .empty-products {
+  min-height: 108px;
+  padding: 26px 20px;
+}
+
+/* =========================================================
+   TARJETA — DETALLE DE COMPRA
+   ========================================================= */
+
+.compras-page .purchase-table-wrapper {
+  margin-left: 26px;
+  margin-right: 26px;
+}
+
+.compras-page .purchase-summary {
+  margin-left: 26px;
+  margin-right: 26px;
+  padding-bottom: 20px;
+}
+
+/* =========================================================
+   HERO — VALORES LEGIBLES
+   ========================================================= */
+
+.compras-page .erp-stat-label {
+  color: rgba(255, 255, 255, .72);
+}
+
+.compras-page .erp-stat strong {
+  color: #fff;
+}
+
+/* =========================================================
+   ESPACIO ENTRE TARJETAS
+   ========================================================= */
+
+.compras-page > .erp-card {
+  margin-bottom: 16px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .compras-page .erp-breadcrumb {
+    margin-bottom: 12px;
+  }
+
+  .compras-page .erp-form-grid {
+    margin: 18px 18px 22px;
+  }
+
+  .compras-page .erp-field {
+    width: 100%;
+  }
+
+  .compras-page .product-search {
+    margin: 18px 18px 0;
+  }
+
+  .compras-page .product-results {
+    margin: 12px 18px 20px;
+  }
+
+  .compras-page .purchase-table-wrapper {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .compras-page .purchase-summary {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .compras-page .erp-form-grid {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  .compras-page .product-search {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  .compras-page .product-results {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  .compras-page .purchase-table-wrapper {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+
+  .compras-page .purchase-summary {
+    margin-left: 14px;
+    margin-right: 14px;
+  }
+}

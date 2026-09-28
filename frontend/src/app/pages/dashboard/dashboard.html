@@ -6,7 +6,7 @@
     <div>
 
       <h1>
-        Dashboard
+        MIStock
       </h1>
 
       <p>
@@ -271,30 +271,36 @@
 
         } @else {
 
-        @for (nota of notasRapidas; track nota.id) {
+        @for (nota of notasRapidasPaginadas; track nota.id) {
 
         <article
           class="quick-note-item"
-          [class.quick-note-completed]="nota.completada"
+          [class.quick-note-completed]="nota.estado === 'COMPLETADA'"
         >
 
           <button
             type="button"
             class="quick-note-check"
-            [class.checked]="nota.completada"
+            [class.checked]="nota.estado === 'COMPLETADA'"
             (click)="alternarNotaCompletada(nota)"
-            [attr.aria-label]="nota.completada ? 'Marcar pendiente' : 'Marcar completada'"
+            [attr.aria-label]="nota.estado === 'COMPLETADA' ? 'Marcar pendiente' : 'Marcar completada'"
           >
-            {{ nota.completada ? '✓' : '' }}
+            {{ nota.estado === 'COMPLETADA' ? '✓' : '' }}
           </button>
 
           <div class="quick-note-body" (click)="editarNota(nota)">
             <strong>{{ nota.titulo }}</strong>
-            <p>{{ nota.contenido }}</p>
+            <p>{{ nota.descripcion }}</p>
 
-            @if (nota.recordatorio) {
+            @if (nota.fechaAlerta) {
             <small>
-              ⏰ {{ nota.recordatorio | date:'dd/MM/yyyy HH:mm' }}
+              ⏰ {{ nota.fechaAlerta | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+            }
+
+            @if (nota.alarma && nota.fechaAlerta) {
+            <small class="quick-note-alarm">
+              🔔 Alarma activada
             </small>
             }
           </div>
@@ -302,7 +308,7 @@
           <button
             type="button"
             class="quick-note-delete"
-            (click)="solicitarEliminarNota(nota)"
+            (click)="$event.preventDefault(); $event.stopPropagation(); solicitarEliminarNota(nota)"
             aria-label="Eliminar nota"
           >
             ×
@@ -318,7 +324,20 @@
 
       <div class="quick-notes-footer">
         <span>{{ notasRapidas.length }} {{ notasRapidas.length === 1 ? 'nota' : 'notas' }}</span>
-        <span>Guardadas automáticamente</span>
+
+        @if (totalPaginasNotas > 1) {
+        <div class="quick-notes-pagination" aria-label="Paginación de notas">
+          <button type="button" class="quick-notes-page-arrow" [disabled]="paginaNotasActual === 1" (click)="paginaNotasAnterior()" aria-label="Página anterior">‹</button>
+
+          @for (pagina of paginasNotas; track pagina) {
+          <button type="button" class="quick-notes-page-number" [class.active]="pagina === paginaNotasActual" (click)="cambiarPaginaNotas(pagina)">{{ pagina }}</button>
+          }
+
+          <button type="button" class="quick-notes-page-arrow" [disabled]="paginaNotasActual === totalPaginasNotas" (click)="paginaNotasSiguiente()" aria-label="Página siguiente">›</button>
+        </div>
+        }
+
+        <span>Guardadas en el sistema</span>
       </div>
 
     </section>
@@ -994,12 +1013,28 @@
       </label>
 
       <label>
-        Recordatorio (opcional)
+        Fecha y hora de alerta (opcional)
         <input
           type="datetime-local"
           name="notaRecordatorio"
           [(ngModel)]="notaForm.recordatorio"
         >
+      </label>
+
+      <label class="quick-note-alarm-option">
+        <span class="quick-note-label">Alarma</span>
+
+        <span class="quick-note-switch-row">
+          <input
+            type="checkbox"
+            name="notaAlarma"
+            [(ngModel)]="notaForm.alarma"
+          >
+          <span class="quick-note-switch"></span>
+          <span class="quick-note-switch-text">
+            🔔 Activar alarma sonora dentro de MiStock
+          </span>
+        </span>
       </label>
 
     </div>
@@ -1022,6 +1057,38 @@
         {{ notaEditandoId === null ? 'Guardar nota' : 'Guardar cambios' }}
       </button>
     </div>
+
+  </div>
+
+</div>
+
+}
+
+
+<!-- =====================================================
+     MODAL ALERTA INTERNA DE NOTA RÁPIDA
+====================================================== -->
+
+@if (mostrarModalAlertaNota && notaEnAlerta) {
+
+<div class="quick-note-alert-overlay" (click)="cerrarModalAlertaNota()">
+
+  <div class="quick-note-alert-modal" (click)="$event.stopPropagation()">
+
+    <div class="quick-note-alert-icon">🔔</div>
+    <span class="quick-note-alert-kicker">RECORDATORIO</span>
+    <h2>{{ notaEnAlerta.titulo }}</h2>
+    <p>{{ notaEnAlerta.descripcion }}</p>
+
+    @if (notaEnAlerta.fechaAlerta) {
+    <div class="quick-note-alert-time">
+      ⏰ {{ notaEnAlerta.fechaAlerta | date:'dd/MM/yyyy HH:mm' }}
+    </div>
+    }
+
+    <button type="button" class="quick-note-alert-button" (click)="cerrarModalAlertaNota()">
+      Entendido
+    </button>
 
   </div>
 

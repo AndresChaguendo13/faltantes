@@ -2611,3 +2611,643 @@
   }
 
 }
+
+
+/* =========================================================
+   FIX MODAL NOTAS RÁPIDAS
+   El HTML utiliza quick-note-modal-*.
+   ========================================================= */
+
+.quick-note-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10000 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 100vw !important;
+  height: 100vh !important;
+
+  padding: 24px !important;
+  box-sizing: border-box !important;
+
+  background: rgba(15, 23, 42, 0.56) !important;
+  backdrop-filter: blur(3px);
+
+  animation: quickNoteOverlayIn 0.18s ease-out;
+}
+
+.quick-note-modal {
+  position: relative !important;
+
+  width: min(520px, calc(100vw - 48px)) !important;
+  max-height: min(720px, calc(100vh - 48px)) !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: hidden !important;
+
+  background: #ffffff !important;
+  border: 1px solid #e6ebf1 !important;
+  border-radius: 18px !important;
+
+  box-shadow:
+    0 28px 70px rgba(15, 23, 42, 0.22),
+    0 8px 24px rgba(15, 23, 42, 0.10) !important;
+
+  animation: quickNoteModalIn 0.22s ease-out;
+}
+
+.quick-note-modal-header {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+
+  padding: 22px 24px 18px !important;
+
+  border-bottom: 1px solid #edf1f5 !important;
+  background: #ffffff !important;
+}
+
+.quick-note-modal-kicker {
+  display: inline-block;
+
+  margin-bottom: 5px;
+
+  color: #0878e8;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.quick-note-modal-header h2 {
+  margin: 0 !important;
+
+  color: #172b3f !important;
+  font-size: 21px !important;
+  line-height: 1.2 !important;
+  font-weight: 800 !important;
+}
+
+.quick-note-modal-header p {
+  margin: 6px 0 0 !important;
+
+  color: #8290a0 !important;
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+}
+
+.quick-note-modal-close {
+  flex: 0 0 auto;
+
+  width: 34px !important;
+  height: 34px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 0 !important;
+
+  border: 1px solid #e4e9ef !important;
+  border-radius: 9px !important;
+
+  background: #f7f9fb !important;
+  color: #667586 !important;
+
+  font-size: 21px !important;
+  line-height: 1 !important;
+
+  cursor: pointer !important;
+
+  transition:
+    background .15s ease,
+    color .15s ease,
+    border-color .15s ease !important;
+}
+
+.quick-note-modal-close:hover {
+  background: #eef5fb !important;
+  border-color: #c9dff4 !important;
+  color: #0878e8 !important;
+}
+
+.quick-note-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+
+  padding: 22px 24px !important;
+
+  overflow-y: auto !important;
+}
+
+.quick-note-form label {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+
+  margin: 0 !important;
+
+  color: #344054 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+.quick-note-form input[type="text"],
+.quick-note-form input[type="datetime-local"],
+.quick-note-form textarea {
+  width: 100% !important;
+  box-sizing: border-box !important;
+
+  padding: 11px 12px !important;
+
+  border: 1px solid #d8e0e8 !important;
+  border-radius: 9px !important;
+
+  background: #ffffff !important;
+  color: #26384a !important;
+
+  font-family: inherit !important;
+  font-size: 12px !important;
+
+  outline: none !important;
+
+  transition:
+    border-color .15s ease,
+    box-shadow .15s ease !important;
+}
+
+.quick-note-form textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.quick-note-form input::placeholder,
+.quick-note-form textarea::placeholder {
+  color: #a5afb9;
+}
+
+.quick-note-form input[type="text"]:focus,
+.quick-note-form input[type="datetime-local"]:focus,
+.quick-note-form textarea:focus {
+  border-color: #168df0 !important;
+  box-shadow: 0 0 0 3px rgba(22, 141, 240, 0.10) !important;
+}
+
+.quick-note-label {
+  color: #344054 !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+.quick-note-alarm-option {
+  gap: 8px !important;
+}
+
+.quick-note-switch-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+
+  min-height: 34px;
+}
+
+.quick-note-switch-row input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.quick-note-switch {
+  position: relative;
+
+  width: 38px;
+  height: 21px;
+
+  flex: 0 0 auto;
+
+  border-radius: 99px;
+  background: #dce3ea;
+
+  cursor: pointer;
+
+  transition: background .18s ease;
+}
+
+.quick-note-switch::after {
+  content: "";
+
+  position: absolute;
+  top: 3px;
+  left: 3px;
+
+  width: 15px;
+  height: 15px;
+
+  border-radius: 50%;
+  background: #ffffff;
+
+  box-shadow: 0 1px 3px rgba(0,0,0,.18);
+
+  transition: transform .18s ease;
+}
+
+.quick-note-switch-row input[type="checkbox"]:checked + .quick-note-switch {
+  background: #0878e8;
+}
+
+.quick-note-switch-row input[type="checkbox"]:checked + .quick-note-switch::after {
+  transform: translateX(17px);
+}
+
+.quick-note-switch-text {
+  color: #687786 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+}
+
+.quick-note-modal-actions {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 9px !important;
+
+  padding: 15px 24px !important;
+
+  border-top: 1px solid #edf1f5 !important;
+  background: #fafbfc !important;
+}
+
+.quick-note-cancel-button,
+.quick-note-save-button {
+  min-height: 36px !important;
+
+  padding: 0 15px !important;
+
+  border-radius: 8px !important;
+
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+
+  cursor: pointer !important;
+}
+
+.quick-note-cancel-button {
+  border: 1px solid #d8e0e8 !important;
+  background: #ffffff !important;
+  color: #526071 !important;
+}
+
+.quick-note-cancel-button:hover {
+  background: #f5f7f9 !important;
+}
+
+.quick-note-save-button {
+  border: 0 !important;
+  background: #0878e8 !important;
+  color: #ffffff !important;
+
+  box-shadow: 0 4px 10px rgba(8, 120, 232, 0.18);
+}
+
+.quick-note-save-button:hover:not(:disabled) {
+  background: #066bd0 !important;
+}
+
+.quick-note-save-button:disabled {
+  opacity: .45 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+@keyframes quickNoteOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes quickNoteModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .quick-note-modal-overlay {
+    padding: 12px !important;
+  }
+
+  .quick-note-modal {
+    width: 100% !important;
+    max-height: calc(100vh - 24px) !important;
+    border-radius: 14px !important;
+  }
+
+  .quick-note-modal-header {
+    padding: 18px 18px 15px !important;
+  }
+
+  .quick-note-form {
+    padding: 18px !important;
+  }
+
+  .quick-note-modal-actions {
+    padding: 13px 18px !important;
+  }
+}
+
+
+/* =========================================================
+   NOTAS RÁPIDAS — PAGINACIÓN
+========================================================= */
+
+.quick-notes-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.quick-notes-page-arrow,
+.quick-notes-page-number {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid #dfe6ed;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #667586;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.quick-notes-page-number.active {
+  border-color: #0878e8;
+  background: #0878e8;
+  color: #ffffff;
+}
+
+.quick-notes-page-arrow:hover:not(:disabled),
+.quick-notes-page-number:hover:not(.active) {
+  border-color: #bcd8ef;
+  background: #f2f8fd;
+  color: #0878e8;
+}
+
+.quick-notes-page-arrow:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.quick-note-alarm {
+  color: #0878e8 !important;
+  font-weight: 700;
+}
+
+/* =========================================================
+   NOTAS RÁPIDAS — ALERTA INTERNA
+========================================================= */
+
+.quick-note-alert-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100002 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  background: rgba(15, 23, 42, .66) !important;
+  backdrop-filter: blur(4px);
+  animation: quickNoteOverlayIn .18s ease-out;
+}
+
+.quick-note-alert-modal {
+  width: min(430px, calc(100vw - 40px));
+  box-sizing: border-box;
+  padding: 30px 28px 26px;
+  border: 1px solid #e3e9ef;
+  border-radius: 18px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 28px 80px rgba(15,23,42,.28);
+  animation: quickNoteModalIn .22s ease-out;
+}
+
+.quick-note-alert-icon {
+  width: 62px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #eaf7ff;
+  color: #0878e8;
+  font-size: 28px;
+  box-shadow: 0 8px 22px rgba(8,120,232,.12);
+}
+
+.quick-note-alert-kicker {
+  display: block;
+  margin-bottom: 6px;
+  color: #0878e8;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.quick-note-alert-modal h2 {
+  margin: 0;
+  color: #172b3f;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.quick-note-alert-modal p {
+  margin: 10px auto 0;
+  max-width: 340px;
+  color: #657585;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.quick-note-alert-time {
+  margin: 16px auto 0;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: #f5f8fb;
+  color: #536575;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.quick-note-alert-button {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 9px;
+  background: #0878e8;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.quick-note-alert-button:hover {
+  background: #066bd0;
+}
+
+@media (max-width: 600px) {
+  .quick-notes-footer {
+    flex-wrap: wrap;
+  }
+
+  .quick-notes-pagination {
+    order: 3;
+    width: 100%;
+  }
+
+  .quick-note-alert-modal {
+    padding: 25px 20px 21px;
+  }
+
+
+
+
+}
+
+/* =====================================================
+   MODAL CONFIRMACIÓN ELIMINAR NOTA
+   FIX DEFINITIVO
+   Este bloque está FUERA de cualquier @media para que
+   funcione también en escritorio.
+===================================================== */
+
+.quick-note-delete-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  box-sizing: border-box !important;
+  background: rgba(15, 23, 42, 0.68) !important;
+  z-index: 2147483647 !important;
+}
+
+.quick-note-delete-modal {
+  position: relative !important;
+  width: min(390px, calc(100vw - 40px)) !important;
+  max-width: 390px !important;
+  margin: 0 !important;
+  padding: 26px !important;
+  box-sizing: border-box !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  text-align: center !important;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.32) !important;
+  color: #182c40 !important;
+}
+
+.quick-note-delete-icon {
+  width: 52px !important;
+  height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto 14px !important;
+  border-radius: 50% !important;
+  background: #fff1f1 !important;
+  color: #dc3030 !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+}
+
+.quick-note-delete-modal h2 {
+  margin: 0 0 8px !important;
+  color: #182c40 !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+}
+
+.quick-note-delete-modal p {
+  margin: 0 !important;
+  color: #71808f !important;
+  font-size: 11px !important;
+  line-height: 1.55 !important;
+}
+
+.quick-note-delete-modal p strong {
+  color: #35495c !important;
+}
+
+.quick-note-delete-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+  margin-top: 22px !important;
+}
+
+.quick-note-delete-actions button {
+  min-height: 42px !important;
+  box-sizing: border-box !important;
+  border-radius: 8px !important;
+  font-family: inherit !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+.quick-note-cancel-button {
+  border: 1px solid #d8e0e7 !important;
+  background: #f7f9fb !important;
+  color: #536575 !important;
+}
+
+.quick-note-cancel-button:hover {
+  background: #eef2f5 !important;
+}
+
+.quick-note-delete-confirm-button {
+  border: none !important;
+  background: #dc3030 !important;
+  color: #ffffff !important;
+}
+
+.quick-note-delete-confirm-button:hover {
+  background: #c92323 !important;
+}
+
+@media (max-width: 600px) {
+  .quick-note-delete-actions {
+    grid-template-columns: 1fr !important;
+  }
+}
