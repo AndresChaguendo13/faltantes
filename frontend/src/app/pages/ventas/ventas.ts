@@ -409,6 +409,8 @@ export class Ventas implements OnInit {
                   'Producto no encontrado'
                 );
 
+                this.limpiarBusqueda();
+
               }
 
               this.cdr.detectChanges();
