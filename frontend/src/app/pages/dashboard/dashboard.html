@@ -51,7 +51,10 @@
 
         </div>
 
-        <a>
+        <a
+          [routerLink]="['/productos']"
+          class="stat-details-link"
+        >
           Ver detalles →
         </a>
 
@@ -85,7 +88,10 @@
 
         </div>
 
-        <a>
+        <a
+          [routerLink]="['/productos']"
+          class="stat-details-link"
+        >
           Ver detalles →
         </a>
 
@@ -119,7 +125,10 @@
 
         </div>
 
-        <a>
+        <a
+          [routerLink]="['/balance']"
+          class="stat-details-link"
+        >
           Ver detalles →
         </a>
 
@@ -153,7 +162,10 @@
 
         </div>
 
-        <a>
+        <a
+          [routerLink]="['/compras']"
+          class="stat-details-link"
+        >
           Ver detalles →
         </a>
 
@@ -187,7 +199,10 @@
 
         </div>
 
-        <a>
+        <a
+          [routerLink]="['/productos']"
+          class="stat-details-link"
+        >
           Ver detalles →
         </a>
 
@@ -221,7 +236,10 @@
 
         </div>
 
-        <a>
+        <a
+          [routerLink]="['/balance']"
+          class="stat-details-link"
+        >
           Ver detalles →
         </a>
 
@@ -308,7 +326,7 @@
           <button
             type="button"
             class="quick-note-delete"
-            (click)="$event.preventDefault(); $event.stopPropagation(); solicitarEliminarNota(nota)"
+            (click)="solicitarEliminarNota(nota)"
             aria-label="Eliminar nota"
           >
             ×
