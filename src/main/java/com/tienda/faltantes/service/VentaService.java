@@ -99,6 +99,10 @@ public class VentaService {
                             DetalleVentaResponseDTO detalleDTO =
                                     new DetalleVentaResponseDTO();
 
+                            detalleDTO.setProductoId(
+                                    detalle.getProducto().getId()
+                            );
+
                             detalleDTO.setProducto(
                                     detalle.getProducto().getNombre()
                             );
@@ -159,6 +163,10 @@ public class VentaService {
 
                                         DetalleVentaResponseDTO detalleDTO =
                                                 new DetalleVentaResponseDTO();
+
+                                        detalleDTO.setProductoId(
+                                                detalle.getProducto().getId()
+                                        );
 
                                         detalleDTO.setProducto(
                                                 detalle.getProducto().getNombre()
@@ -336,6 +344,7 @@ public class VentaService {
                 .map(detalle -> {
                     DetalleVentaResponseDTO detalleDTO = new DetalleVentaResponseDTO();
 
+                    detalleDTO.setProductoId(detalle.getProducto().getId());
                     detalleDTO.setProducto(detalle.getProducto().getNombre());
                     detalleDTO.setCantidad(detalle.getCantidad());
                     detalleDTO.setPrecioUnitario(detalle.getPrecioUnitario());

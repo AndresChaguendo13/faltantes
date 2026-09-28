@@ -13,6 +13,11 @@ import {
 } from '../../services/ventas';
 
 import {
+  DevolucionesVentaService,
+  DevolucionVentaRequest
+} from '../../services/devoluciones-venta';
+
+import {
   CajaService,
   Caja,
   CajaResumen,
@@ -49,6 +54,16 @@ export class Balance implements OnInit {
   cantidadVentas = 0;
   ventasContado = 0;
   ventasFiado = 0;
+  ventaSeleccionada: VentaResponse | null = null;
+  mostrarDetalleVenta = false;
+  detalleDevolucionSeleccionado: any = null;
+  mostrarDevolucion = false;
+
+  cantidadDevolucion = 1;
+  motivoDevolucion = '';
+
+  procesandoDevolucion = false;
+  errorDevolucion = '';
 
 
   // =========================
@@ -182,6 +197,153 @@ export class Balance implements OnInit {
     this.ventasPaginaActual = pagina;
   }
 
+  // =========================
+// DETALLE DE VENTA
+// =========================
+
+  verDetalleVenta(venta: VentaResponse): void {
+    this.ventaSeleccionada = venta;
+    this.mostrarDetalleVenta = true;
+
+    this.cdr.detectChanges();
+  }
+
+  cerrarDetalleVenta(): void {
+    this.mostrarDetalleVenta = false;
+    this.ventaSeleccionada = null;
+
+    this.cdr.detectChanges();
+  }
+
+  // =========================
+// DEVOLUCIONES
+// =========================
+
+  abrirDevolucion(detalle: any): void {
+
+    this.detalleDevolucionSeleccionado = detalle;
+
+    this.cantidadDevolucion = 1;
+
+    this.motivoDevolucion = '';
+
+    this.errorDevolucion = '';
+
+    this.mostrarDevolucion = true;
+
+    this.cdr.detectChanges();
+  }
+
+
+  cerrarDevolucion(): void {
+
+    this.mostrarDevolucion = false;
+
+    this.detalleDevolucionSeleccionado = null;
+
+    this.cantidadDevolucion = 1;
+
+    this.motivoDevolucion = '';
+
+    this.errorDevolucion = '';
+
+    this.procesandoDevolucion = false;
+
+    this.cdr.detectChanges();
+  }
+
+
+  confirmarDevolucion(): void {
+
+    if (!this.ventaSeleccionada || !this.detalleDevolucionSeleccionado) {
+      return;
+    }
+
+    const cantidad = Number(this.cantidadDevolucion);
+
+    if (!cantidad || cantidad <= 0) {
+
+      this.errorDevolucion =
+        'La cantidad debe ser mayor que cero.';
+
+      return;
+    }
+
+    if (cantidad > this.detalleDevolucionSeleccionado.cantidad) {
+
+      this.errorDevolucion =
+        `No puedes devolver más de ${this.detalleDevolucionSeleccionado.cantidad} unidad(es).`;
+
+      return;
+    }
+
+    if (!this.motivoDevolucion.trim()) {
+
+      this.errorDevolucion =
+        'Debes indicar el motivo de la devolución.';
+
+      return;
+    }
+
+    const request: DevolucionVentaRequest = {
+
+      ventaId: this.ventaSeleccionada.id,
+
+      productoId:
+      this.detalleDevolucionSeleccionado.productoId,
+
+      cantidad: cantidad,
+
+      motivo: this.motivoDevolucion.trim()
+    };
+
+    this.procesandoDevolucion = true;
+
+    this.errorDevolucion = '';
+
+    this.devolucionesVentaService
+      .devolverProducto(request)
+      .subscribe({
+
+        next: (respuesta) => {
+
+          console.log(
+            'DEVOLUCIÓN REALIZADA:',
+            respuesta
+          );
+
+          this.procesandoDevolucion = false;
+
+          this.cerrarDevolucion();
+
+          this.cargarBalance();
+
+          this.cargarCaja();
+
+          this.cdr.detectChanges();
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'ERROR DEVOLVIENDO PRODUCTO:',
+            error
+          );
+
+          this.procesandoDevolucion = false;
+
+          this.errorDevolucion =
+            error?.error?.message ||
+            'No fue posible realizar la devolución.';
+
+          this.cdr.detectChanges();
+
+        }
+
+      });
+  }
+
 
 
 
@@ -192,6 +354,7 @@ export class Balance implements OnInit {
   constructor(
     private ventaService: VentaService,
     private cajaService: CajaService,
+    private devolucionesVentaService: DevolucionesVentaService,
     private cdr: ChangeDetectorRef
   ) {}
 

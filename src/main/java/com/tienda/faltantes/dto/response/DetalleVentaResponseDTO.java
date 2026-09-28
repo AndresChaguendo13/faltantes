@@ -2,10 +2,19 @@ package com.tienda.faltantes.dto.response;
 
 public class DetalleVentaResponseDTO {
 
+    private Long productoId;
     private String producto;
     private Integer cantidad;
     private Double precioUnitario;
     private Double subtotal;
+
+    public Long getProductoId() {
+        return productoId;
+    }
+
+    public void setProductoId(Long productoId) {
+        this.productoId = productoId;
+    }
 
     public String getProducto() {
         return producto;

@@ -1,5 +1,9 @@
 <div class="balance-page">
 
+  <!-- =========================
+       HEADER
+  ========================= -->
+
   <header class="balance-header">
 
     <div>
@@ -8,25 +12,28 @@
     </div>
 
     <div class="balance-actions">
-
-
-
     </div>
 
   </header>
 
+
   <!-- =========================
-     CAJA
-========================= -->
+       CAJA
+  ========================= -->
 
   <section class="caja-panel">
 
     <div class="caja-panel-header">
 
       <div>
-        <span class="caja-kicker">CONTROL DE CAJA</span>
 
-        <h2>Caja del día</h2>
+        <span class="caja-kicker">
+          CONTROL DE CAJA
+        </span>
+
+        <h2>
+          Caja del día
+        </h2>
 
         <p *ngIf="caja">
           Abierta desde
@@ -36,6 +43,7 @@
         <p *ngIf="!caja">
           No hay una caja abierta actualmente.
         </p>
+
       </div>
 
       <span
@@ -43,8 +51,8 @@
         [class.abierta]="caja"
         [class.cerrada]="!caja"
       >
-      {{ caja ? 'CAJA ABIERTA' : 'CAJA CERRADA' }}
-    </span>
+        {{ caja ? 'CAJA ABIERTA' : 'CAJA CERRADA' }}
+      </span>
 
     </div>
 
@@ -89,7 +97,9 @@
 
         <article class="caja-metric">
 
-          <span>Saldo inicial</span>
+          <span>
+            Saldo inicial
+          </span>
 
           <strong>
             {{ caja.montoInicial | currency:'COP':'symbol':'1.0-0' }}
@@ -100,7 +110,9 @@
 
         <article class="caja-metric">
 
-          <span>Ventas contado</span>
+          <span>
+            Ventas contado
+          </span>
 
           <strong>
             {{
@@ -114,7 +126,9 @@
 
         <article class="caja-metric">
 
-          <span>Abonos fiados</span>
+          <span>
+            Abonos fiados
+          </span>
 
           <strong>
             {{
@@ -128,7 +142,9 @@
 
         <article class="caja-metric highlight">
 
-          <span>Total recibido</span>
+          <span>
+            Total recibido
+          </span>
 
           <strong>
             {{
@@ -148,7 +164,9 @@
 
         <div>
 
-          <h3>Cerrar caja</h3>
+          <h3>
+            Cerrar caja
+          </h3>
 
           <p>
             Ingresa el dinero físico que tienes actualmente
@@ -162,9 +180,9 @@
 
           <label>
 
-          <span>
-            Dinero físico en caja
-          </span>
+            <span>
+              Dinero físico en caja
+            </span>
 
             <input
               type="number"
@@ -175,7 +193,6 @@
             >
 
           </label>
-
 
 
           <button
@@ -206,7 +223,9 @@
 
         <div class="caja-open-info">
 
-          <h3>Abrir caja</h3>
+          <h3>
+            Abrir caja
+          </h3>
 
           <p>
             Ingresa el dinero inicial disponible para comenzar
@@ -220,9 +239,9 @@
 
           <label>
 
-          <span>
-            Monto inicial
-          </span>
+            <span>
+              Monto inicial
+            </span>
 
             <input
               type="number"
@@ -255,6 +274,8 @@
   </section>
 
 
+  <!-- ERROR GENERAL -->
+
   <div
     *ngIf="error"
     class="balance-error"
@@ -262,6 +283,8 @@
     {{ error }}
   </div>
 
+
+  <!-- CARGANDO -->
 
   <div
     *ngIf="cargando"
@@ -273,54 +296,89 @@
 
   <ng-container *ngIf="!cargando">
 
+
+    <!-- =========================
+         MÉTRICAS
+    ========================= -->
+
     <section class="balance-cards">
 
       <article class="balance-card">
-        <span>Ventas realizadas</span>
-        <strong>{{ cantidadVentas }}</strong>
+
+        <span>
+          Ventas realizadas
+        </span>
+
+        <strong>
+          {{ cantidadVentas }}
+        </strong>
+
       </article>
 
+
       <article class="balance-card highlight">
-        <span>Total vendido</span>
+
+        <span>
+          Total vendido
+        </span>
+
         <strong>
           {{ totalVentas | currency:'COP':'symbol':'1.0-0' }}
         </strong>
+
       </article>
 
+
       <article class="balance-card">
-        <span>Ventas contado</span>
+
+        <span>
+          Ventas contado
+        </span>
+
         <strong>
           {{ ventasContado | currency:'COP':'symbol':'1.0-0' }}
         </strong>
+
       </article>
 
+
       <article class="balance-card">
-        <span>Ventas fiadas</span>
+
+        <span>
+          Ventas fiadas
+        </span>
+
         <strong>
           {{ ventasFiado | currency:'COP':'symbol':'1.0-0' }}
         </strong>
+
       </article>
 
     </section>
 
 
-    <!-- ============================= -->
-    <!-- HISTORIAL DE CAJAS -->
-    <!-- ============================= -->
+    <!-- =============================
+         HISTORIAL DE CAJAS
+    ============================= -->
 
     <section class="balance-section caja-historial">
 
       <div class="section-header">
 
         <div>
-          <h2>Historial de cajas</h2>
+
+          <h2>
+            Historial de cajas
+          </h2>
 
           <p>
             Consulta los cierres anteriores y revisa cómo quedó cada caja.
           </p>
+
         </div>
 
       </div>
+
 
       <div
         *ngIf="cargandoHistorialCajas"
@@ -329,16 +387,22 @@
         Cargando historial de cajas...
       </div>
 
+
       <div
         *ngIf="!cargandoHistorialCajas && historialCajas.length === 0"
         class="historial-empty"
       >
-        <strong>No hay cajas registradas</strong>
+
+        <strong>
+          No hay cajas registradas
+        </strong>
 
         <span>
-      Cuando cierres una caja aparecerá aquí.
-    </span>
+          Cuando cierres una caja aparecerá aquí.
+        </span>
+
       </div>
+
 
       <div
         *ngIf="!cargandoHistorialCajas && historialCajas.length > 0"
@@ -373,6 +437,7 @@
 
           </thead>
 
+
           <tbody>
 
           <tr
@@ -380,117 +445,151 @@
           >
 
             <td>
+
               <strong>
                 #{{ cajaHistorial.id }}
               </strong>
+
             </td>
 
+
             <td>
+
               {{ cajaHistorial.fechaApertura | date:'dd/MM/yyyy HH:mm' }}
+
             </td>
 
+
             <td>
-            <span
-              *ngIf="cajaHistorial.fechaCierre"
-            >
-              {{ cajaHistorial.fechaCierre | date:'dd/MM/yyyy HH:mm' }}
-            </span>
+
+                <span
+                  *ngIf="cajaHistorial.fechaCierre"
+                >
+                  {{ cajaHistorial.fechaCierre | date:'dd/MM/yyyy HH:mm' }}
+                </span>
 
               <span
                 *ngIf="!cajaHistorial.fechaCierre"
                 class="sin-dato"
               >
-              —
-            </span>
+                  —
+                </span>
+
             </td>
 
+
             <td>
+
               {{
               cajaHistorial.montoInicial
               | currency:'COP':'symbol-narrow':'1.0-0'
               }}
+
             </td>
 
+
             <td>
-            <span
-              *ngIf="cajaHistorial.montoEsperado !== null
-                     && cajaHistorial.montoEsperado !== undefined"
-            >
-              {{
-                cajaHistorial.montoEsperado
-                  | currency:'COP':'symbol-narrow':'1.0-0'
-              }}
-            </span>
+
+                <span
+                  *ngIf="
+                    cajaHistorial.montoEsperado !== null
+                    && cajaHistorial.montoEsperado !== undefined
+                  "
+                >
+
+                  {{
+                    cajaHistorial.montoEsperado
+                    | currency:'COP':'symbol-narrow':'1.0-0'
+                  }}
+
+                </span>
 
               <span
-                *ngIf="cajaHistorial.montoEsperado === null
-                     || cajaHistorial.montoEsperado === undefined"
+                *ngIf="
+                    cajaHistorial.montoEsperado === null
+                    || cajaHistorial.montoEsperado === undefined
+                  "
                 class="sin-dato"
               >
-              —
-            </span>
+                  —
+                </span>
+
             </td>
 
+
             <td>
-            <span
-              *ngIf="cajaHistorial.montoFinal !== null
-                     && cajaHistorial.montoFinal !== undefined"
-            >
-              {{
-                cajaHistorial.montoFinal
-                  | currency:'COP':'symbol-narrow':'1.0-0'
-              }}
-            </span>
+
+                <span
+                  *ngIf="
+                    cajaHistorial.montoFinal !== null
+                    && cajaHistorial.montoFinal !== undefined
+                  "
+                >
+
+                  {{
+                    cajaHistorial.montoFinal
+                    | currency:'COP':'symbol-narrow':'1.0-0'
+                  }}
+
+                </span>
 
               <span
-                *ngIf="cajaHistorial.montoFinal === null
-                     || cajaHistorial.montoFinal === undefined"
+                *ngIf="
+                    cajaHistorial.montoFinal === null
+                    || cajaHistorial.montoFinal === undefined
+                  "
                 class="sin-dato"
               >
-              —
-            </span>
+                  —
+                </span>
+
             </td>
+
 
             <td>
 
-            <span
-              *ngIf="cajaHistorial.diferencia !== null
-                     && cajaHistorial.diferencia !== undefined"
-              [class.diferencia-positiva]="cajaHistorial.diferencia > 0"
-              [class.diferencia-negativa]="cajaHistorial.diferencia < 0"
-              [class.diferencia-cero]="cajaHistorial.diferencia === 0"
-            >
+                <span
+                  *ngIf="
+                    cajaHistorial.diferencia !== null
+                    && cajaHistorial.diferencia !== undefined
+                  "
+                  [class.diferencia-positiva]="cajaHistorial.diferencia > 0"
+                  [class.diferencia-negativa]="cajaHistorial.diferencia < 0"
+                  [class.diferencia-cero]="cajaHistorial.diferencia === 0"
+                >
 
-              {{
-                cajaHistorial.diferencia
-                  | currency:'COP':'symbol-narrow':'1.0-0'
-              }}
+                  {{
+                    cajaHistorial.diferencia
+                    | currency:'COP':'symbol-narrow':'1.0-0'
+                  }}
 
-            </span>
+                </span>
 
               <span
-                *ngIf="cajaHistorial.diferencia === null
-                     || cajaHistorial.diferencia === undefined"
+                *ngIf="
+                    cajaHistorial.diferencia === null
+                    || cajaHistorial.diferencia === undefined
+                  "
                 class="sin-dato"
               >
-              —
-            </span>
+                  —
+                </span>
 
             </td>
+
 
             <td>
 
-            <span
-              class="estado-caja"
-              [class.estado-abierta]="cajaHistorial.estado === 'ABIERTA'"
-              [class.estado-cerrada]="cajaHistorial.estado === 'CERRADA'"
-            >
-
-              {{ cajaHistorial.estado }}
-
-            </span>
+                <span
+                  class="estado-caja"
+                  [class.estado-abierta]="cajaHistorial.estado === 'ABIERTA'"
+                  [class.estado-cerrada]="cajaHistorial.estado === 'CERRADA'"
+                >
+                  {{ cajaHistorial.estado }}
+                </span>
 
             </td>
+
 
             <td>
 
@@ -512,29 +611,83 @@
 
       </div>
 
-      <div *ngIf="totalPaginasCajas > 1" class="table-footer">
+
+      <div
+        *ngIf="totalPaginasCajas > 1"
+        class="table-footer"
+      >
+
         <span class="results-text">
-          Mostrando <strong>{{ ((cajasPaginaActual - 1) * cajasPorPagina) + 1 }}</strong> -
-          <strong>{{ Math.min(cajasPaginaActual * cajasPorPagina, historialCajas.length) }}</strong>
-          de <strong>{{ historialCajas.length }}</strong> cajas
+
+          Mostrando
+
+          <strong>
+            {{ ((cajasPaginaActual - 1) * cajasPorPagina) + 1 }}
+          </strong>
+
+          -
+
+          <strong>
+            {{
+              Math.min(
+                cajasPaginaActual * cajasPorPagina,
+                historialCajas.length
+              )
+            }}
+          </strong>
+
+          de
+
+          <strong>
+            {{ historialCajas.length }}
+          </strong>
+
+          cajas
+
         </span>
 
-        <div class="pagination">
-          <button type="button" (click)="cambiarPaginaCajas(cajasPaginaActual - 1)" [disabled]="cajasPaginaActual === 1" aria-label="Página anterior de cajas">‹</button>
 
-          <button *ngFor="let pagina of paginasCajas" type="button" [class.active-page]="cajasPaginaActual === pagina" (click)="cambiarPaginaCajas(pagina)">
+        <div class="pagination">
+
+          <button
+            type="button"
+            (click)="cambiarPaginaCajas(cajasPaginaActual - 1)"
+            [disabled]="cajasPaginaActual === 1"
+            aria-label="Página anterior de cajas"
+          >
+            ‹
+          </button>
+
+
+          <button
+            *ngFor="let pagina of paginasCajas"
+            type="button"
+            [class.active-page]="cajasPaginaActual === pagina"
+            (click)="cambiarPaginaCajas(pagina)"
+          >
             {{ pagina }}
           </button>
 
-          <button type="button" (click)="cambiarPaginaCajas(cajasPaginaActual + 1)" [disabled]="cajasPaginaActual === totalPaginasCajas" aria-label="Página siguiente de cajas">›</button>
+
+          <button
+            type="button"
+            (click)="cambiarPaginaCajas(cajasPaginaActual + 1)"
+            [disabled]="cajasPaginaActual === totalPaginasCajas"
+            aria-label="Página siguiente de cajas"
+          >
+            ›
+          </button>
+
         </div>
+
       </div>
 
     </section>
 
-    <!-- ============================= -->
-    <!-- DETALLE DE CAJA -->
-    <!-- ============================= -->
+
+    <!-- =============================
+         DETALLE DE CAJA
+    ============================= -->
 
     <div
       *ngIf="cajaSeleccionada"
@@ -551,15 +704,16 @@
 
           <div>
 
-        <span class="detalle-caja-label">
-          DETALLE DE CAJA
-        </span>
+            <span class="detalle-caja-label">
+              DETALLE DE CAJA
+            </span>
 
             <h2>
               Caja #{{ cajaSeleccionada.id }}
             </h2>
 
           </div>
+
 
           <button
             type="button"
@@ -576,9 +730,9 @@
 
           <div>
 
-        <span>
-          Apertura
-        </span>
+            <span>
+              Apertura
+            </span>
 
             <strong>
               {{
@@ -589,11 +743,12 @@
 
           </div>
 
+
           <div>
 
-        <span>
-          Cierre
-        </span>
+            <span>
+              Cierre
+            </span>
 
             <strong>
               {{
@@ -610,11 +765,12 @@
 
         <div class="detalle-caja-grid">
 
+
           <div class="detalle-caja-card">
 
-        <span>
-          Monto inicial
-        </span>
+            <span>
+              Monto inicial
+            </span>
 
             <strong>
               {{
@@ -628,9 +784,9 @@
 
           <div class="detalle-caja-card">
 
-        <span>
-          Ventas contado
-        </span>
+            <span>
+              Ventas contado
+            </span>
 
             <strong>
               {{
@@ -644,9 +800,9 @@
 
           <div class="detalle-caja-card">
 
-        <span>
-          Abonos fiados
-        </span>
+            <span>
+              Abonos fiados
+            </span>
 
             <strong>
               {{
@@ -660,9 +816,9 @@
 
           <div class="detalle-caja-card">
 
-        <span>
-          Monto esperado
-        </span>
+            <span>
+              Monto esperado
+            </span>
 
             <strong>
               {{
@@ -676,9 +832,9 @@
 
           <div class="detalle-caja-card">
 
-        <span>
-          Dinero contado
-        </span>
+            <span>
+              Dinero contado
+            </span>
 
             <strong>
               {{
@@ -695,9 +851,9 @@
             [ngClass]="obtenerClaseDiferencia()"
           >
 
-        <span>
-          Diferencia
-        </span>
+            <span>
+              Diferencia
+            </span>
 
             <strong>
               {{
@@ -713,9 +869,9 @@
 
         <div class="detalle-resultado">
 
-      <span>
-        Resultado del cierre
-      </span>
+          <span>
+            Resultado del cierre
+          </span>
 
           <strong>
             {{ cajaSeleccionada.resultado }}
@@ -741,30 +897,56 @@
     </div>
 
 
+    <!-- =============================
+         HISTORIAL DE VENTAS
+    ============================= -->
+
     <section class="balance-table-card">
 
       <div class="balance-table-header">
 
         <div>
-          <h2>Historial de ventas</h2>
-          <span>{{ cantidadVentas }} operación(es)</span>
+
+          <h2>
+            Historial de ventas
+          </h2>
+
+          <span>
+            {{ cantidadVentas }} operación(es)
+          </span>
+
         </div>
 
-        <a routerLink="/ventas" class="balance-sell-link">
+
+        <a
+          routerLink="/ventas"
+          class="balance-sell-link"
+        >
           Ir a vender →
         </a>
 
       </div>
 
 
+      <!-- SIN VENTAS -->
+
       <div
         *ngIf="ventas.length === 0"
         class="balance-empty"
       >
-        <strong>No hay ventas registradas</strong>
-        <span>Cuando realices una venta aparecerá aquí.</span>
+
+        <strong>
+          No hay ventas registradas
+        </strong>
+
+        <span>
+          Cuando realices una venta aparecerá aquí.
+        </span>
+
       </div>
 
+
+      <!-- TABLA -->
 
       <div
         *ngIf="ventas.length > 0"
@@ -774,45 +956,92 @@
         <table>
 
           <thead>
+
           <tr>
+
             <th>ID</th>
+
             <th>Fecha</th>
+
             <th>Cliente</th>
+
             <th>Pago</th>
+
             <th>Productos</th>
+
             <th>Total</th>
+
+            <th>Acciones</th>
+
           </tr>
+
           </thead>
+
 
           <tbody>
 
-          <tr *ngFor="let venta of ventasPaginadas">
-
-            <td>#{{ venta.id }}</td>
+          <tr
+            *ngFor="let venta of ventasPaginadas"
+          >
 
             <td>
+              #{{ venta.id }}
+            </td>
+
+
+            <td>
+
               {{ venta.fecha | date:'dd/MM/yyyy HH:mm' }}
+
             </td>
 
+
             <td>
+
               {{ venta.nombreCliente || 'Consumidor final' }}
+
             </td>
 
+
             <td>
+
                 <span
                   class="payment"
                   [class.fiado]="venta.tipoPago === 'FIADO'"
                 >
                   {{ venta.tipoPago }}
                 </span>
+
             </td>
+
 
             <td>
+
               {{ venta.detalles.length }}
+
             </td>
 
+
             <td class="money">
-              {{ venta.total | currency:'COP':'symbol':'1.0-0' }}
+
+              {{
+              venta.total
+              | currency:'COP':'symbol':'1.0-0'
+              }}
+
+            </td>
+
+
+            <td>
+
+              <button
+                type="button"
+                class="btn-ver-venta"
+                (click)="verDetalleVenta(venta)"
+              >
+                Ver detalle
+              </button>
+
             </td>
 
           </tr>
@@ -823,31 +1052,400 @@
 
       </div>
 
-      <div *ngIf="totalPaginasVentas > 1" class="table-footer">
+
+      <!-- PAGINACIÓN VENTAS -->
+
+      <div
+        *ngIf="totalPaginasVentas > 1"
+        class="table-footer"
+      >
+
         <span class="results-text">
-          Mostrando <strong>{{ ((ventasPaginaActual - 1) * ventasPorPagina) + 1 }}</strong> -
-          <strong>{{ Math.min(ventasPaginaActual * ventasPorPagina, ventas.length) }}</strong>
-          de <strong>{{ ventas.length }}</strong> ventas
+
+          Mostrando
+
+          <strong>
+            {{ ((ventasPaginaActual - 1) * ventasPorPagina) + 1 }}
+          </strong>
+
+          -
+
+          <strong>
+            {{
+              Math.min(
+                ventasPaginaActual * ventasPorPagina,
+                ventas.length
+              )
+            }}
+          </strong>
+
+          de
+
+          <strong>
+            {{ ventas.length }}
+          </strong>
+
+          ventas
+
         </span>
 
-        <div class="pagination">
-          <button type="button" (click)="cambiarPaginaVentas(ventasPaginaActual - 1)" [disabled]="ventasPaginaActual === 1" aria-label="Página anterior de ventas">‹</button>
 
-          <button *ngFor="let pagina of paginasVentas" type="button" [class.active-page]="ventasPaginaActual === pagina" (click)="cambiarPaginaVentas(pagina)">
+        <div class="pagination">
+
+          <button
+            type="button"
+            (click)="cambiarPaginaVentas(ventasPaginaActual - 1)"
+            [disabled]="ventasPaginaActual === 1"
+            aria-label="Página anterior de ventas"
+          >
+            ‹
+          </button>
+
+
+          <button
+            *ngFor="let pagina of paginasVentas"
+            type="button"
+            [class.active-page]="ventasPaginaActual === pagina"
+            (click)="cambiarPaginaVentas(pagina)"
+          >
             {{ pagina }}
           </button>
 
-          <button type="button" (click)="cambiarPaginaVentas(ventasPaginaActual + 1)" [disabled]="ventasPaginaActual === totalPaginasVentas" aria-label="Página siguiente de ventas">›</button>
+
+          <button
+            type="button"
+            (click)="cambiarPaginaVentas(ventasPaginaActual + 1)"
+            [disabled]="ventasPaginaActual === totalPaginasVentas"
+            aria-label="Página siguiente de ventas"
+          >
+            ›
+          </button>
+
         </div>
+
       </div>
 
     </section>
 
   </ng-container>
 
+
+  <!-- =====================================================
+       MODAL DETALLE DE VENTA
+  ===================================================== -->
+
+  <div
+    *ngIf="mostrarDetalleVenta && ventaSeleccionada"
+    class="detalle-venta-overlay"
+    (click)="cerrarDetalleVenta()"
+  >
+
+    <div
+      class="detalle-venta-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- HEADER -->
+
+      <div class="detalle-venta-header">
+
+        <div>
+
+          <span class="detalle-venta-label">
+            DETALLE DE VENTA
+          </span>
+
+          <h2>
+            Venta #{{ ventaSeleccionada.id }}
+          </h2>
+
+          <p>
+            {{ ventaSeleccionada.fecha | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="detalle-venta-close"
+          (click)="cerrarDetalleVenta()"
+          aria-label="Cerrar detalle de venta"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- INFORMACIÓN DE LA VENTA -->
+
+      <div class="detalle-venta-info">
+
+        <div>
+
+          <span>
+            Cliente
+          </span>
+
+          <strong>
+            {{ ventaSeleccionada.nombreCliente || 'Consumidor final' }}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Tipo de pago
+          </span>
+
+          <strong>
+            {{ ventaSeleccionada.tipoPago }}
+          </strong>
+
+        </div>
+
+
+        <div>
+
+          <span>
+            Total de venta
+          </span>
+
+          <strong>
+            {{
+            ventaSeleccionada.total
+            | currency:'COP':'symbol-narrow':'1.0-0'
+            }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- PRODUCTOS VENDIDOS -->
+
+      <div class="detalle-venta-productos">
+
+        <h3>
+          Productos vendidos
+        </h3>
+
+
+        <div
+          class="detalle-venta-producto"
+          *ngFor="let detalle of ventaSeleccionada.detalles"
+        >
+
+          <div class="producto-detalle-info">
+
+            <strong>
+              {{ detalle.producto }}
+            </strong>
+
+            <span>
+
+      {{ detalle.cantidad }} unidad(es)
+
+      ×
+
+      {{
+        detalle.precioUnitario
+        | currency:'COP':'symbol-narrow':'1.0-0'
+      }}
+
+    </span>
+
+          </div>
+
+
+          <div class="producto-detalle-acciones">
+
+            <strong class="producto-detalle-subtotal">
+
+              {{
+              detalle.subtotal
+              | currency:'COP':'symbol-narrow':'1.0-0'
+              }}
+
+            </strong>
+
+            <button
+              type="button"
+              class="btn-devolver-producto"
+              (click)="abrirDevolucion(detalle)"
+            >
+              ↩ Devolver
+            </button>
+
+          </div>
+
+        </div>
+
+
+      <!-- FOOTER -->
+
+      <div class="detalle-venta-footer">
+
+        <button
+          type="button"
+          class="btn-cerrar-detalle-venta"
+          (click)="cerrarDetalleVenta()"
+        >
+          Cerrar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+    <!-- =====================================================
+     MODAL DEVOLUCIÓN DE PRODUCTO
+===================================================== -->
+
+    <div
+      *ngIf="mostrarDevolucion && detalleDevolucionSeleccionado && ventaSeleccionada"
+      class="devolucion-overlay"
+      (click)="cerrarDevolucion()"
+    >
+
+      <div
+        class="devolucion-modal"
+        (click)="$event.stopPropagation()"
+      >
+
+        <!-- HEADER -->
+
+        <div class="devolucion-header">
+
+          <div>
+
+        <span class="devolucion-label">
+          DEVOLUCIÓN DE PRODUCTO
+        </span>
+
+            <h2>
+              {{ detalleDevolucionSeleccionado.producto }}
+            </h2>
+
+            <p>
+              Venta #{{ ventaSeleccionada.id }}
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            class="devolucion-close"
+            (click)="cerrarDevolucion()"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <!-- CONTENIDO -->
+
+        <div class="devolucion-body">
+
+          <div class="devolucion-dato">
+
+        <span>
+          Cantidad vendida
+        </span>
+
+            <strong>
+              {{ detalleDevolucionSeleccionado.cantidad }}
+            </strong>
+
+          </div>
+
+
+          <label class="devolucion-field">
+
+        <span>
+          Cantidad a devolver
+        </span>
+
+            <input
+              type="number"
+              min="1"
+              [max]="detalleDevolucionSeleccionado.cantidad"
+              [(ngModel)]="cantidadDevolucion"
+            >
+
+          </label>
+
+
+          <label class="devolucion-field">
+
+        <span>
+          Motivo de la devolución
+        </span>
+
+            <textarea
+              rows="3"
+              [(ngModel)]="motivoDevolucion"
+              placeholder="Ej: Producto defectuoso, producto equivocado..."
+            ></textarea>
+
+          </label>
+
+
+          <div
+            *ngIf="errorDevolucion"
+            class="devolucion-error"
+          >
+            {{ errorDevolucion }}
+          </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="devolucion-footer">
+
+          <button
+            type="button"
+            class="devolucion-btn cancelar"
+            [disabled]="procesandoDevolucion"
+            (click)="cerrarDevolucion()"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="devolucion-btn confirmar"
+            [disabled]="procesandoDevolucion"
+            (click)="confirmarDevolucion()"
+          >
+
+            {{
+            procesandoDevolucion
+            ? 'Procesando...'
+            : 'Confirmar devolución'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
   <!-- =========================
-     MODAL CONFIRMACIÓN CAJA
-========================= -->
+       MODAL CONFIRMACIÓN CAJA
+  ========================= -->
 
   <div
     *ngIf="mostrarConfirmacionCaja"
@@ -860,6 +1458,7 @@
       (click)="$event.stopPropagation()"
     >
 
+
       <!-- HEADER -->
 
       <div class="confirmacion-caja-header">
@@ -868,11 +1467,12 @@
           <span>!</span>
         </div>
 
+
         <div>
 
-        <span class="confirmacion-caja-label">
-          CONFIRMACIÓN
-        </span>
+          <span class="confirmacion-caja-label">
+            CONFIRMACIÓN
+          </span>
 
           <h2>
             {{
@@ -883,6 +1483,7 @@
           </h2>
 
         </div>
+
 
         <button
           type="button"
@@ -914,11 +1515,15 @@
              ABRIR
         ========================= -->
 
-        <ng-container *ngIf="tipoConfirmacionCaja === 'ABRIR'">
+        <ng-container
+          *ngIf="tipoConfirmacionCaja === 'ABRIR'"
+        >
 
           <div class="confirmacion-dato principal">
 
-            <span>Monto inicial</span>
+            <span>
+              Monto inicial
+            </span>
 
             <strong>
               {{
@@ -929,8 +1534,11 @@
 
           </div>
 
+
           <p class="confirmacion-caja-info">
+
             Esta acción registrará una nueva apertura de caja.
+
           </p>
 
         </ng-container>
@@ -940,19 +1548,26 @@
              CERRAR
         ========================= -->
 
-        <ng-container *ngIf="tipoConfirmacionCaja === 'CERRAR'">
+        <ng-container
+          *ngIf="tipoConfirmacionCaja === 'CERRAR'"
+        >
 
           <div class="confirmacion-resumen">
 
+
             <div class="confirmacion-dato">
 
-              <span>Monto esperado</span>
+              <span>
+                Monto esperado
+              </span>
 
               <strong>
+
                 {{
                 obtenerMontoEsperado()
                 | currency:'COP':'symbol-narrow':'1.0-0'
                 }}
+
               </strong>
 
             </div>
@@ -960,13 +1575,17 @@
 
             <div class="confirmacion-dato">
 
-              <span>Dinero contado</span>
+              <span>
+                Dinero contado
+              </span>
 
               <strong>
+
                 {{
                 montoFinal
                 | currency:'COP':'symbol-narrow':'1.0-0'
                 }}
+
               </strong>
 
             </div>
@@ -974,28 +1593,33 @@
 
             <div class="confirmacion-dato">
 
-              <span>Diferencia</span>
+              <span>
+                Diferencia
+              </span>
 
               <strong
                 [class.confirmacion-positiva]="
-                montoFinal - obtenerMontoEsperado() > 0
-              "
+                  montoFinal - obtenerMontoEsperado() > 0
+                "
                 [class.confirmacion-negativa]="
-                montoFinal - obtenerMontoEsperado() < 0
-              "
+                  montoFinal - obtenerMontoEsperado() < 0
+                "
                 [class.confirmacion-cero]="
-                montoFinal - obtenerMontoEsperado() === 0
-              "
+                  montoFinal - obtenerMontoEsperado() === 0
+                "
               >
+
                 {{
                 montoFinal - obtenerMontoEsperado()
                 | currency:'COP':'symbol-narrow':'1.0-0'
                 }}
+
               </strong>
 
             </div>
 
           </div>
+
 
           <p class="confirmacion-caja-info">
 
@@ -1020,6 +1644,7 @@
         >
           Cancelar
         </button>
+
 
         <button
           type="button"
