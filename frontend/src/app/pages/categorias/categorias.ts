@@ -13,10 +13,6 @@ import {
 } from '@angular/forms';
 
 import {
-  RouterLink
-} from '@angular/router';
-
-import {
   Categoria,
   CategoriaService
 } from '../../services/categoria';
@@ -33,8 +29,7 @@ import { NotificationService } from '../../shared/services/notification.service'
 
   imports: [
     CommonModule,
-    FormsModule,
-    RouterLink
+    FormsModule
   ],
 
   templateUrl: './categorias.html',
@@ -117,7 +112,7 @@ export class Categorias implements OnInit {
 
     private cdr: ChangeDetectorRef,
 
-  private notification: NotificationService
+    private notification: NotificationService
 
   ) {}
 

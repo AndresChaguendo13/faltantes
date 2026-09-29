@@ -605,16 +605,25 @@ export class Balance implements OnInit {
 // =========================
 
   solicitarAbrirCaja(): void {
+    console.log('🟡 1. solicitarAbrirCaja()');
+
     const monto = Number(this.montoInicial || 0);
 
+    console.log('🟡 2. monto:', monto);
+
     if (monto < 0) {
-      this.errorCaja =
-        'El monto inicial no puede ser negativo.';
+      console.log('🔴 monto negativo');
+      this.errorCaja = 'El monto inicial no puede ser negativo.';
       return;
     }
 
+    console.log('🟡 3. antes de mostrar modal');
+
     this.tipoConfirmacionCaja = 'ABRIR';
     this.mostrarConfirmacionCaja = true;
+
+    console.log('🟢 4. estado modal:', this.mostrarConfirmacionCaja);
+    console.log('🟢 5. tipo:', this.tipoConfirmacionCaja);
   }
 
   solicitarCerrarCaja(): void {
@@ -641,16 +650,27 @@ export class Balance implements OnInit {
 
   confirmarAccionCaja(): void {
 
+    console.log('🟡 4. CONFIRMANDO CAJA:', {
+      tipo: this.tipoConfirmacionCaja
+    });
+
     if (this.tipoConfirmacionCaja === 'ABRIR') {
+
+      console.log('🟢 5. EJECUTANDO APERTURA');
+
       this.mostrarConfirmacionCaja = false;
       this.tipoConfirmacionCaja = null;
+
       this.ejecutarAbrirCaja();
+
       return;
     }
 
     if (this.tipoConfirmacionCaja === 'CERRAR') {
+
       this.mostrarConfirmacionCaja = false;
       this.tipoConfirmacionCaja = null;
+
       this.ejecutarCerrarCaja();
     }
   }
@@ -669,6 +689,7 @@ export class Balance implements OnInit {
   ejecutarAbrirCaja(): void {
 
     const monto = Number(this.montoInicial || 0);
+    console.log('🔵 6. ENVIANDO APERTURA AL BACKEND:', monto);
 
     this.procesandoCaja = true;
     this.errorCaja = '';

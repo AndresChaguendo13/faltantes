@@ -4,7 +4,7 @@ import {
   DecimalPipe,
   DatePipe
 } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DashboardService, DashboardResponse } from '../../services/dashboard';
 import {Producto, ProductoService} from '../../services/producto';
@@ -17,7 +17,6 @@ import { NotaRapida, NotaRapidaService } from '../../services/nota-rapida';
   selector: 'app-dashboard',
   imports: [
     RouterLink,
-    RouterLinkActive,
     CurrencyPipe,
     DecimalPipe,
     DatePipe,

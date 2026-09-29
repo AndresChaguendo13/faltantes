@@ -257,12 +257,8 @@
           <button
             type="button"
             class="caja-btn primary"
-            [disabled]="procesandoCaja"
-            (click)="abrirCaja()"
-          >
-
-            {{ procesandoCaja ? 'Abriendo...' : 'Abrir caja' }}
-
+            (click)="abrirCaja()">
+            Abrir caja
           </button>
 
         </div>
@@ -272,6 +268,80 @@
     </ng-container>
 
   </section>
+
+  <!-- =========================
+     MODAL CONFIRMACIÓN CAJA
+========================= -->
+
+  <div
+    *ngIf="mostrarConfirmacionCaja"
+    class="confirmacion-caja-overlay"
+    (click)="cancelarConfirmacionCaja()">
+
+    <div
+      class="confirmacion-caja-modal"
+      (click)="$event.stopPropagation()">
+
+      <div class="confirmacion-caja-header">
+
+        <div class="confirmacion-caja-icon">
+          <span>!</span>
+        </div>
+
+        <div>
+        <span class="confirmacion-caja-label">
+          CONFIRMACIÓN
+        </span>
+
+          <h2>
+            {{ tipoConfirmacionCaja === 'ABRIR'
+            ? 'Abrir caja'
+            : 'Cerrar caja' }}
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="confirmacion-caja-close"
+          (click)="cancelarConfirmacionCaja()">
+          ×
+        </button>
+
+      </div>
+
+      <div class="confirmacion-caja-body">
+
+        <p class="confirmacion-caja-question">
+          {{ tipoConfirmacionCaja === 'ABRIR'
+          ? '¿Estás seguro de que deseas abrir una nueva caja?'
+          : '¿Estás seguro de que deseas cerrar la caja actual?' }}
+        </p>
+
+        <div class="confirmacion-caja-actions">
+
+          <button
+            type="button"
+            class="confirmacion-caja-btn cancelar"
+            (click)="cancelarConfirmacionCaja()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="confirmacion-caja-btn confirmar"
+            (click)="confirmarAccionCaja()">
+            {{ tipoConfirmacionCaja === 'ABRIR'
+            ? 'Sí, abrir caja'
+            : 'Sí, cerrar caja' }}
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
 
 
   <!-- ERROR GENERAL -->
@@ -1446,54 +1516,56 @@
   <!-- =========================
        MODAL CONFIRMACIÓN CAJA
   ========================= -->
-
-  <div
-    *ngIf="mostrarConfirmacionCaja"
-    class="confirmacion-caja-overlay"
-    (click)="cancelarConfirmacionCaja()"
-  >
-
+    <!-- CONFIRMACIÓN DE CAJA -->
     <div
-      class="confirmacion-caja-modal"
-      (click)="$event.stopPropagation()"
-    >
+      *ngIf="mostrarConfirmacionCaja"
+      class="confirmacion-caja-overlay"
+      (click)="cancelarConfirmacionCaja()">
 
+      <div
+        class="confirmacion-caja-modal"
+        (click)="$event.stopPropagation()">
 
-      <!-- HEADER -->
-
-      <div class="confirmacion-caja-header">
-
-        <div class="confirmacion-caja-icon">
-          <span>!</span>
+        <div class="confirmacion-caja-icono">
+          🔐
         </div>
 
+        <h2>
+          {{ tipoConfirmacionCaja === 'ABRIR'
+          ? '¿Abrir caja?'
+          : '¿Cerrar caja?' }}
+        </h2>
 
-        <div>
+        <p>
+          {{ tipoConfirmacionCaja === 'ABRIR'
+          ? 'Se abrirá la caja con el monto inicial indicado.'
+          : 'Se cerrará la caja y se registrará el cierre del día.' }}
+        </p>
 
-          <span class="confirmacion-caja-label">
-            CONFIRMACIÓN
-          </span>
+        <div class="confirmacion-caja-acciones">
 
-          <h2>
-            {{
-            tipoConfirmacionCaja === 'ABRIR'
-            ? 'Abrir caja'
-            : 'Cerrar caja'
-            }}
-          </h2>
+          <button
+            type="button"
+            class="confirmacion-caja-btn cancelar"
+            (click)="cancelarConfirmacionCaja()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="confirmacion-caja-btn confirmar"
+            (click)="confirmarAccionCaja()">
+            {{ tipoConfirmacionCaja === 'ABRIR'
+            ? 'Sí, abrir caja'
+            : 'Sí, cerrar caja' }}
+          </button>
 
         </div>
-
-
-        <button
-          type="button"
-          class="confirmacion-caja-close"
-          (click)="cancelarConfirmacionCaja()"
-        >
-          ×
-        </button>
 
       </div>
+
+
+
 
 
       <!-- CONTENIDO -->

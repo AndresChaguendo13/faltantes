@@ -314,30 +314,60 @@
    RESPONSIVE — LOGIN PRIMERO EN TABLET Y CELULAR
    ========================================================== */
 
-/* Tablet */
+/* Tablet / ventana mediana */
 @media (max-width:1150px) {
   .login-page {
-    padding:24px;
+    min-height:100vh;
+    padding:20px 16px 30px;
+    align-items:flex-start;
     overflow-x:hidden;
+    overflow-y:auto;
   }
 
   .login-container {
-    grid-template-columns:minmax(0,1fr) minmax(360px,.72fr);
+    width:100%;
+    min-height:auto;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
   }
 
+  /* LOGIN ARRIBA */
+  .login-panel {
+    order:1;
+    width:100%;
+    min-height:auto;
+    padding:0;
+  }
+
+  /* INFORMACIÓN DEBAJO */
   .welcome-panel {
-    padding-left:18px;
-    padding-right:25px;
+    order:2;
+    width:100%;
+    min-height:560px;
+    padding:30px 30px 25px;
+    overflow:hidden;
+  }
+
+  .login-card {
+    width:min(100%,430px);
+    margin:0 auto;
+  }
+
+  .welcome-content {
+    margin-top:48px;
   }
 
   .illustration-area {
-    left:390px;
-    transform:scale(.82);
-    transform-origin:left bottom;
+    left:50%;
+    bottom:-20px;
+    transform:translateX(-50%) scale(.70);
+    transform-origin:center bottom;
   }
 
-  .welcome-content h1 {
-    font-size:43px;
+  .panel-footer {
+    left:30px;
+    bottom:14px;
   }
 }
 
@@ -639,7 +669,7 @@
 /* ==========================================================
    PANTALLAS BAJAS
    ========================================================== */
-@media (min-width:901px) and (max-height:760px) {
+@media (min-width:1151px) and (max-height:760px) {
   .login-page {
     padding-top:12px;
     padding-bottom:12px;
