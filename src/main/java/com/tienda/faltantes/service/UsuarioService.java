@@ -11,7 +11,7 @@ import com.tienda.faltantes.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.tienda.faltantes.dto.request.UsuarioUpdateRequestDTO;
-
+import com.tienda.faltantes.dto.request.CambiarPasswordRequestDTO;
 import java.util.List;
 
 @Service
@@ -109,6 +109,9 @@ public class UsuarioService {
         return response;
     }
 
+
+
+
     public List<UsuarioResponseDTO> listar() {
 
         return usuarioRepository.findAll()
@@ -125,5 +128,159 @@ public class UsuarioService {
                 })
                 .toList();
     }
+
+
+
+
+
+    // =====================================================
+// ELIMINAR USUARIO
+// =====================================================
+
+    public void eliminar(Long id) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RecursoNoEncontradoException(
+                                "Usuario no encontrado"
+                        )
+                );
+
+        usuarioRepository.delete(usuario);
+    }
+
+    // =====================================================
+// OBTENER PERFIL DEL USUARIO AUTENTICADO
+// =====================================================
+
+    public UsuarioResponseDTO obtenerMiPerfil(
+            String username) {
+
+        Usuario usuario =
+                usuarioRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RecursoNoEncontradoException(
+                                        "Usuario no encontrado"
+                                )
+                        );
+
+        UsuarioResponseDTO response =
+                new UsuarioResponseDTO();
+
+        response.setId(
+                usuario.getId()
+        );
+
+        response.setNombre(
+                usuario.getNombre()
+        );
+
+        response.setUsername(
+                usuario.getUsername()
+        );
+
+        response.setRol(
+                usuario.getRol().getNombre()
+        );
+
+        return response;
+    }
+
+
+
+
+
+
+
+
+
+
+
+// =====================================================
+// CAMBIAR CONTRASEÑA DEL USUARIO AUTENTICADO
+// =====================================================
+
+    public void cambiarPassword(
+            String username,
+            CambiarPasswordRequestDTO dto) {
+
+        Usuario usuario =
+                usuarioRepository.findByUsername(username)
+                        .orElseThrow(() ->
+                                new RecursoNoEncontradoException(
+                                        "Usuario no encontrado"
+                                )
+                        );
+
+
+        // -------------------------------------------------
+        // Verificar contraseña actual
+        // -------------------------------------------------
+
+        if (!passwordEncoder.matches(
+                dto.getPasswordActual(),
+                usuario.getPassword()
+        )) {
+
+            throw new IllegalArgumentException(
+                    "La contraseña actual es incorrecta"
+            );
+        }
+
+
+        // -------------------------------------------------
+        // Verificar nueva contraseña
+        // -------------------------------------------------
+
+        if (!dto.getNuevaPassword().equals(
+                dto.getConfirmarPassword()
+        )) {
+
+            throw new IllegalArgumentException(
+                    "Las nuevas contraseñas no coinciden"
+            );
+        }
+
+
+        // -------------------------------------------------
+        // Longitud mínima
+        // -------------------------------------------------
+
+        if (dto.getNuevaPassword().length() < 6) {
+
+            throw new IllegalArgumentException(
+                    "La nueva contraseña debe tener al menos 6 caracteres"
+            );
+        }
+
+
+        // -------------------------------------------------
+        // Evitar reutilizar la misma contraseña
+        // -------------------------------------------------
+
+        if (passwordEncoder.matches(
+                dto.getNuevaPassword(),
+                usuario.getPassword()
+        )) {
+
+            throw new IllegalArgumentException(
+                    "La nueva contraseña debe ser diferente a la actual"
+            );
+        }
+
+
+        // -------------------------------------------------
+        // Encriptar y guardar
+        // -------------------------------------------------
+
+        usuario.setPassword(
+                passwordEncoder.encode(
+                        dto.getNuevaPassword()
+                )
+        );
+
+        usuarioRepository.save(usuario);
+    }
+
 
 }

@@ -1,0 +1,209 @@
+<div class="perfil-page">
+
+  <!-- ENCABEZADO -->
+
+  <div class="perfil-header">
+
+    <div>
+
+      <span class="perfil-kicker">
+        MI CUENTA
+      </span>
+
+      <h1>
+        Mi perfil
+      </h1>
+
+      <p>
+        Consulta la información de tu cuenta y tu rol dentro del sistema.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- CARGANDO -->
+
+  <div
+    class="perfil-loading"
+    *ngIf="cargando"
+  >
+
+    <div class="spinner"></div>
+
+    <span>
+      Cargando información...
+    </span>
+
+  </div>
+
+
+  <!-- ERROR -->
+
+  <div
+    class="perfil-error"
+    *ngIf="!cargando && error"
+  >
+
+    <strong>
+      No se pudo cargar el perfil
+    </strong>
+
+    <span>
+      {{ error }}
+    </span>
+
+    <button
+      type="button"
+      (click)="cargarPerfil()"
+    >
+      Intentar nuevamente
+    </button>
+
+  </div>
+
+
+  <!-- PERFIL -->
+
+  <div
+    class="perfil-card"
+    *ngIf="!cargando && usuario"
+  >
+
+    <!-- IDENTIDAD -->
+
+    <div class="perfil-identidad">
+
+      <div class="perfil-avatar">
+
+        {{ usuario.nombre.charAt(0).toUpperCase() }}
+
+      </div>
+
+
+      <div class="perfil-identidad-texto">
+
+        <h2>
+          {{ usuario.nombre }}
+        </h2>
+
+        <span>
+          @{{ usuario.username }}
+        </span>
+
+      </div>
+
+
+      <div
+        class="perfil-rol"
+        [ngClass]="{
+          'rol-admin': usuario.rol === 'ADMIN',
+          'rol-empleado': usuario.rol === 'EMPLEADO',
+          'rol-cajero': usuario.rol === 'CAJERO'
+        }"
+      >
+
+        {{ usuario.rol }}
+
+      </div>
+
+    </div>
+
+
+    <!-- INFORMACIÓN -->
+
+    <div class="perfil-separador"></div>
+
+
+    <div class="perfil-info">
+
+      <div class="perfil-info-item">
+
+        <span class="perfil-label">
+          Nombre completo
+        </span>
+
+        <strong>
+          {{ usuario.nombre }}
+        </strong>
+
+      </div>
+
+
+      <div class="perfil-info-item">
+
+        <span class="perfil-label">
+          Nombre de usuario
+        </span>
+
+        <strong>
+          {{ usuario.username }}
+        </strong>
+
+      </div>
+
+
+      <div class="perfil-info-item">
+
+        <span class="perfil-label">
+          Rol del sistema
+        </span>
+
+        <strong>
+          {{ usuario.rol }}
+        </strong>
+
+      </div>
+
+
+      <div class="perfil-info-item">
+
+        <span class="perfil-label">
+          Estado
+        </span>
+
+        <strong class="estado-activo">
+          Activo
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- SEGURIDAD -->
+
+    <div class="perfil-separador"></div>
+
+
+    <div class="perfil-seguridad">
+
+      <div>
+
+        <h3>
+          Seguridad de la cuenta
+        </h3>
+
+        <p>
+          Puedes cambiar la contraseña de tu cuenta desde aquí.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="btn-password"
+        routerLink="/cambiar-contrasena"
+      >
+
+        Cambiar contraseña
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

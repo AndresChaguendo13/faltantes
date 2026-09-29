@@ -1,0 +1,952 @@
+<div class="usuarios-page">
+
+  <!-- ================================================= -->
+  <!-- ENCABEZADO -->
+  <!-- ================================================= -->
+
+  <div class="usuarios-header">
+
+    <div>
+
+      <span class="usuarios-kicker">
+        ADMINISTRACIÓN
+      </span>
+
+      <h1>
+        Usuarios
+      </h1>
+
+      <p>
+        Administra los usuarios y sus roles de acceso.
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="btn-nuevo-usuario"
+      (click)="abrirNuevoUsuario()">
+
+      + Nuevo usuario
+
+    </button>
+
+  </div>
+
+
+  <!-- ERROR GENERAL -->
+
+  <div
+    *ngIf="
+      error &&
+      !mostrarModal &&
+      !mostrarModalEditar
+    "
+    class="usuarios-error">
+
+    {{ error }}
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- TARJETA -->
+  <!-- ================================================= -->
+
+  <div class="usuarios-card">
+
+    <div class="usuarios-card-header">
+
+      <div>
+
+        <h2>
+          Usuarios del sistema
+        </h2>
+
+        <span>
+          {{ usuariosFiltrados.length }} usuario(s)
+        </span>
+
+      </div>
+
+
+      <!-- BUSCADOR -->
+
+      <div class="usuarios-buscador">
+
+        <span>
+          ⌕
+        </span>
+
+        <input
+          type="text"
+          placeholder="Buscar usuario..."
+          [(ngModel)]="busqueda">
+
+      </div>
+
+    </div>
+
+
+    <!-- CARGANDO -->
+
+    <div
+      *ngIf="cargando"
+      class="usuarios-loading">
+
+      Cargando usuarios...
+
+    </div>
+
+
+    <!-- SIN USUARIOS -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        usuariosFiltrados.length === 0
+      "
+      class="usuarios-empty">
+
+      No hay usuarios registrados.
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- TABLA -->
+    <!-- ================================================= -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        usuariosFiltrados.length > 0
+      "
+      class="usuarios-table-wrapper">
+
+      <table class="usuarios-table">
+
+        <thead>
+
+        <tr>
+
+          <th>
+            ID
+          </th>
+
+          <th>
+            Nombre
+          </th>
+
+          <th>
+            Usuario
+          </th>
+
+          <th>
+            Rol
+          </th>
+
+          <th>
+            Acciones
+          </th>
+
+        </tr>
+
+        </thead>
+
+
+        <tbody>
+
+        <tr
+          *ngFor="
+              let usuario of usuariosFiltrados
+            ">
+
+          <!-- ID -->
+
+          <td>
+
+            #{{ usuario.id }}
+
+          </td>
+
+
+          <!-- NOMBRE -->
+
+          <td>
+
+            <strong>
+              {{ usuario.nombre }}
+            </strong>
+
+          </td>
+
+
+          <!-- USERNAME -->
+
+          <td>
+
+            {{ usuario.username }}
+
+          </td>
+
+
+          <!-- ROL -->
+
+          <td>
+
+              <span
+                class="rol-badge"
+                [class.admin]="
+                  usuario.rol === 'ADMIN'
+                "
+                [class.empleado]="
+                  usuario.rol === 'EMPLEADO'
+                "
+                [class.cajero]="
+                  usuario.rol === 'CAJERO'
+                ">
+
+                {{ usuario.rol }}
+
+              </span>
+
+          </td>
+
+
+          <!-- ACCIONES -->
+
+          <td class="acciones-usuario">
+
+            <button
+              type="button"
+              class="btn-icono-accion btn-editar-icono"
+              (click)="abrirEditarUsuario(usuario)"
+              aria-label="Editar usuario"
+              title="Editar"
+            >
+              <svg
+                class="icono-accion-svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 20H21"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+
+                <path
+                  d="M16.5 3.5C16.8978 3.10218 17.4374 2.87868 18 2.87868C18.5626 2.87868 19.1022 3.10218 19.5 3.5C19.8978 3.89782 20.1213 4.43739 20.1213 5C20.1213 5.56261 19.8978 6.10218 19.5 6.5L7 19L3 20L4 16L16.5 3.5Z"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+
+              <span class="tooltip-accion">
+    Editar
+  </span>
+            </button>
+
+            <button
+              type="button"
+              class="btn-icono-accion btn-eliminar-icono"
+              (click)="confirmarEliminar(usuario)"
+              aria-label="Eliminar usuario"
+            >
+              <span class="icono-accion">🗑</span>
+
+              <span class="tooltip-accion">
+      Eliminar
+    </span>
+            </button>
+
+          </td>
+        </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ===================================================== -->
+<!-- MODAL NUEVO USUARIO -->
+<!-- ===================================================== -->
+
+<div
+  *ngIf="mostrarModal"
+  class="usuario-modal-overlay"
+  (click)="cerrarModal()">
+
+  <div
+    class="usuario-modal"
+    (click)="$event.stopPropagation()">
+
+
+    <!-- HEADER -->
+
+    <div class="usuario-modal-header">
+
+      <div>
+
+        <span class="usuario-modal-kicker">
+          ADMINISTRACIÓN
+        </span>
+
+        <h2>
+          Nuevo usuario
+        </h2>
+
+        <p>
+          Crea un nuevo usuario y asigna su rol de acceso.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="btn-modal-cerrar"
+        [disabled]="creando"
+        (click)="cerrarModal()">
+
+        ×
+
+      </button>
+
+    </div>
+
+
+    <!-- BODY -->
+
+    <div class="usuario-modal-body">
+
+
+      <!-- ERROR -->
+
+      <div
+        *ngIf="error"
+        class="modal-error">
+
+        {{ error }}
+
+      </div>
+
+
+      <!-- NOMBRE -->
+
+      <div class="form-group">
+
+        <label>
+          Nombre completo
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="nuevoUsuario.nombre"
+          placeholder="Ej. Juan Pérez"
+          [disabled]="creando">
+
+      </div>
+
+
+      <!-- USERNAME -->
+
+      <div class="form-group">
+
+        <label>
+          Nombre de usuario
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="nuevoUsuario.username"
+          placeholder="Ej. juan"
+          [disabled]="creando">
+
+      </div>
+
+
+      <!-- ROL -->
+
+      <div class="form-group">
+
+        <label>
+          Rol
+        </label>
+
+        <select
+          [(ngModel)]="nuevoUsuario.rol"
+          [disabled]="creando">
+
+          <option value="ADMIN">
+            ADMIN
+          </option>
+
+          <option value="EMPLEADO">
+            EMPLEADO
+          </option>
+
+          <option value="CAJERO">
+            CAJERO
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- PASSWORD -->
+
+      <div class="form-group">
+
+        <label>
+          Contraseña
+        </label>
+
+        <div class="password-input">
+
+          <input
+            [type]="
+              mostrarPassword
+                ? 'text'
+                : 'password'
+            "
+            [(ngModel)]="
+              nuevoUsuario.password
+            "
+            placeholder="Escribe una contraseña"
+            [disabled]="creando">
+
+          <button
+            type="button"
+            class="btn-password"
+            [disabled]="creando"
+            (click)="
+              mostrarPassword =
+                !mostrarPassword
+            ">
+
+            {{
+            mostrarPassword
+            ? 'Ocultar'
+            : 'Mostrar'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- CONFIRMAR PASSWORD -->
+
+      <div class="form-group">
+
+        <label>
+          Confirmar contraseña
+        </label>
+
+        <div class="password-input">
+
+          <input
+            [type]="
+              mostrarConfirmacion
+                ? 'text'
+                : 'password'
+            "
+            [(ngModel)]="
+              confirmarPassword
+            "
+            placeholder="Repite la contraseña"
+            [disabled]="creando">
+
+          <button
+            type="button"
+            class="btn-password"
+            [disabled]="creando"
+            (click)="
+              mostrarConfirmacion =
+                !mostrarConfirmacion
+            ">
+
+            {{
+            mostrarConfirmacion
+            ? 'Ocultar'
+            : 'Mostrar'
+            }}
+
+          </button>
+
+        </div>
+
+
+        <!-- PASSWORD ERROR -->
+
+        <div
+          *ngIf="
+            mostrarErrorContrasena
+          "
+          class="password-feedback error">
+
+          ✕ Las contraseñas no coinciden.
+
+        </div>
+
+
+        <!-- PASSWORD OK -->
+
+        <div
+          *ngIf="
+            contrasenasCoinciden
+          "
+          class="password-feedback success">
+
+          ✓ Las contraseñas coinciden.
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="usuario-modal-footer">
+
+      <button
+        type="button"
+        class="btn-modal-cancelar"
+        [disabled]="creando"
+        (click)="cerrarModal()">
+
+        Cancelar
+
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-modal-crear"
+        [disabled]="creando"
+        (click)="crearUsuario()">
+
+        <span
+          *ngIf="!creando">
+
+          Crear usuario
+
+        </span>
+
+        <span
+          *ngIf="creando">
+
+          Creando...
+
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- ===================================================== -->
+<!-- MODAL EDITAR USUARIO -->
+<!-- ===================================================== -->
+
+<div
+  *ngIf="mostrarModalEditar"
+  class="usuario-modal-overlay"
+  (click)="cerrarModalEditar()">
+
+  <div
+    class="usuario-modal"
+    (click)="$event.stopPropagation()">
+
+
+    <!-- HEADER -->
+
+    <div class="usuario-modal-header">
+
+      <div>
+
+        <span class="usuario-modal-kicker">
+          ADMINISTRACIÓN
+        </span>
+
+        <h2>
+          Editar usuario
+        </h2>
+
+        <p>
+          Actualiza los datos, rol o contraseña del usuario.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="btn-modal-cerrar"
+        [disabled]="editando"
+        (click)="cerrarModalEditar()">
+
+        ×
+
+      </button>
+
+    </div>
+
+
+    <!-- BODY -->
+
+    <div class="usuario-modal-body">
+
+
+      <!-- ERROR -->
+
+      <div
+        *ngIf="error"
+        class="modal-error">
+
+        {{ error }}
+
+      </div>
+
+
+      <!-- NOMBRE -->
+
+      <div class="form-group">
+
+        <label>
+          Nombre completo
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="
+            usuarioEditar.nombre
+          "
+          placeholder="Nombre completo"
+          [disabled]="editando">
+
+      </div>
+
+
+      <!-- USERNAME -->
+
+      <div class="form-group">
+
+        <label>
+          Nombre de usuario
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="
+            usuarioEditar.username
+          "
+          placeholder="Nombre de usuario"
+          [disabled]="editando">
+
+      </div>
+
+
+      <!-- ROL -->
+
+      <div class="form-group">
+
+        <label>
+          Rol
+        </label>
+
+        <select
+          [(ngModel)]="
+            usuarioEditar.rol
+          "
+          [disabled]="editando">
+
+          <option value="ADMIN">
+            ADMIN
+          </option>
+
+          <option value="EMPLEADO">
+            EMPLEADO
+          </option>
+
+          <option value="CAJERO">
+            CAJERO
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <!-- NUEVA PASSWORD -->
+
+      <div class="form-group">
+
+        <label>
+          Nueva contraseña
+          <span>
+            (opcional)
+          </span>
+        </label>
+
+        <div class="password-input">
+
+          <input
+            [type]="
+              mostrarPasswordEditar
+                ? 'text'
+                : 'password'
+            "
+            [(ngModel)]="
+              nuevaPasswordEditar
+            "
+            placeholder="Déjalo vacío para conservarla"
+            [disabled]="editando">
+
+          <button
+            type="button"
+            class="btn-password"
+            [disabled]="editando"
+            (click)="
+              mostrarPasswordEditar =
+                !mostrarPasswordEditar
+            ">
+
+            {{
+            mostrarPasswordEditar
+            ? 'Ocultar'
+            : 'Mostrar'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- CONFIRMAR PASSWORD -->
+
+      <div class="form-group">
+
+        <label>
+          Confirmar nueva contraseña
+        </label>
+
+        <div class="password-input">
+
+          <input
+            [type]="
+              mostrarConfirmacionEditar
+                ? 'text'
+                : 'password'
+            "
+            [(ngModel)]="
+              confirmarPasswordEditar
+            "
+            placeholder="Repite la nueva contraseña"
+            [disabled]="editando">
+
+          <button
+            type="button"
+            class="btn-password"
+            [disabled]="editando"
+            (click)="
+              mostrarConfirmacionEditar =
+                !mostrarConfirmacionEditar
+            ">
+
+            {{
+            mostrarConfirmacionEditar
+            ? 'Ocultar'
+            : 'Mostrar'
+            }}
+
+          </button>
+
+        </div>
+
+
+        <!-- PASSWORD ERROR -->
+
+        <div
+          *ngIf="
+            confirmarPasswordEditar &&
+            !contrasenasEditarCoinciden
+          "
+          class="password-feedback error">
+
+          ✕ Las contraseñas no coinciden.
+
+        </div>
+
+
+        <!-- PASSWORD OK -->
+
+        <div
+          *ngIf="
+            nuevaPasswordEditar &&
+            confirmarPasswordEditar &&
+            contrasenasEditarCoinciden
+          "
+          class="password-feedback success">
+
+          ✓ Las contraseñas coinciden.
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="usuario-modal-footer">
+
+      <button
+        type="button"
+        class="btn-modal-cancelar"
+        [disabled]="editando"
+        (click)="cerrarModalEditar()">
+
+        Cancelar
+
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-modal-crear"
+        [disabled]="editando"
+        (click)="guardarEdicionUsuario()">
+
+        <span
+          *ngIf="!editando">
+
+          Guardar cambios
+
+        </span>
+
+        <span
+          *ngIf="editando">
+
+          Guardando...
+
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+<!-- =====================================================
+     MODAL CONFIRMAR ELIMINACIÓN
+     ===================================================== -->
+
+<div
+  class="modal-overlay"
+  *ngIf="mostrarModalEliminar"
+  (click)="cancelarEliminar()"
+>
+  <div
+    class="modal-confirmar-eliminar"
+    (click)="$event.stopPropagation()"
+  >
+
+    <button
+      type="button"
+      class="modal-cerrar"
+      (click)="cancelarEliminar()"
+      [disabled]="eliminando"
+    >
+      ×
+    </button>
+
+    <div class="icono-advertencia">
+      !
+    </div>
+
+    <h2>Eliminar usuario</h2>
+
+    <p class="texto-principal">
+      ¿Estás seguro de eliminar este usuario?
+    </p>
+
+    <div
+      class="usuario-confirmacion"
+      *ngIf="usuarioEliminando"
+    >
+      <strong>
+        {{ usuarioEliminando.nombre }}
+      </strong>
+
+      <span>
+        {{ usuarioEliminando.username }}
+      </span>
+    </div>
+
+    <p class="texto-advertencia">
+      Esta acción no se puede deshacer.
+    </p>
+
+    <div
+      class="acciones-confirmacion"
+    >
+
+      <button
+        type="button"
+        class="btn-cancelar"
+        (click)="cancelarEliminar()"
+        [disabled]="eliminando"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        class="btn-confirmar-eliminar"
+        (click)="ejecutarEliminar()"
+        [disabled]="eliminando"
+      >
+
+        <span *ngIf="!eliminando">
+          Eliminar usuario
+        </span>
+
+        <span *ngIf="eliminando">
+          Eliminando...
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+</div>

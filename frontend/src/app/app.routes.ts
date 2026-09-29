@@ -11,6 +11,9 @@ import { Compras } from './pages/compras/compras';
 import { Ventas } from './pages/ventas/ventas';
 import { Balance } from './pages/balance/balance';
 import { authGuard } from './guards/auth-guard';
+import { Usuarios } from './pages/usuarios/usuarios';
+import { MiPerfil } from './pages/mi-perfil/mi-perfil';
+import { CambiarContrasena } from './pages/cambiar-contrasena/cambiar-contrasena';
 
 export const routes: Routes = [
 
@@ -72,6 +75,20 @@ export const routes: Routes = [
 
       { path: 'balance', component: Balance },
 
+      {
+        path: 'usuarios',
+        component: Usuarios
+      },
+
+      {
+        path: 'mi-perfil',
+        component: MiPerfil
+      },
+
+      {
+        path: 'cambiar-contrasena',
+        component: CambiarContrasena
+      },
 
       /*
        * Balance se conectará aquí cuando confirmemos

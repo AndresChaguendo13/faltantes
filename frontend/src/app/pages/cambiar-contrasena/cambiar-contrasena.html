@@ -1,0 +1,234 @@
+<div class="password-page">
+
+  <div class="password-header">
+
+    <span>
+      SEGURIDAD
+    </span>
+
+    <h1>
+      Cambiar contraseña
+    </h1>
+
+    <p>
+      Actualiza la contraseña de tu cuenta.
+    </p>
+
+  </div>
+
+
+  <div class="password-card">
+
+    <div class="password-icon">
+
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+
+        <rect
+          x="4"
+          y="10"
+          width="16"
+          height="11"
+          rx="2"
+          stroke="currentColor"
+          stroke-width="1.8"
+        />
+
+        <path
+          d="M8 10V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V10"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
+
+        <circle
+          cx="12"
+          cy="15"
+          r="1"
+          fill="currentColor"
+        />
+
+      </svg>
+
+    </div>
+
+
+    <div class="password-title">
+
+      <h2>
+        Actualiza tu contraseña
+      </h2>
+
+      <p>
+        Por seguridad, primero confirma tu contraseña actual.
+      </p>
+
+    </div>
+
+
+    <!-- ERROR -->
+
+    <div
+      class="password-error"
+      *ngIf="error"
+    >
+
+      {{ error }}
+
+    </div>
+
+
+    <!-- CONTRASEÑA ACTUAL -->
+
+    <div class="campo">
+
+      <label>
+        Contraseña actual
+      </label>
+
+      <div class="password-input">
+
+        <input
+          [type]="
+            mostrarPasswordActual
+              ? 'text'
+              : 'password'
+          "
+          [(ngModel)]="passwordActual"
+          placeholder="Ingresa tu contraseña actual"
+          autocomplete="current-password"
+        />
+
+        <button
+          type="button"
+          (click)="
+            mostrarPasswordActual =
+              !mostrarPasswordActual
+          "
+          aria-label="Mostrar contraseña"
+        >
+
+          👁
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- NUEVA -->
+
+    <div class="campo">
+
+      <label>
+        Nueva contraseña
+      </label>
+
+      <div class="password-input">
+
+        <input
+          [type]="
+            mostrarNuevaPassword
+              ? 'text'
+              : 'password'
+          "
+          [(ngModel)]="nuevaPassword"
+          placeholder="Mínimo 6 caracteres"
+          autocomplete="new-password"
+        />
+
+        <button
+          type="button"
+          (click)="
+            mostrarNuevaPassword =
+              !mostrarNuevaPassword
+          "
+          aria-label="Mostrar contraseña"
+        >
+
+          👁
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- CONFIRMAR -->
+
+    <div class="campo">
+
+      <label>
+        Confirmar nueva contraseña
+      </label>
+
+      <div class="password-input">
+
+        <input
+          [type]="
+            mostrarConfirmarPassword
+              ? 'text'
+              : 'password'
+          "
+          [(ngModel)]="confirmarPassword"
+          placeholder="Repite la nueva contraseña"
+          autocomplete="new-password"
+        />
+
+        <button
+          type="button"
+          (click)="
+            mostrarConfirmarPassword =
+              !mostrarConfirmarPassword
+          "
+          aria-label="Mostrar contraseña"
+        >
+
+          👁
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="password-actions">
+
+      <button
+        type="button"
+        class="btn-cancelar"
+        (click)="volver()"
+        [disabled]="guardando"
+      >
+        Cancelar
+      </button>
+
+
+      <button
+        type="button"
+        class="btn-guardar"
+        (click)="cambiarPassword()"
+        [disabled]="guardando"
+      >
+
+        <span *ngIf="!guardando">
+          Cambiar contraseña
+        </span>
+
+        <span *ngIf="guardando">
+          Guardando...
+        </span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

@@ -120,4 +120,25 @@ export class AppLayout implements OnInit, OnDestroy {
     private productoService: ProductoService,
     private productLookup: ProductLookupService
   ) {}
+
+
+
+  irAMiPerfil(): void {
+
+    this.menuUsuarioAbierto = false;
+
+    this.router.navigate([
+      '/mi-perfil'
+    ]);
+  }
+
+
+  irACambiarPassword(): void {
+
+    this.menuUsuarioAbierto = false;
+
+    this.router.navigate([
+      '/cambiar-contrasena'
+    ]);
+  }
 }

@@ -299,13 +299,16 @@
         ADMINISTRACIÓN
       </div>
 
-      <a class="erp-menu-item erp-menu-disabled">
-        <span class="erp-menu-icon">
-          <svg><use href="#icon-user"></use></svg>
-        </span>
+      <a
+        class="erp-menu-item"
+        routerLink="/usuarios"
+        routerLinkActive="active"
+      >
+  <span class="erp-menu-icon">
+    <svg><use href="#icon-user"></use></svg>
+  </span>
         <span>Usuarios</span>
       </a>
-
       <a class="erp-menu-item erp-menu-disabled">
         <span class="erp-menu-icon">
           <svg><use href="#icon-report"></use></svg>
@@ -424,6 +427,7 @@
               <button
                 type="button"
                 class="erp-dropdown-item"
+                (click)="irAMiPerfil()"
               >
                 Mi perfil
               </button>
@@ -431,9 +435,12 @@
               <button
                 type="button"
                 class="erp-dropdown-item"
+                (click)="irACambiarPassword()"
               >
                 Cambiar contraseña
               </button>
+
+
 
               <div class="erp-dropdown-divider"></div>
 
