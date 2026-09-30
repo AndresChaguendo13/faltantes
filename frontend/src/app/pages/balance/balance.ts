@@ -14,7 +14,8 @@ import {
 
 import {
   DevolucionesVentaService,
-  DevolucionVentaRequest
+  DevolucionVentaRequest,
+  DevolucionVentaResponse
 } from '../../services/devoluciones-venta';
 
 import {
@@ -81,6 +82,18 @@ export class Balance implements OnInit {
   procesandoDevolucion = false;
   errorDevolucion = '';
 
+  // =========================
+  // DEVOLUCIONES REGISTRADAS
+  // =========================
+
+  devolucionesVenta: DevolucionVentaResponse[] = [];
+  devolucionesCompra: DevolucionCompraResponse[] = [];
+
+  cargandoDevoluciones = false;
+  errorDevoluciones = '';
+
+  tipoDevolucionListado: 'VENTA' | 'COMPRA' = 'VENTA';
+
 
   // =========================
   // CAJA
@@ -136,10 +149,6 @@ export class Balance implements OnInit {
   compras: CompraResponse[] = [];
   comprasPaginaActual = 1;
   comprasPorPagina = 10;
-
-  // Devoluciones ya registradas. Se usan para calcular cuántas unidades
-  // de una compra todavía se pueden devolver. No se muestran en Balance.
-  devolucionesCompra: DevolucionCompraResponse[] = [];
 
   compraSeleccionada: CompraResponse | null = null;
   mostrarDetalleCompra = false;
@@ -310,9 +319,24 @@ export class Balance implements OnInit {
   }
 
   verDetalleCompra(compra: CompraResponse): void {
+    // Abrimos el detalle inmediatamente con la compra de la tabla.
     this.compraSeleccionada = compra;
     this.mostrarDetalleCompra = true;
     this.cdr.detectChanges();
+
+    // Si la lista no trae los detalles completos, los consultamos
+    // directamente por ID para garantizar que el modal muestre los productos.
+    if (!compra.detalles || compra.detalles.length === 0) {
+      this.compraService.buscarPorId(compra.id).subscribe({
+        next: (detalleCompleto) => {
+          this.compraSeleccionada = detalleCompleto;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          console.error('ERROR CARGANDO DETALLE DE COMPRA:', error);
+        }
+      });
+    }
   }
 
   cerrarDetalleCompra(): void {
@@ -423,6 +447,7 @@ export class Balance implements OnInit {
           this.procesandoDevolucionCompra = false;
           this.cerrarDevolucionCompra();
           this.cargarCompras();
+          this.cargarDevoluciones();
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -564,6 +589,7 @@ export class Balance implements OnInit {
 
           this.cargarBalance();
           this.cargarCaja();
+          this.cargarDevoluciones();
 
           this.cdr.detectChanges();
 
@@ -616,7 +642,7 @@ export class Balance implements OnInit {
     this.cargarCaja();
     this.cargarHistorialCajas();
     this.cargarCompras();
-    this.cargarDevolucionesCompra();
+    this.cargarDevoluciones();
   }
 
 
@@ -766,18 +792,6 @@ export class Balance implements OnInit {
   // COMPRAS DEL DÍA
   // =========================
 
-  cargarDevolucionesCompra(): void {
-    this.devolucionesCompraService.listar().subscribe({
-      next: (devoluciones: DevolucionCompraResponse[]) => {
-        this.devolucionesCompra = devoluciones || [];
-      },
-      error: (error) => {
-        console.error('ERROR CARGANDO DEVOLUCIONES DE COMPRA:', error);
-        this.devolucionesCompra = [];
-      }
-    });
-  }
-
   cargarCompras(): void {
     this.compraService.listar().subscribe({
       next: (compras) => {
@@ -870,6 +884,80 @@ export class Balance implements OnInit {
       }
 
     });
+  }
+
+
+  // =========================
+  // DEVOLUCIONES REGISTRADAS
+  // =========================
+
+  cargarDevoluciones(): void {
+
+    this.cargandoDevoluciones = true;
+    this.errorDevoluciones = '';
+
+    this.devolucionesVentaService.listar().subscribe({
+
+      next: (devoluciones) => {
+
+        this.devolucionesVenta = devoluciones || [];
+
+        this.devolucionesCompraService.listar().subscribe({
+
+          next: (devolucionesCompra) => {
+
+            this.devolucionesCompra =
+              devolucionesCompra || [];
+
+            this.cargandoDevoluciones = false;
+
+            this.cdr.detectChanges();
+          },
+
+          error: (error) => {
+
+            console.error(
+              'ERROR CARGANDO DEVOLUCIONES DE COMPRA:',
+              error
+            );
+
+            this.devolucionesCompra = [];
+            this.cargandoDevoluciones = false;
+            this.errorDevoluciones =
+              'No se pudieron cargar las devoluciones de compra.';
+
+            this.cdr.detectChanges();
+          }
+
+        });
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'ERROR CARGANDO DEVOLUCIONES DE VENTA:',
+          error
+        );
+
+        this.devolucionesVenta = [];
+        this.devolucionesCompra = [];
+        this.cargandoDevoluciones = false;
+        this.errorDevoluciones =
+          'No se pudieron cargar las devoluciones.';
+
+        this.cdr.detectChanges();
+      }
+
+    });
+
+  }
+
+  seleccionarTipoDevolucion(
+    tipo: 'VENTA' | 'COMPRA'
+  ): void {
+
+    this.tipoDevolucionListado = tipo;
   }
 
 

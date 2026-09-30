@@ -1,0 +1,619 @@
+<div class="caja-page">
+
+  <!-- HEADER -->
+  <section class="caja-header">
+    <div>
+      <span class="caja-kicker">GESTIÓN FINANCIERA</span>
+      <h1>Caja</h1>
+      <p>Administra la apertura, movimientos y cierre de la caja.</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-refrescar"
+      (click)="refrescar()"
+      [disabled]="cargando || cargandoHistorial"
+    >
+      <span class="icon-refresh">↻</span>
+      Actualizar
+    </button>
+  </section>
+
+  <!-- MENSAJES -->
+  <div *ngIf="mensaje" class="alerta alerta-exito">
+    <span>✓</span>
+    <span>{{ mensaje }}</span>
+  </div>
+
+  <div *ngIf="error" class="alerta alerta-error">
+    <span>!</span>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- CARGANDO -->
+  <div *ngIf="cargando" class="estado-cargando">
+    <div class="spinner"></div>
+    <span>Consultando estado de la caja...</span>
+  </div>
+
+  <!-- VENTAS DEL DÍA -->
+  <section class="metricas-grid metricas-ventas-dia">
+
+    <article class="metrica-card">
+      <div class="metrica-icono ventas">▣</div>
+      <div>
+        <span>Ventas realizadas</span>
+        <strong>{{ cantidadVentas }}</strong>
+      </div>
+    </article>
+
+    <article class="metrica-card metrica-destacada">
+      <div class="metrica-icono recibido">$</div>
+      <div>
+        <span>Total vendido</span>
+        <strong>${{ formatearMonto(totalVentas) }}</strong>
+      </div>
+    </article>
+
+    <article class="metrica-card">
+      <div class="metrica-icono ventas">✓</div>
+      <div>
+        <span>Ventas contado</span>
+        <strong>${{ formatearMonto(ventasContado) }}</strong>
+      </div>
+    </article>
+
+    <article class="metrica-card">
+      <div class="metrica-icono abonos">↗</div>
+      <div>
+        <span>Ventas fiadas</span>
+        <strong>${{ formatearMonto(ventasFiado) }}</strong>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- CAJA ABIERTA -->
+  <ng-container *ngIf="!cargando && cajaActual">
+
+    <section class="estado-caja-card">
+      <div class="estado-principal">
+        <div class="estado-icono">
+          $
+        </div>
+
+        <div>
+          <span class="estado-label">CAJA ACTUAL</span>
+          <h2>Caja #{{ cajaActual.id }}</h2>
+          <p>
+            Abierta desde
+            <strong>{{ cajaActual.fechaApertura | date:'dd/MM/yyyy HH:mm' }}</strong>
+          </p>
+        </div>
+      </div>
+
+      <div class="estado-derecha">
+        <span class="estado-badge estado-abierta">
+          <span class="punto"></span>
+          CAJA ABIERTA
+        </span>
+
+        <button
+          type="button"
+          class="btn-cerrar-caja"
+          (click)="abrirModalCerrar()"
+        >
+          Cerrar caja
+        </button>
+      </div>
+    </section>
+
+    <!-- TARJETAS -->
+    <section class="metricas-grid">
+
+      <article class="metrica-card">
+        <div class="metrica-icono inicial">$</div>
+        <div>
+          <span>Saldo inicial</span>
+          <strong>${{ formatearMonto(cajaActual.montoInicial) }}</strong>
+        </div>
+      </article>
+
+      <article class="metrica-card">
+        <div class="metrica-icono ventas">▣</div>
+        <div>
+          <span>Ventas contado</span>
+          <strong>${{ formatearMonto(resumen?.ventasContado) }}</strong>
+        </div>
+      </article>
+
+      <article class="metrica-card">
+        <div class="metrica-icono abonos">↗</div>
+        <div>
+          <span>Abonos fiados</span>
+          <strong>${{ formatearMonto(resumen?.abonosFiados) }}</strong>
+        </div>
+      </article>
+
+      <article class="metrica-card">
+        <div class="metrica-icono recibido">✓</div>
+        <div>
+          <span>Total recibido</span>
+          <strong>${{ formatearMonto(totalRecibido) }}</strong>
+        </div>
+      </article>
+
+      <article class="metrica-card metrica-destacada">
+        <div class="metrica-icono esperado">≡</div>
+        <div>
+          <span>Monto esperado</span>
+          <strong>${{ formatearMonto(montoEsperadoActual) }}</strong>
+        </div>
+      </article>
+
+    </section>
+
+  </ng-container>
+
+  <!-- CAJA CERRADA / SIN CAJA -->
+  <section
+    *ngIf="!cargando && !cajaActual"
+    class="caja-sin-abrir"
+  >
+    <div class="sin-abrir-icono">$</div>
+    <span class="caja-kicker">ESTADO ACTUAL</span>
+    <h2>No hay una caja abierta</h2>
+    <p>
+      Para comenzar a registrar movimientos de efectivo debes abrir una caja.
+    </p>
+
+    <button
+      type="button"
+      class="btn-abrir-caja"
+      (click)="abrirModalAbrir()"
+    >
+      <span>+</span>
+      Abrir caja
+    </button>
+  </section>
+
+  <!-- HISTORIAL -->
+  <section class="historial-section">
+
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">REGISTROS</span>
+        <h2>Historial de cajas</h2>
+        <p>Consulta las jornadas anteriores y revisa su detalle.</p>
+      </div>
+
+      <span class="contador">
+        {{ historial.length }} registro(s)
+      </span>
+    </div>
+
+    <div *ngIf="cargandoHistorial" class="tabla-estado">
+      <div class="spinner"></div>
+      <span>Cargando historial...</span>
+    </div>
+
+    <div
+      *ngIf="!cargandoHistorial && historial.length === 0"
+      class="tabla-vacia"
+    >
+      <div class="tabla-vacia-icono">▤</div>
+      <h3>No hay cajas registradas</h3>
+      <p>Cuando abras y cierres una caja aparecerá aquí.</p>
+    </div>
+
+    <div
+      *ngIf="!cargandoHistorial && historial.length > 0"
+      class="tabla-wrapper"
+    >
+      <table class="caja-table">
+        <thead>
+        <tr>
+          <th>CAJA</th>
+          <th>APERTURA</th>
+          <th>CIERRE</th>
+          <th>MONTO INICIAL</th>
+          <th>MONTO FINAL</th>
+          <th>ESTADO</th>
+          <th>ACCIÓN</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let caja of cajasPaginadas">
+
+          <td>
+            <span class="numero-caja">#{{ caja.id }}</span>
+          </td>
+
+          <td>
+            {{ caja.fechaApertura | date:'dd/MM/yyyy HH:mm' }}
+          </td>
+
+          <td>
+              <span *ngIf="caja.fechaCierre">
+                {{ caja.fechaCierre | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+            <span *ngIf="!caja.fechaCierre" class="sin-dato">
+                En curso
+              </span>
+          </td>
+
+          <td>
+            ${{ formatearMonto(caja.montoInicial) }}
+          </td>
+
+          <td>
+              <span *ngIf="caja.montoFinal !== null && caja.montoFinal !== undefined">
+                ${{ formatearMonto(caja.montoFinal) }}
+              </span>
+            <span *ngIf="caja.montoFinal === null || caja.montoFinal === undefined" class="sin-dato">
+                —
+              </span>
+          </td>
+
+          <td>
+              <span
+                class="estado-badge"
+                [ngClass]="obtenerClaseEstado(caja.estado)"
+              >
+                <span class="punto"></span>
+                {{ caja.estado }}
+              </span>
+          </td>
+
+          <td>
+            <button
+              type="button"
+              class="btn-detalle"
+              (click)="verDetalle(caja)"
+            >
+              Ver detalle
+            </button>
+          </td>
+
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div
+      *ngIf="!cargandoHistorial && historial.length > cajasPorPagina"
+      class="paginacion"
+    >
+      <button
+        type="button"
+        (click)="cambiarPagina(paginaActual - 1)"
+        [disabled]="paginaActual === 1"
+      >
+        ‹
+      </button>
+
+      <button
+        type="button"
+        *ngFor="let pagina of paginas"
+        [class.activa]="pagina === paginaActual"
+        (click)="cambiarPagina(pagina)"
+      >
+        {{ pagina }}
+      </button>
+
+      <button
+        type="button"
+        (click)="cambiarPagina(paginaActual + 1)"
+        [disabled]="paginaActual === totalPaginas"
+      >
+        ›
+      </button>
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL ABRIR CAJA -->
+<!-- ========================================================= -->
+
+<div
+  *ngIf="mostrarModalAbrir"
+  class="modal-overlay"
+  (click)="cerrarModalAbrir()"
+>
+  <div
+    class="modal-card modal-operacion"
+    (click)="$event.stopPropagation()"
+  >
+
+    <div class="modal-header">
+      <div>
+        <span class="section-kicker">NUEVA JORNADA</span>
+        <h2>Abrir caja</h2>
+      </div>
+
+      <button
+        type="button"
+        class="btn-modal-cerrar"
+        (click)="cerrarModalAbrir()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-ayuda">
+        Ingresa el dinero disponible al comenzar la jornada.
+      </p>
+
+      <label for="montoInicial">Monto inicial</label>
+
+      <div class="input-monto">
+        <span>$</span>
+        <input
+          id="montoInicial"
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          [value]="formatearMonto(montoInicial)"
+          (input)="actualizarMontoInicial($event)"
+          placeholder="0"
+        />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn-secundario"
+        (click)="cerrarModalAbrir()"
+        [disabled]="procesando"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        class="btn-principal"
+        (click)="confirmarAbrirCaja()"
+        [disabled]="procesando"
+      >
+        <span *ngIf="!procesando">Abrir caja</span>
+        <span *ngIf="procesando">Abriendo...</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL CERRAR CAJA -->
+<!-- ========================================================= -->
+
+<div
+  *ngIf="mostrarModalCerrar"
+  class="modal-overlay"
+  (click)="cerrarModalCerrar()"
+>
+  <div
+    class="modal-card modal-operacion"
+    (click)="$event.stopPropagation()"
+  >
+
+    <div class="modal-header">
+      <div>
+        <span class="section-kicker">CIERRE DE JORNADA</span>
+        <h2>Cerrar caja</h2>
+      </div>
+
+      <button
+        type="button"
+        class="btn-modal-cerrar"
+        (click)="cerrarModalCerrar()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="resumen-cierre">
+        <div>
+          <span>Monto esperado</span>
+          <strong>${{ formatearMonto(montoEsperadoActual) }}</strong>
+        </div>
+
+        <div>
+          <span>Saldo inicial</span>
+          <strong>${{ formatearMonto(cajaActual?.montoInicial) }}</strong>
+        </div>
+
+        <div>
+          <span>Ventas contado</span>
+          <strong>${{ formatearMonto(resumen?.ventasContado) }}</strong>
+        </div>
+
+        <div>
+          <span>Abonos fiados</span>
+          <strong>${{ formatearMonto(resumen?.abonosFiados) }}</strong>
+        </div>
+      </div>
+
+      <p class="modal-ayuda">
+        Cuenta físicamente el efectivo disponible e ingresa el monto final.
+      </p>
+
+      <label for="montoFinal">Monto final contado</label>
+
+      <div class="input-monto">
+        <span>$</span>
+        <input
+          id="montoFinal"
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          [value]="formatearMonto(montoFinal)"
+          (input)="actualizarMontoFinal($event)"
+          placeholder="0"
+        />
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn-secundario"
+        (click)="cerrarModalCerrar()"
+        [disabled]="procesando"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        class="btn-principal btn-cierre"
+        (click)="confirmarCerrarCaja()"
+        [disabled]="procesando"
+      >
+        <span *ngIf="!procesando">Confirmar cierre</span>
+        <span *ngIf="procesando">Cerrando...</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL DETALLE -->
+<!-- ========================================================= -->
+
+<div
+  *ngIf="mostrarModalDetalle && cajaSeleccionada"
+  class="modal-overlay"
+  (click)="cerrarDetalle()"
+>
+  <div
+    class="modal-card modal-detalle"
+    (click)="$event.stopPropagation()"
+  >
+
+    <div class="modal-header">
+      <div>
+        <span class="section-kicker">DETALLE DE CAJA</span>
+        <h2>Caja #{{ cajaSeleccionada.id }}</h2>
+      </div>
+
+      <button
+        type="button"
+        class="btn-modal-cerrar"
+        (click)="cerrarDetalle()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="detalle-fechas">
+      <div>
+        <span>Apertura</span>
+        <strong>
+          {{ cajaSeleccionada.fechaApertura | date:'dd/MM/yyyy HH:mm' }}
+        </strong>
+      </div>
+
+      <div>
+        <span>Cierre</span>
+        <strong *ngIf="cajaSeleccionada.fechaCierre">
+          {{ cajaSeleccionada.fechaCierre | date:'dd/MM/yyyy HH:mm' }}
+        </strong>
+        <strong *ngIf="!cajaSeleccionada.fechaCierre">
+          En curso
+        </strong>
+      </div>
+    </div>
+
+    <div class="detalle-grid">
+
+      <div class="detalle-item">
+        <span>Saldo inicial</span>
+        <strong>
+          ${{ formatearMonto(cajaSeleccionada.montoInicial) }}
+        </strong>
+      </div>
+
+      <div class="detalle-item">
+        <span>Ventas contado</span>
+        <strong>
+          ${{ formatearMonto(cajaSeleccionada.ventasContado) }}
+        </strong>
+      </div>
+
+      <div class="detalle-item">
+        <span>Abonos fiados</span>
+        <strong>
+          ${{ formatearMonto(cajaSeleccionada.abonosFiados) }}
+        </strong>
+      </div>
+
+      <div class="detalle-item detalle-destacado">
+        <span>Monto esperado</span>
+        <strong>
+          ${{ formatearMonto(cajaSeleccionada.montoEsperado) }}
+        </strong>
+      </div>
+
+      <div class="detalle-item">
+        <span>Monto final</span>
+        <strong *ngIf="cajaSeleccionada.montoFinal !== null">
+          ${{ formatearMonto(cajaSeleccionada.montoFinal) }}
+        </strong>
+        <strong *ngIf="cajaSeleccionada.montoFinal === null">
+          —
+        </strong>
+      </div>
+
+      <div class="detalle-item">
+        <span>Diferencia</span>
+        <strong
+          *ngIf="cajaSeleccionada.diferencia !== null"
+          [ngClass]="obtenerClaseResultado(cajaSeleccionada.resultado)"
+        >
+          ${{ formatearMonto(cajaSeleccionada.diferencia) }}
+        </strong>
+        <strong *ngIf="cajaSeleccionada.diferencia === null">
+          —
+        </strong>
+      </div>
+
+    </div>
+
+    <div class="resultado-caja">
+      <span>Resultado</span>
+
+      <span
+        class="resultado-badge"
+        [ngClass]="obtenerClaseResultado(cajaSeleccionada.resultado)"
+      >
+        {{ cajaSeleccionada.resultado }}
+      </span>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn-principal"
+        (click)="cerrarDetalle()"
+      >
+        Cerrar
+      </button>
+    </div>
+
+  </div>
+</div>
