@@ -303,7 +303,11 @@
         ADMINISTRACIÓN
       </div>
 
-      <a class="erp-menu-item erp-menu-disabled">
+      <a
+        class="erp-menu-item"
+        routerLink="/usuarios"
+        routerLinkActive="active"
+      >
         <span class="erp-menu-icon">
           <svg><use href="#icon-user"></use></svg>
         </span>
@@ -428,6 +432,7 @@
             <button
               type="button"
               class="erp-dropdown-item"
+              (click)="irAMiPerfil()"
             >
               Mi perfil
             </button>
@@ -435,6 +440,7 @@
             <button
               type="button"
               class="erp-dropdown-item"
+              (click)="irACambiarPassword()"
             >
               Cambiar contraseña
             </button>
