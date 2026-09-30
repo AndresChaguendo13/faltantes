@@ -308,7 +308,7 @@
 
 .caja-metrics {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -336,6 +336,15 @@
 .caja-metric.highlight {
   background: #f7f9fc;
   border-color: #d8dee8;
+}
+
+.caja-metric.esperado {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.caja-metric.esperado strong {
+  font-weight: 800;
 }
 
 
@@ -1005,6 +1014,19 @@
 
 .confirmacion-dato.principal strong {
   font-size: 19px;
+}
+
+
+.confirmacion-apertura-principal {
+  margin-bottom: 16px;
+}
+
+.confirmacion-apertura-resumen {
+  margin-top: 0;
+}
+
+.confirmacion-apertura-info {
+  margin-top: 18px;
 }
 
 
@@ -2123,5 +2145,204 @@
   .table-footer {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+
+/* =========================================================
+   BALANCE DEL DÍA
+========================================================= */
+
+.balance-header p strong {
+  color: #172033;
+  font-weight: 800;
+}
+
+.caja-open-form input,
+.caja-close-form input {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.caja-open-form input::placeholder,
+.caja-close-form input::placeholder {
+  color: #98a2b3;
+}
+
+@media (max-width: 700px) {
+  .balance-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .balance-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================
+   DEVOLUCIONES
+   ========================================= */
+
+.devoluciones-section {
+  margin-top: 24px;
+}
+
+.devoluciones-header {
+  margin-bottom: 14px;
+}
+
+.devoluciones-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 5px;
+  border: 1px solid #e5e9f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  width: fit-content;
+}
+
+.devoluciones-tabs button {
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.devoluciones-tabs button:hover {
+  color: #172033;
+  background: #fff;
+}
+
+.devoluciones-tabs button.active {
+  border-color: #dfe5ec;
+  background: #fff;
+  color: #172033;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.devoluciones-tabs button span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #475569;
+  font-size: 10px;
+}
+
+.devoluciones-tabs button.active span {
+  background: #eef4ff;
+  color: #2563eb;
+}
+
+.devoluciones-listado {
+  width: 100%;
+}
+
+.tabla-devoluciones-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.tabla-devoluciones {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+
+.tabla-devoluciones th {
+  padding: 13px 14px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 700;
+  color: #667085;
+  background: #f8f9fb;
+  border-bottom: 1px solid #eaecf0;
+  white-space: nowrap;
+}
+
+.tabla-devoluciones td {
+  padding: 13px 14px;
+  font-size: 12px;
+  color: #344054;
+  border-bottom: 1px solid #f0f2f5;
+  white-space: nowrap;
+}
+
+.tabla-devoluciones tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.tabla-devoluciones tbody tr:hover {
+  background: #fafbfc;
+}
+
+.tabla-devoluciones .money {
+  color: #172033;
+  font-weight: 800;
+}
+
+.tabla-devoluciones td strong {
+  color: #172033;
+  font-weight: 700;
+}
+
+@media (max-width: 700px) {
+
+  .devoluciones-tabs {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .devoluciones-tabs button {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+}
+
+
+/* =========================================================
+   COMPRAS EN BALANCE
+========================================================= */
+
+.compras-balance-section {
+  margin-top: 20px;
+}
+
+.btn-devolver-producto:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  background: #f3f4f6;
+  color: #9ca3af;
+  border-color: #e5e7eb;
+}
+
+@media (max-width: 700px) {
+  .detalle-venta-producto {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .producto-detalle-acciones {
+    width: 100%;
+    justify-content: space-between;
   }
 }

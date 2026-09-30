@@ -14,6 +14,7 @@ import { authGuard } from './guards/auth-guard';
 import { Usuarios } from './pages/usuarios/usuarios';
 import { MiPerfil } from './pages/mi-perfil/mi-perfil';
 import { CambiarContrasena } from './pages/cambiar-contrasena/cambiar-contrasena';
+import { Devoluciones } from './pages/devoluciones/devoluciones';
 
 export const routes: Routes = [
 
@@ -76,6 +77,13 @@ export const routes: Routes = [
       { path: 'balance', component: Balance },
 
       {
+        path: 'devoluciones',
+        component: Devoluciones
+      },
+
+
+      {
+
         path: 'usuarios',
         component: Usuarios
       },

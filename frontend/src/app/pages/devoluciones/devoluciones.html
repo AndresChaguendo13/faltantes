@@ -1,0 +1,257 @@
+<div class="devoluciones-page">
+
+  <header class="devoluciones-header">
+    <div>
+      <span class="devoluciones-kicker">GESTIÓN</span>
+      <h1>Devoluciones</h1>
+      <p>Consulta las devoluciones registradas de ventas y compras.</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-recargar"
+      (click)="cargarDevoluciones()"
+      [disabled]="cargandoDevoluciones"
+    >
+      ↻ Recargar
+    </button>
+  </header>
+
+  <section class="devoluciones-card">
+
+    <div class="section-header">
+      <div>
+        <h2>Historial de devoluciones</h2>
+        <p>Consulta las devoluciones realizadas y sus respectivos detalles.</p>
+      </div>
+    </div>
+
+    <div *ngIf="cargandoDevoluciones" class="estado-panel">
+      <strong>Cargando devoluciones...</strong>
+      <span>Estamos consultando las devoluciones registradas.</span>
+    </div>
+
+    <div *ngIf="!cargandoDevoluciones && errorDevoluciones" class="error-panel">
+      {{ errorDevoluciones }}
+    </div>
+
+    <ng-container *ngIf="!cargandoDevoluciones && !errorDevoluciones">
+
+      <div class="devoluciones-tabs">
+        <button
+          type="button"
+          [class.active]="tipoDevolucionListado === 'VENTA'"
+          (click)="seleccionarTipoDevolucion('VENTA')"
+        >
+          <span>Devoluciones de venta</span>
+          <strong>{{ devolucionesVenta.length }}</strong>
+        </button>
+
+        <button
+          type="button"
+          [class.active]="tipoDevolucionListado === 'COMPRA'"
+          (click)="seleccionarTipoDevolucion('COMPRA')"
+        >
+          <span>Devoluciones de compra</span>
+          <strong>{{ devolucionesCompra.length }}</strong>
+        </button>
+      </div>
+
+      <!-- =========================
+           DEVOLUCIONES DE VENTA
+      ========================== -->
+
+      <section *ngIf="tipoDevolucionListado === 'VENTA'" class="listado-devoluciones">
+
+        <div *ngIf="devolucionesVenta.length === 0" class="estado-panel">
+          <strong>No hay devoluciones de venta</strong>
+          <span>Las devoluciones realizadas sobre ventas aparecerán aquí.</span>
+        </div>
+
+        <ng-container *ngIf="devolucionesVenta.length > 0">
+
+          <div class="tabla-wrapper">
+            <table class="tabla-devoluciones">
+              <thead>
+              <tr>
+                <th>FECHA</th>
+                <th>VENTA</th>
+                <th>PRODUCTO</th>
+                <th>CANTIDAD</th>
+                <th>VALOR</th>
+                <th>MOTIVO</th>
+              </tr>
+              </thead>
+
+              <tbody>
+              <tr *ngFor="let devolucion of devolucionesVentaPaginadas">
+                <td>
+                  {{ devolucion.fecha | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+
+                <td>
+                  <span class="id-badge">#{{ devolucion.ventaId }}</span>
+                </td>
+
+                <td>
+                  <strong class="producto-nombre">
+                    {{ devolucion.nombreProducto }}
+                  </strong>
+                </td>
+
+                <td>
+                  {{ devolucion.cantidad }}
+                </td>
+
+                <td class="money">
+                  {{ devolucion.valor | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </td>
+
+                <td class="motivo">
+                  {{ devolucion.motivo || '—' }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="totalPaginasVentas > 1" class="table-footer">
+            <span class="results-text">
+              Mostrando
+              <strong>{{ inicioVentas }}</strong>
+              -
+              <strong>{{ finVentas }}</strong>
+              de
+              <strong>{{ devolucionesVenta.length }}</strong>
+              devoluciones
+            </span>
+
+            <div class="pagination">
+              <button
+                type="button"
+                (click)="cambiarPaginaVentas(ventasPaginaActual - 1)"
+                [disabled]="ventasPaginaActual === 1"
+                aria-label="Página anterior"
+              >
+                ‹
+              </button>
+
+              <span class="pagina-indicador">
+                Página {{ ventasPaginaActual }} de {{ totalPaginasVentas }}
+              </span>
+
+              <button
+                type="button"
+                (click)="cambiarPaginaVentas(ventasPaginaActual + 1)"
+                [disabled]="ventasPaginaActual === totalPaginasVentas"
+                aria-label="Página siguiente"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+
+        </ng-container>
+      </section>
+
+      <!-- =========================
+           DEVOLUCIONES DE COMPRA
+      ========================== -->
+
+      <section *ngIf="tipoDevolucionListado === 'COMPRA'" class="listado-devoluciones">
+
+        <div *ngIf="devolucionesCompra.length === 0" class="estado-panel">
+          <strong>No hay devoluciones de compra</strong>
+          <span>Las devoluciones realizadas a proveedores aparecerán aquí.</span>
+        </div>
+
+        <ng-container *ngIf="devolucionesCompra.length > 0">
+
+          <div class="tabla-wrapper">
+            <table class="tabla-devoluciones">
+              <thead>
+              <tr>
+                <th>FECHA</th>
+                <th>COMPRA</th>
+                <th>PRODUCTO</th>
+                <th>CANTIDAD</th>
+                <th>VALOR</th>
+                <th>MOTIVO</th>
+              </tr>
+              </thead>
+
+              <tbody>
+              <tr *ngFor="let devolucion of devolucionesCompraPaginadas">
+                <td>
+                  {{ devolucion.fecha | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+
+                <td>
+                  <span class="id-badge">#{{ devolucion.compraId }}</span>
+                </td>
+
+                <td>
+                  <strong class="producto-nombre">
+                    {{ devolucion.nombreProducto }}
+                  </strong>
+                </td>
+
+                <td>
+                  {{ devolucion.cantidad }}
+                </td>
+
+                <td class="money">
+                  {{ devolucion.valor | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </td>
+
+                <td class="motivo">
+                  {{ devolucion.motivo || '—' }}
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div *ngIf="totalPaginasCompras > 1" class="table-footer">
+            <span class="results-text">
+              Mostrando
+              <strong>{{ inicioCompras }}</strong>
+              -
+              <strong>{{ finCompras }}</strong>
+              de
+              <strong>{{ devolucionesCompra.length }}</strong>
+              devoluciones
+            </span>
+
+            <div class="pagination">
+              <button
+                type="button"
+                (click)="cambiarPaginaCompras(comprasPaginaActual - 1)"
+                [disabled]="comprasPaginaActual === 1"
+                aria-label="Página anterior"
+              >
+                ‹
+              </button>
+
+              <span class="pagina-indicador">
+                Página {{ comprasPaginaActual }} de {{ totalPaginasCompras }}
+              </span>
+
+              <button
+                type="button"
+                (click)="cambiarPaginaCompras(comprasPaginaActual + 1)"
+                [disabled]="comprasPaginaActual === totalPaginasCompras"
+                aria-label="Página siguiente"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+
+        </ng-container>
+      </section>
+
+    </ng-container>
+
+  </section>
+</div>

@@ -266,7 +266,11 @@
       <!-- Estos módulos se dejan visualmente preparados.
            Se conectan cuando sus rutas/componentes estén creados. -->
 
-      <a class="erp-menu-item erp-menu-disabled">
+      <a
+        class="erp-menu-item"
+        routerLink="/devoluciones"
+        routerLinkActive="active"
+      >
         <span class="erp-menu-icon">
           <svg><use href="#icon-return"></use></svg>
         </span>
@@ -299,16 +303,13 @@
         ADMINISTRACIÓN
       </div>
 
-      <a
-        class="erp-menu-item"
-        routerLink="/usuarios"
-        routerLinkActive="active"
-      >
-  <span class="erp-menu-icon">
-    <svg><use href="#icon-user"></use></svg>
-  </span>
+      <a class="erp-menu-item erp-menu-disabled">
+        <span class="erp-menu-icon">
+          <svg><use href="#icon-user"></use></svg>
+        </span>
         <span>Usuarios</span>
       </a>
+
       <a class="erp-menu-item erp-menu-disabled">
         <span class="erp-menu-icon">
           <svg><use href="#icon-report"></use></svg>
@@ -422,37 +423,33 @@
 
           @if (menuUsuarioAbierto) {
 
-            <div class="erp-user-dropdown">
+          <div class="erp-user-dropdown">
 
-              <button
-                type="button"
-                class="erp-dropdown-item"
-                (click)="irAMiPerfil()"
-              >
-                Mi perfil
-              </button>
+            <button
+              type="button"
+              class="erp-dropdown-item"
+            >
+              Mi perfil
+            </button>
 
-              <button
-                type="button"
-                class="erp-dropdown-item"
-                (click)="irACambiarPassword()"
-              >
-                Cambiar contraseña
-              </button>
+            <button
+              type="button"
+              class="erp-dropdown-item"
+            >
+              Cambiar contraseña
+            </button>
 
+            <div class="erp-dropdown-divider"></div>
 
+            <button
+              type="button"
+              class="erp-dropdown-item erp-logout"
+              (click)="cerrarSesion()"
+            >
+              Cerrar sesión
+            </button>
 
-              <div class="erp-dropdown-divider"></div>
-
-              <button
-                type="button"
-                class="erp-dropdown-item erp-logout"
-                (click)="cerrarSesion()"
-              >
-                Cerrar sesión
-              </button>
-
-            </div>
+          </div>
 
           }
 

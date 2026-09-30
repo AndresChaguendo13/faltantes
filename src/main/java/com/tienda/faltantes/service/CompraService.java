@@ -145,6 +145,10 @@ public class CompraService {
                     DetalleCompraResponseDTO detalleResponse =
                             new DetalleCompraResponseDTO();
 
+                    detalleResponse.setProductoId(
+                            detalle.getProducto().getId()
+                    );
+
                     detalleResponse.setProducto(
                             detalle.getProducto().getNombre()
                     );
