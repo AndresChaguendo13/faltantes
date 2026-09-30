@@ -1,0 +1,391 @@
+<div class="fiados-page">
+
+  <header class="fiados-header">
+    <div>
+      <span class="eyebrow">Cuentas por cobrar</span>
+      <h1>Fiados</h1>
+      <p>Consulta y administra las cuentas pendientes de tus clientes.</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-recargar"
+      (click)="cargarFiados()"
+      [disabled]="cargando">
+      <span>↻</span>
+      {{ cargando ? 'Cargando...' : 'Actualizar' }}
+    </button>
+  </header>
+
+  <section class="resumen-grid">
+
+    <article class="resumen-card">
+      <div class="resumen-icon icon-total">$
+      </div>
+      <div>
+        <span class="resumen-label">Total fiado</span>
+        <strong>{{ formatearMoneda(totalFiado) }}</strong>
+        <small>Valor original de las cuentas</small>
+      </div>
+    </article>
+
+    <article class="resumen-card">
+      <div class="resumen-icon icon-abonado">✓</div>
+      <div>
+        <span class="resumen-label">Total abonado</span>
+        <strong>{{ formatearMoneda(totalAbonado) }}</strong>
+        <small>Pagos registrados</small>
+      </div>
+    </article>
+
+    <article class="resumen-card">
+      <div class="resumen-icon icon-pendiente">!</div>
+      <div>
+        <span class="resumen-label">Saldo pendiente</span>
+        <strong>{{ formatearMoneda(saldoPendiente) }}</strong>
+        <small>{{ cantidadPendientes }} cuenta(s) pendiente(s)</small>
+      </div>
+    </article>
+
+  </section>
+
+  <section class="contenido-card">
+
+    <div class="seccion-titulo">
+      <div>
+        <h2>Listado de fiados</h2>
+        <p>Consulta las cuentas por cobrar y registra sus abonos.</p>
+      </div>
+    </div>
+
+    <div class="filtros">
+
+      <div class="campo-busqueda">
+        <span>⌕</span>
+        <input
+          type="text"
+          [(ngModel)]="terminoBusqueda"
+          (ngModelChange)="aplicarFiltros()"
+          placeholder="Buscar por cliente, ID o venta...">
+      </div>
+
+      <select
+        [(ngModel)]="filtroEstado"
+        (ngModelChange)="aplicarFiltros()">
+        <option value="todos">Todos los estados</option>
+        <option value="pendientes">Pendientes</option>
+        <option value="pagados">Pagados</option>
+      </select>
+
+      <button
+        type="button"
+        class="btn-limpiar"
+        (click)="limpiarFiltros()">
+        Limpiar
+      </button>
+
+    </div>
+
+    <div
+      *ngIf="error"
+      class="mensaje-error">
+      {{ error }}
+    </div>
+
+    <div
+      *ngIf="cargando"
+      class="estado-vacio">
+      <div class="spinner"></div>
+      <p>Cargando fiados...</p>
+    </div>
+
+    <div
+      *ngIf="!cargando && !fiadosVisibles.length"
+      class="estado-vacio">
+      <div class="vacio-icon">✓</div>
+      <h3>No hay fiados para mostrar</h3>
+      <p>
+        No existen cuentas que coincidan con los filtros seleccionados.
+      </p>
+    </div>
+
+    <div
+      *ngIf="!cargando && fiadosVisibles.length"
+      class="tabla-wrapper">
+
+      <table>
+        <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Venta</th>
+          <th>Fecha</th>
+          <th>Valor original</th>
+          <th>Abonado</th>
+          <th>Saldo pendiente</th>
+          <th>Estado</th>
+          <th class="col-accion">Acción</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr
+          *ngFor="let fiado of fiadosPaginados; trackBy: trackById">
+
+          <td>
+            <div class="cliente-cell">
+              <div class="avatar">
+                {{ (fiado.nombreCliente || '?').charAt(0).toUpperCase() }}
+              </div>
+              <div>
+                <strong>{{ fiado.nombreCliente }}</strong>
+                <small>ID fiado #{{ fiado.id }}</small>
+              </div>
+            </div>
+          </td>
+
+          <td>
+              <span class="venta-badge">
+                {{ fiado.ventaId ? '#' + fiado.ventaId : 'Sin venta' }}
+              </span>
+          </td>
+
+          <td>{{ formatearFecha(fiado.fecha) }}</td>
+
+          <td class="monto">
+            {{ formatearMoneda(fiado.valorOriginal) }}
+          </td>
+
+          <td class="monto abonado">
+            {{ formatearMoneda(fiado.valorAbonado) }}
+          </td>
+
+          <td class="monto pendiente">
+            {{ formatearMoneda(fiado.saldoPendiente) }}
+          </td>
+
+          <td>
+              <span
+                class="estado"
+                [class.estado-pagado]="esPagado(fiado)"
+                [class.estado-pendiente]="!esPagado(fiado)">
+                {{ esPagado(fiado) ? 'PAGADO' : 'PENDIENTE' }}
+              </span>
+          </td>
+
+          <td class="col-accion">
+            <button
+              type="button"
+              class="btn-detalle"
+              (click)="abrirDetalle(fiado)">
+              Ver detalle
+            </button>
+          </td>
+
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <div
+      *ngIf="!cargando && fiadosVisibles.length"
+      class="paginacion">
+
+      <span>
+        Mostrando {{ inicioPagina }} - {{ finPagina }}
+        de {{ fiadosVisibles.length }}
+      </span>
+
+      <div class="paginas">
+        <button
+          type="button"
+          [disabled]="paginaActual === 1"
+          (click)="cambiarPagina(paginaActual - 1)">
+          ‹
+        </button>
+
+        <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
+
+        <button
+          type="button"
+          [disabled]="paginaActual === totalPaginas"
+          (click)="cambiarPagina(paginaActual + 1)">
+          ›
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
+
+<div
+  *ngIf="mostrarDetalle"
+  class="modal-backdrop"
+  (click)="cerrarDetalle()">
+
+  <section
+    class="modal"
+    (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div>
+        <span class="eyebrow">Detalle de cuenta</span>
+        <h2>Fiado #{{ fiadoSeleccionado?.id }}</h2>
+      </div>
+
+      <button
+        type="button"
+        class="btn-cerrar"
+        (click)="cerrarDetalle()"
+        [disabled]="guardandoAbono">
+        ×
+      </button>
+    </div>
+
+    <div
+      *ngIf="!fiadoSeleccionado"
+      class="modal-cargando">
+      <div class="spinner"></div>
+      <p>Cargando detalle...</p>
+    </div>
+
+    <div *ngIf="fiadoSeleccionado">
+
+      <div class="cliente-detalle">
+        <div class="avatar grande">
+          {{ (fiadoSeleccionado.nombreCliente || '?').charAt(0).toUpperCase() }}
+        </div>
+
+        <div>
+          <span>Cliente</span>
+          <strong>{{ fiadoSeleccionado.nombreCliente }}</strong>
+          <small>
+            Venta:
+            {{ fiadoSeleccionado.ventaId ? '#' + fiadoSeleccionado.ventaId : 'Sin venta' }}
+          </small>
+        </div>
+
+        <span
+          class="estado"
+          [class.estado-pagado]="esPagado(fiadoSeleccionado)"
+          [class.estado-pendiente]="!esPagado(fiadoSeleccionado)">
+          {{ esPagado(fiadoSeleccionado) ? 'PAGADO' : 'PENDIENTE' }}
+        </span>
+      </div>
+
+      <div class="detalle-metricas">
+
+        <div>
+          <span>Valor original</span>
+          <strong>
+            {{ formatearMoneda(fiadoSeleccionado.valorOriginal) }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Total abonado</span>
+          <strong class="texto-abonado">
+            {{ formatearMoneda(fiadoSeleccionado.valorAbonado) }}
+          </strong>
+        </div>
+
+        <div>
+          <span>Saldo pendiente</span>
+          <strong class="texto-pendiente">
+            {{ formatearMoneda(fiadoSeleccionado.saldoPendiente) }}
+          </strong>
+        </div>
+
+      </div>
+
+      <div
+        *ngIf="!esPagado(fiadoSeleccionado)"
+        class="form-abono">
+
+        <div>
+          <h3>Registrar abono</h3>
+          <p>
+            Saldo disponible:
+            <strong>
+              {{ formatearMoneda(fiadoSeleccionado.saldoPendiente) }}
+            </strong>
+          </p>
+        </div>
+
+        <div class="abono-form-row">
+
+          <div class="campo-monto">
+            <span>$</span>
+            <input
+              type="number"
+              min="0.01"
+              [max]="fiadoSeleccionado.saldoPendiente"
+              step="1"
+              [(ngModel)]="valorAbono"
+              placeholder="0">
+          </div>
+
+          <button
+            type="button"
+            class="btn-abonar"
+            (click)="registrarAbono()"
+            [disabled]="guardandoAbono">
+            {{ guardandoAbono ? 'Registrando...' : 'Registrar abono' }}
+          </button>
+
+        </div>
+
+      </div>
+
+      <div
+        *ngIf="esPagado(fiadoSeleccionado)"
+        class="cuenta-pagada">
+        <span>✓</span>
+        Esta cuenta está completamente pagada.
+      </div>
+
+      <div class="historial">
+
+        <div class="historial-titulo">
+          <div>
+            <h3>Historial de abonos</h3>
+            <span>
+              {{ fiadoSeleccionado.abonos?.length || 0 }} registro(s)
+            </span>
+          </div>
+        </div>
+
+        <div
+          *ngIf="!fiadoSeleccionado.abonos?.length"
+          class="historial-vacio">
+          Todavía no hay abonos registrados.
+        </div>
+
+        <div
+          *ngIf="fiadoSeleccionado.abonos?.length"
+          class="abonos-lista">
+
+          <div
+            *ngFor="let abono of fiadoSeleccionado.abonos"
+            class="abono-item">
+
+            <div class="abono-icon">✓</div>
+
+            <div class="abono-info">
+              <strong>{{ formatearMoneda(abono.valor) }}</strong>
+              <span>{{ formatearFecha(abono.fecha) }}</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
