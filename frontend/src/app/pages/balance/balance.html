@@ -874,8 +874,454 @@
 
 
     <!-- =============================
-         HISTORIAL DE COMPRAS
+         DETALLE DE CAJA
     ============================= -->
+
+    <div
+      *ngIf="cajaSeleccionada"
+      class="detalle-caja-overlay"
+      (click)="cerrarDetalleCaja()"
+    >
+
+      <div
+        class="detalle-caja-modal"
+        (click)="$event.stopPropagation()"
+      >
+
+        <div class="detalle-caja-header">
+
+          <div>
+
+            <span class="detalle-caja-label">
+              DETALLE DE CAJA
+            </span>
+
+            <h2>
+              Caja #{{ cajaSeleccionada.id }}
+            </h2>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="detalle-caja-close"
+            (click)="cerrarDetalleCaja()"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <div class="detalle-caja-fechas">
+
+          <div>
+
+            <span>
+              Apertura
+            </span>
+
+            <strong>
+              {{
+              cajaSeleccionada.fechaApertura
+              | date:'dd/MM/yyyy HH:mm'
+              }}
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Cierre
+            </span>
+
+            <strong>
+              {{
+              cajaSeleccionada.fechaCierre
+              ? (cajaSeleccionada.fechaCierre | date:'dd/MM/yyyy HH:mm')
+              : '—'
+              }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="detalle-caja-grid">
+
+
+          <div class="detalle-caja-card">
+
+            <span>
+              Monto inicial
+            </span>
+
+            <strong>
+              {{
+              cajaSeleccionada.montoInicial
+              | currency:'COP':'symbol-narrow':'1.0-0'
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="detalle-caja-card">
+
+            <span>
+              Ventas contado
+            </span>
+
+            <strong>
+              {{
+              cajaSeleccionada.ventasContado
+              | currency:'COP':'symbol-narrow':'1.0-0'
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="detalle-caja-card">
+
+            <span>
+              Abonos fiados
+            </span>
+
+            <strong>
+              {{
+              cajaSeleccionada.abonosFiados
+              | currency:'COP':'symbol-narrow':'1.0-0'
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="detalle-caja-card">
+
+            <span>
+              Monto esperado
+            </span>
+
+            <strong>
+              {{
+              cajaSeleccionada.montoEsperado
+              | currency:'COP':'symbol-narrow':'1.0-0'
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="detalle-caja-card">
+
+            <span>
+              Dinero contado
+            </span>
+
+            <strong>
+              {{
+              cajaSeleccionada.montoFinal
+              | currency:'COP':'symbol-narrow':'1.0-0'
+              }}
+            </strong>
+
+          </div>
+
+
+          <div
+            class="detalle-caja-card detalle-diferencia"
+            [ngClass]="obtenerClaseDiferencia()"
+          >
+
+            <span>
+              Diferencia
+            </span>
+
+            <strong>
+              {{
+              cajaSeleccionada.diferencia
+              | currency:'COP':'symbol-narrow':'1.0-0'
+              }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="detalle-resultado">
+
+          <span>
+            Resultado del cierre
+          </span>
+
+          <strong>
+            {{ cajaSeleccionada.resultado }}
+          </strong>
+
+        </div>
+
+
+        <div class="detalle-caja-footer">
+
+          <button
+            type="button"
+            class="btn-cerrar-detalle"
+            (click)="cerrarDetalleCaja()"
+          >
+            Cerrar
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+
+    <!-- =============================
+             HISTORIAL DE VENTAS
+        ============================= -->
+
+    <section class="balance-table-card">
+
+      <div class="balance-table-header">
+
+        <div>
+
+          <h2>
+            Ventas del día
+          </h2>
+
+          <span>
+            {{ cantidadVentas }} operación(es) del {{ fechaBalance | date:'dd/MM/yyyy' }}
+          </span>
+
+        </div>
+
+
+        <a
+          routerLink="/ventas"
+          class="balance-sell-link"
+        >
+          Ir a vender →
+        </a>
+
+      </div>
+
+
+      <!-- SIN VENTAS -->
+
+      <div
+        *ngIf="ventas.length === 0"
+        class="balance-empty"
+      >
+
+        <strong>
+          No hay ventas registradas hoy
+        </strong>
+
+        <span>
+          Las ventas realizadas hoy aparecerán aquí.
+        </span>
+
+      </div>
+
+
+      <!-- TABLA -->
+
+      <div
+        *ngIf="ventas.length > 0"
+        class="balance-table-wrapper"
+      >
+
+        <table>
+
+          <thead>
+
+          <tr>
+
+            <th>ID</th>
+
+            <th>Fecha</th>
+
+            <th>Cliente</th>
+
+            <th>Pago</th>
+
+            <th>Productos</th>
+
+            <th>Total</th>
+
+            <th>Acciones</th>
+
+          </tr>
+
+          </thead>
+
+
+          <tbody>
+
+          <tr
+            *ngFor="let venta of ventasPaginadas"
+          >
+
+            <td>
+              #{{ venta.id }}
+            </td>
+
+
+            <td>
+
+              {{ venta.fecha | date:'dd/MM/yyyy HH:mm' }}
+
+            </td>
+
+
+            <td>
+
+              {{ venta.nombreCliente || 'Consumidor final' }}
+
+            </td>
+
+
+            <td>
+
+                <span
+                  class="payment"
+                  [class.fiado]="venta.tipoPago === 'FIADO'"
+                >
+                  {{ venta.tipoPago }}
+                </span>
+
+            </td>
+
+
+            <td>
+
+              {{ venta.detalles.length }}
+
+            </td>
+
+
+            <td class="money">
+
+              {{
+              venta.total
+              | currency:'COP':'symbol':'1.0-0'
+              }}
+
+            </td>
+
+
+            <td>
+
+              <button
+                type="button"
+                class="btn-ver-venta"
+                (click)="verDetalleVenta(venta)"
+              >
+                Ver detalle
+              </button>
+
+            </td>
+
+          </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <!-- PAGINACIÓN VENTAS -->
+
+      <div
+        *ngIf="totalPaginasVentas > 1"
+        class="table-footer"
+      >
+
+        <span class="results-text">
+
+          Mostrando
+
+          <strong>
+            {{ ((ventasPaginaActual - 1) * ventasPorPagina) + 1 }}
+          </strong>
+
+          -
+
+          <strong>
+            {{
+              Math.min(
+                ventasPaginaActual * ventasPorPagina,
+                ventas.length
+              )
+            }}
+          </strong>
+
+          de
+
+          <strong>
+            {{ ventas.length }}
+          </strong>
+
+          ventas
+
+        </span>
+
+
+        <div class="pagination">
+
+          <button
+            type="button"
+            (click)="cambiarPaginaVentas(ventasPaginaActual - 1)"
+            [disabled]="ventasPaginaActual === 1"
+            aria-label="Página anterior de ventas"
+          >
+            ‹
+          </button>
+
+
+          <button
+            *ngFor="let pagina of paginasVentas"
+            type="button"
+            [class.active-page]="ventasPaginaActual === pagina"
+            (click)="cambiarPaginaVentas(pagina)"
+          >
+            {{ pagina }}
+          </button>
+
+
+          <button
+            type="button"
+            (click)="cambiarPaginaVentas(ventasPaginaActual + 1)"
+            [disabled]="ventasPaginaActual === totalPaginasVentas"
+            aria-label="Página siguiente de ventas"
+          >
+            ›
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =============================
+             HISTORIAL DE COMPRAS
+        ============================= -->
 
     <section class="balance-table-card compras-balance-section">
 
