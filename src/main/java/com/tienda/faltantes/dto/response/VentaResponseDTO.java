@@ -10,9 +10,18 @@ public class VentaResponseDTO {
     private Double total;
     private List<DetalleVentaResponseDTO> detalles;
     private String tipoPago;
+    private String medioPago;
     private Long clienteId;
     private String nombreCliente;
     private Long fiadoId;
+
+    public String getMedioPago() {
+        return medioPago;
+    }
+
+    public void setMedioPago(String medioPago) {
+        this.medioPago = medioPago;
+    }
 
     public Long getFiadoId() {
         return fiadoId;

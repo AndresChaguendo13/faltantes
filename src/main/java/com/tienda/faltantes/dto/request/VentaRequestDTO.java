@@ -13,6 +13,7 @@ public class VentaRequestDTO {
     private Long clienteId;
 
     private String tipoPago;
+    private String medioPago;
 
     public List<DetalleVentaRequestDTO> getDetalles() {
         return detalles;
@@ -28,6 +29,14 @@ public class VentaRequestDTO {
 
     public void setClienteId(Long clienteId) {
         this.clienteId = clienteId;
+    }
+
+    public String getMedioPago() {
+        return medioPago;
+    }
+
+    public void setMedioPago(String medioPago) {
+        this.medioPago = medioPago;
     }
 
     public String getTipoPago() {

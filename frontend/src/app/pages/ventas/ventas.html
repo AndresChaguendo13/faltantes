@@ -135,31 +135,31 @@
            TOOLBAR PRODUCTOS
            ================================================= -->
 
-        <div class="pos-products-toolbar">
+      <div class="pos-products-toolbar">
 
-          <div>
+        <div>
 
-            <strong>
-              {{ codigoBusqueda ? 'Resultados de búsqueda' : 'Productos' }}
-            </strong>
+          <strong>
+            {{ codigoBusqueda ? 'Resultados de búsqueda' : 'Productos' }}
+          </strong>
 
-            <span>
+          <span>
       {{ productosVisibles.length }}
       {{ productosVisibles.length === 1 ? 'resultado' : 'resultados' }}
     </span>
 
-          </div>
-
-          <button
-            type="button"
-            class="pos-clear-filter"
-            *ngIf="codigoBusqueda || categoriaSeleccionada !== null"
-            (click)="limpiarFiltros()"
-          >
-            Limpiar filtros
-          </button>
-
         </div>
+
+        <button
+          type="button"
+          class="pos-clear-filter"
+          *ngIf="codigoBusqueda || categoriaSeleccionada !== null"
+          (click)="limpiarFiltros()"
+        >
+          Limpiar filtros
+        </button>
+
+      </div>
 
 
       <!-- =================================================
@@ -184,26 +184,26 @@
            SIN PRODUCTOS
            ================================================= -->
 
-        <div
-          *ngIf="
+      <div
+        *ngIf="
     !cargandoProductos &&
     productosVisibles.length === 0 &&
     codigoBusqueda.trim()
   "
-          class="pos-no-products"
-        >
-          <div class="pos-no-products-icon">
-            📦
-          </div>
+        class="pos-no-products"
+      >
+        <div class="pos-no-products-icon">
+          📦
+        </div>
 
-          <strong>
-            No encontramos productos
-          </strong>
+        <strong>
+          No encontramos productos
+        </strong>
 
-          <span>
+        <span>
     Prueba con otro nombre, código o categoría.
   </span>
-        </div>
+      </div>
 
 
       <!-- =================================================
@@ -593,6 +593,35 @@
           </button>
 
 
+          <!-- TRANSFERENCIA -->
+
+          <button
+            type="button"
+            class="pos-payment-option"
+            [class.active]="tipoPago === 'TRANSFERENCIA'"
+            (click)="seleccionarTipoPago('TRANSFERENCIA')"
+            [disabled]="guardandoVenta"
+          >
+
+            <span class="pos-payment-icon">
+              🔄
+            </span>
+
+            <span class="pos-payment-text">
+
+              <strong>
+                Transferencia
+              </strong>
+
+              <small>
+                Pago electrónico
+              </small>
+
+            </span>
+
+          </button>
+
+
           <!-- FIADO -->
 
           <button
@@ -671,6 +700,41 @@
           </strong>
 
         </div>
+
+      </div>
+
+
+      <!-- ===================================================== -->
+      <!-- TRANSFERENCIA -->
+      <!-- ===================================================== -->
+
+      <div
+        *ngIf="tipoPago === 'TRANSFERENCIA'"
+        class="pos-payment-detail"
+      >
+
+        <label for="medioPagoTransferencia">
+          Medio de transferencia
+        </label>
+
+        <select
+          id="medioPagoTransferencia"
+          [(ngModel)]="medioPagoTransferencia"
+          [disabled]="guardandoVenta"
+        >
+
+          <option value="">
+            Selecciona un medio de pago
+          </option>
+
+          <option
+            *ngFor="let medio of mediosTransferencia"
+            [value]="medio.valor"
+          >
+            {{ medio.nombre }}
+          </option>
+
+        </select>
 
       </div>
 
@@ -761,6 +825,8 @@
             {{
             tipoPago === 'CONTADO'
             ? 'Contado'
+            : tipoPago === 'TRANSFERENCIA'
+            ? 'Transferencia'
             : 'Fiado'
             }}
           </strong>
@@ -799,6 +865,10 @@
             (
               tipoPago === 'FIADO' &&
               clienteSeleccionadoId === null
+            ) ||
+            (
+              tipoPago === 'TRANSFERENCIA' &&
+              !medioPagoTransferencia
             )
           "
         >

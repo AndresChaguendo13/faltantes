@@ -1,0 +1,129 @@
+<div class="transferencias-page">
+
+  <header class="transferencias-header">
+    <div>
+      <span class="transferencias-kicker">MEDIOS DE PAGO</span>
+      <h1>Transferencias</h1>
+      <p>
+        Transferencias registradas hoy,
+        <strong>{{ fechaHoy | date:'dd/MM/yyyy' }}</strong>.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-refresh"
+      (click)="cargarTransferencias()"
+      [disabled]="cargando$ | async"
+    >
+      <span>↻</span>
+      Actualizar
+    </button>
+  </header>
+
+  <div *ngIf="error" class="transferencias-error">
+    {{ error }}
+  </div>
+
+  <div *ngIf="cargando$ | async" class="transferencias-loading">
+    Cargando transferencias...
+  </div>
+
+  <ng-container *ngIf="!(cargando$ | async)">
+
+    <section class="transferencias-cards">
+
+      <article class="transferencia-card">
+        <div class="card-icon">↔</div>
+        <div>
+          <span>Transferencias de hoy</span>
+          <strong>{{ cantidadTransferencias }}</strong>
+        </div>
+      </article>
+
+      <article class="transferencia-card highlight">
+        <div class="card-icon">$</div>
+        <div>
+          <span>Total transferido</span>
+          <strong>
+            {{ totalTransferencias | currency:'COP':'symbol':'1.0-0' }}
+          </strong>
+        </div>
+      </article>
+
+    </section>
+
+    <section class="transferencias-table-card">
+
+      <div class="table-header">
+        <div>
+          <h2>Transferencias del día</h2>
+          <span>
+            {{ cantidadTransferencias }} operación(es) registradas hoy
+          </span>
+        </div>
+      </div>
+
+      <div
+        *ngIf="transferencias.length === 0"
+        class="transferencias-empty"
+      >
+        <div class="empty-icon">↔</div>
+        <strong>No hay transferencias registradas hoy</strong>
+        <span>
+          Las ventas pagadas por transferencia aparecerán aquí.
+        </span>
+      </div>
+
+      <div
+        *ngIf="transferencias.length > 0"
+        class="transferencias-table-wrapper"
+      >
+        <table>
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Medio</th>
+            <th>Valor</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr *ngFor="let transferencia of transferencias">
+
+            <td>
+                <span class="venta-id">
+                  #{{ transferencia.id }}
+                </span>
+            </td>
+
+            <td>
+              {{ transferencia.fecha | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+
+            <td>
+              {{ transferencia.nombreCliente || 'Consumidor final' }}
+            </td>
+
+            <td>
+                <span class="medio-badge">
+                  {{ nombreMedioPago(transferencia.medioPago) }}
+                </span>
+            </td>
+
+            <td class="money">
+              {{ transferencia.total | currency:'COP':'symbol':'1.0-0' }}
+            </td>
+
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </ng-container>
+
+</div>

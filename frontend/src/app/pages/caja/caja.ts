@@ -7,7 +7,7 @@ import {
   CajaResumen,
   CajaDetalle
 } from '../../services/caja.service';
-import { VentaService, VentaResponse } from '../../services/ventas';
+import { VentaService, VentaResponse  } from '../../services/ventas';
 
 @Component({
   selector: 'app-caja',
@@ -25,6 +25,7 @@ export class CajaComponent implements OnInit {
   totalVentas = 0;
   ventasContado = 0;
   ventasFiado = 0;
+  ventasTransferencia = 0;
   historial: Caja[] = [];
 
   cajaSeleccionada: CajaDetalle | null = null;
@@ -80,6 +81,17 @@ export class CajaComponent implements OnInit {
           .filter(venta => this.obtenerTipoPago(venta) === 'FIADO')
           .reduce((total, venta) => total + Number(venta.total || 0), 0);
 
+        this.ventasTransferencia = ventasDelDia
+          .filter(
+            venta =>
+              this.obtenerTipoPago(venta) === 'TRANSFERENCIA'
+          )
+          .reduce(
+            (total, venta) =>
+              total + Number(venta.total || 0),
+            0
+          );
+
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -88,6 +100,7 @@ export class CajaComponent implements OnInit {
         this.totalVentas = 0;
         this.ventasContado = 0;
         this.ventasFiado = 0;
+        this.ventasTransferencia = 0;
       }
     });
   }

@@ -80,10 +80,11 @@ public class VentaController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<VentaResponseDTO> actualizarTipoPago(
             @PathVariable Long id,
-            @RequestParam String tipoPago) {
+            @RequestParam String tipoPago,
+            @RequestParam(required = false) String medioPago) {
 
         return ResponseEntity.ok(
-                service.actualizarTipoPago(id, tipoPago)
+                service.actualizarTipoPago(id, tipoPago, medioPago)
         );
     }
 

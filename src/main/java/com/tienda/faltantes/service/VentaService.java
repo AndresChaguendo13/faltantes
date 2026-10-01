@@ -80,6 +80,8 @@ public class VentaService {
                         : null
         );
 
+        response.setMedioPago(venta.getMedioPago());
+
         if (venta.getCliente() != null) {
             response.setClienteId(venta.getCliente().getId());
             response.setNombreCliente(venta.getCliente().getNombre());
@@ -145,6 +147,8 @@ public class VentaService {
                                     ? venta.getTipoPago().name()
                                     : null
                     );
+
+                    response.setMedioPago(venta.getMedioPago());
 
                     if (venta.getCliente() != null) {
                         response.setClienteId(venta.getCliente().getId());
@@ -220,7 +224,7 @@ public class VentaService {
             );
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(
-                    "Tipo de pago inválido. Use CONTADO o FIADO"
+                    "Tipo de pago inválido. Use CONTADO, TRANSFERENCIA o FIADO"
             );
         }
 
@@ -228,7 +232,20 @@ public class VentaService {
             cajaService.obtenerCajaAbierta();
         }
 
+        if (tipoPago == TipoPago.TRANSFERENCIA) {
+            if (dto.getMedioPago() == null || dto.getMedioPago().isBlank()) {
+                throw new IllegalArgumentException(
+                        "Una venta por transferencia requiere seleccionar el medio de pago"
+                );
+            }
+        }
+
         venta.setTipoPago(tipoPago);
+        venta.setMedioPago(
+                tipoPago == TipoPago.TRANSFERENCIA
+                        ? dto.getMedioPago().toUpperCase()
+                        : null
+        );
 
         if (dto.getClienteId() != null) {
 
@@ -331,6 +348,8 @@ public class VentaService {
                         : null
         );
 
+        response.setMedioPago(guardada.getMedioPago());
+
         if (guardada.getCliente() != null) {
             response.setClienteId(guardada.getCliente().getId());
             response.setNombreCliente(guardada.getCliente().getNombre());
@@ -360,7 +379,7 @@ public class VentaService {
     }
 
     @Transactional
-    public VentaResponseDTO actualizarTipoPago(Long id, String tipoPago) {
+    public VentaResponseDTO actualizarTipoPago(Long id, String tipoPago, String medioPago) {
 
         Venta venta = ventaRepository.findById(id)
                 .orElseThrow(() ->
@@ -377,7 +396,7 @@ public class VentaService {
             nuevoTipo = TipoPago.valueOf(tipoPago.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException(
-                    "Tipo de pago inválido. Use CONTADO o FIADO");
+                    "Tipo de pago inválido. Use CONTADO, TRANSFERENCIA o FIADO");
         }
 
         TipoPago tipoActual = venta.getTipoPago();
@@ -387,9 +406,7 @@ public class VentaService {
             return buscarPorId(id);
         }
 
-        // =========================================================
-        // CONTADO -> FIADO
-        // =========================================================
+        // Si se convierte a FIADO, debe existir cliente y se crea el fiado.
         if (nuevoTipo == TipoPago.FIADO) {
 
             if (venta.getCliente() == null) {
@@ -406,26 +423,23 @@ public class VentaService {
             }
 
             venta.setTipoPago(TipoPago.FIADO);
+            venta.setMedioPago(null);
 
             Venta guardada = ventaRepository.save(venta);
 
             Fiado fiado = new Fiado();
             fiado.setVenta(guardada);
             fiado.setCliente(guardada.getCliente());
-            fiado.setValorOriginal(
-                    BigDecimal.valueOf(guardada.getTotal()));
+            fiado.setValorOriginal(BigDecimal.valueOf(guardada.getTotal()));
             fiado.setValorAbonado(BigDecimal.ZERO);
-            fiado.setSaldoPendiente(
-                    BigDecimal.valueOf(guardada.getTotal()));
+            fiado.setSaldoPendiente(BigDecimal.valueOf(guardada.getTotal()));
             fiado.setEstado(EstadoFiado.PENDIENTE);
 
             fiadoRepository.save(fiado);
         }
 
-        // =========================================================
-        // FIADO -> CONTADO
-        // =========================================================
-        else if (nuevoTipo == TipoPago.CONTADO) {
+        // Las ventas no fiadas pueden pasar a CONTADO o TRANSFERENCIA.
+        else if (nuevoTipo == TipoPago.CONTADO || nuevoTipo == TipoPago.TRANSFERENCIA) {
 
             Optional<Fiado> fiadoExistente =
                     fiadoRepository.findByVentaId(venta.getId());
@@ -435,20 +449,28 @@ public class VentaService {
                 Fiado fiado = fiadoExistente.get();
 
                 if (fiado.getValorAbonado() != null
-                        && fiado.getValorAbonado()
-                        .compareTo(BigDecimal.ZERO) > 0) {
-
+                        && fiado.getValorAbonado().compareTo(BigDecimal.ZERO) > 0) {
                     throw new IllegalArgumentException(
-                            "No se puede cambiar a CONTADO una venta fiada que ya tiene abonos");
+                            "No se puede cambiar una venta fiada que ya tiene abonos");
                 }
 
                 fiadoRepository.delete(fiado);
             }
 
-            venta.setTipoPago(TipoPago.CONTADO);
+            if (nuevoTipo == TipoPago.TRANSFERENCIA) {
+                if (medioPago == null || medioPago.isBlank()) {
+                    throw new IllegalArgumentException(
+                            "Para cambiar una venta a TRANSFERENCIA se debe indicar el medio de pago");
+                }
+                venta.setTipoPago(TipoPago.TRANSFERENCIA);
+                venta.setMedioPago(medioPago.toUpperCase());
+            } else {
+                venta.setTipoPago(TipoPago.CONTADO);
+                venta.setMedioPago(null);
+            }
+
             ventaRepository.save(venta);
         }
-
         return buscarPorId(id);
     }
 

@@ -8,7 +8,8 @@ export interface DetalleVentaRequest {
 }
 
 export interface VentaRequest {
-  tipoPago: 'CONTADO' | 'FIADO';
+  tipoPago: 'CONTADO' | 'TRANSFERENCIA' | 'FIADO';
+  medioPago: string | null;
   clienteId: number | null;
   detalles: DetalleVentaRequest[];
 }
@@ -25,6 +26,7 @@ export interface VentaResponse {
   fecha: string;
   total: number;
   tipoPago: string;
+  medioPago?: string | null;
   clienteId?: number;
   nombreCliente?: string;
   fiadoId?: number;

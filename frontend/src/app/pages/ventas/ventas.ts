@@ -73,7 +73,18 @@ export class Ventas implements OnInit {
 
   mostrarFinalizarVenta = false;
 
-  tipoPago: 'CONTADO' | 'FIADO' = 'CONTADO';
+  tipoPago: 'CONTADO' | 'TRANSFERENCIA' | 'FIADO' = 'CONTADO';
+
+  medioPagoTransferencia = '';
+
+  mediosTransferencia = [
+    { valor: 'NEQUI', nombre: 'Nequi' },
+    { valor: 'DAVIPLATA', nombre: 'Daviplata' },
+    { valor: 'BANCOLOMBIA', nombre: 'Bancolombia' },
+    { valor: 'TARJETA_DEBITO', nombre: 'Tarjeta débito' },
+    { valor: 'TARJETA_CREDITO', nombre: 'Tarjeta crédito' },
+    { valor: 'OTRO', nombre: 'Otro' }
+  ];
 
   montoRecibido = 0;
 
@@ -623,6 +634,7 @@ export class Ventas implements OnInit {
       this.obtenerTotalCarrito();
 
     this.clienteSeleccionadoId = null;
+    this.medioPagoTransferencia = '';
 
     // Cargar clientes para tenerlos listos
     // si el usuario selecciona FIADO.
@@ -639,14 +651,20 @@ export class Ventas implements OnInit {
     this.cdr.detectChanges();
   }
 
-  seleccionarTipoPago(tipo: 'CONTADO' | 'FIADO'): void {
+  seleccionarTipoPago(tipo: 'CONTADO' | 'TRANSFERENCIA' | 'FIADO'): void {
     this.tipoPago = tipo;
 
     if (tipo === 'CONTADO') {
       this.montoRecibido = this.obtenerTotalCarrito();
       this.clienteSeleccionadoId = null;
+      this.medioPagoTransferencia = '';
+    } else if (tipo === 'TRANSFERENCIA') {
+      this.montoRecibido = 0;
+      this.clienteSeleccionadoId = null;
+      this.medioPagoTransferencia = '';
     } else {
       this.montoRecibido = 0;
+      this.medioPagoTransferencia = '';
     }
 
     this.cdr.detectChanges();
@@ -752,6 +770,23 @@ export class Ventas implements OnInit {
     }
 
     // -----------------------------------------
+    // VALIDACIÓN TRANSFERENCIA
+    // -----------------------------------------
+
+    if (
+      this.tipoPago === 'TRANSFERENCIA' &&
+      !this.medioPagoTransferencia
+    ) {
+
+      this.notification.warning(
+        'Debes seleccionar el medio de transferencia.',
+        'Medio de pago requerido'
+      );
+
+      return;
+    }
+
+    // -----------------------------------------
     // VALIDACIÓN FIADO
     // -----------------------------------------
 
@@ -775,6 +810,11 @@ export class Ventas implements OnInit {
     const venta: VentaRequest = {
 
       tipoPago: this.tipoPago,
+
+      medioPago:
+        this.tipoPago === 'TRANSFERENCIA'
+          ? this.medioPagoTransferencia
+          : null,
 
       clienteId:
         this.tipoPago === 'FIADO'
@@ -810,6 +850,7 @@ export class Ventas implements OnInit {
         this.montoRecibido = 0;
 
         this.clienteSeleccionadoId = null;
+        this.medioPagoTransferencia = '';
 
         this.tipoPago = 'CONTADO';
 

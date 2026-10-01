@@ -31,9 +31,20 @@ public class Venta {
     @Enumerated(EnumType.STRING)
     private TipoPago tipoPago;
 
+    @Column(name = "medio_pago", length = 50)
+    private String medioPago;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+
+    public String getMedioPago() {
+        return medioPago;
+    }
+
+    public void setMedioPago(String medioPago) {
+        this.medioPago = medioPago;
+    }
 
     public TipoPago getTipoPago() {
         return tipoPago;

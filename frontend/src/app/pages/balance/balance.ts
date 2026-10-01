@@ -6,6 +6,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 import {
   VentaService,
@@ -14,8 +15,7 @@ import {
 
 import {
   DevolucionesVentaService,
-  DevolucionVentaRequest,
-  DevolucionVentaResponse
+  DevolucionVentaRequest
 } from '../../services/devoluciones-venta';
 
 import {
@@ -29,14 +29,6 @@ import {
   CompraResponse
 } from '../../services/compra.service';
 
-import {
-  CajaService,
-  Caja,
-  CajaResumen,
-  CajaDetalle
-} from '../../services/caja.service';
-
-
 
 
 @Component({
@@ -44,7 +36,8 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterLink
   ],
   templateUrl: './balance.html',
   styleUrl: './balance.css'
@@ -82,65 +75,6 @@ export class Balance implements OnInit {
   procesandoDevolucion = false;
   errorDevolucion = '';
 
-  // =========================
-  // DEVOLUCIONES REGISTRADAS
-  // =========================
-
-  devolucionesVenta: DevolucionVentaResponse[] = [];
-  devolucionesCompra: DevolucionCompraResponse[] = [];
-
-  cargandoDevoluciones = false;
-  errorDevoluciones = '';
-
-  tipoDevolucionListado: 'VENTA' | 'COMPRA' = 'VENTA';
-
-
-  // =========================
-  // CAJA
-  // =========================
-
-  caja: Caja | null = null;
-
-  resumenCaja: CajaResumen | null = null;
-
-  cargandoCaja = false;
-
-  procesandoCaja = false;
-
-  montoInicial = 0;
-
-  montoFinal = 0;
-
-  errorCaja = '';
-
-  mensajeCaja = '';
-  // =========================
-// CONFIRMACIÓN DE CAJA
-// =========================
-
-  mostrarConfirmacionCaja = false;
-
-  tipoConfirmacionCaja: 'ABRIR' | 'CERRAR' | null = null;
-
-  historialCajas: Caja[] = [];
-
-  cargandoHistorialCajas = false;
-
-  cajaSeleccionada: CajaDetalle | null = null;
-
-  cargandoDetalleCaja = false;
-
-
-
-// =========================
-// PAGINACIÓN
-// =========================
-
-  cajasPaginaActual = 1;
-  cajasPorPagina = 10;
-
-  ventasPaginaActual = 1;
-  ventasPorPagina = 10;
 
   // =========================
   // COMPRAS DEL DÍA
@@ -149,6 +83,10 @@ export class Balance implements OnInit {
   compras: CompraResponse[] = [];
   comprasPaginaActual = 1;
   comprasPorPagina = 10;
+
+  // Devoluciones de compra ya registradas.
+  // Se usan para calcular las unidades que todavía pueden devolverse.
+  devolucionesCompra: DevolucionCompraResponse[] = [];
 
   compraSeleccionada: CompraResponse | null = null;
   mostrarDetalleCompra = false;
@@ -162,50 +100,11 @@ export class Balance implements OnInit {
 
 
 // =========================
-// PAGINACIÓN CAJAS
-// =========================
-
-  get totalPaginasCajas(): number {
-    return Math.ceil(
-      this.historialCajas.length / this.cajasPorPagina
-    );
-  }
-
-  get paginasCajas(): number[] {
-    return Array.from(
-      { length: this.totalPaginasCajas },
-      (_, i) => i + 1
-    );
-  }
-
-  get historialCajasPaginadas(): Caja[] {
-
-    const inicio =
-      (this.cajasPaginaActual - 1) *
-      this.cajasPorPagina;
-
-    return this.historialCajas.slice(
-      inicio,
-      inicio + this.cajasPorPagina
-    );
-  }
-
-  cambiarPaginaCajas(pagina: number): void {
-
-    if (
-      pagina < 1 ||
-      pagina > this.totalPaginasCajas
-    ) {
-      return;
-    }
-
-    this.cajasPaginaActual = pagina;
-  }
-
-
-// =========================
 // PAGINACIÓN VENTAS
 // =========================
+
+  ventasPaginaActual = 1;
+  ventasPorPagina = 10;
 
   get totalPaginasVentas(): number {
     return Math.ceil(
@@ -319,24 +218,9 @@ export class Balance implements OnInit {
   }
 
   verDetalleCompra(compra: CompraResponse): void {
-    // Abrimos el detalle inmediatamente con la compra de la tabla.
     this.compraSeleccionada = compra;
     this.mostrarDetalleCompra = true;
     this.cdr.detectChanges();
-
-    // Si la lista no trae los detalles completos, los consultamos
-    // directamente por ID para garantizar que el modal muestre los productos.
-    if (!compra.detalles || compra.detalles.length === 0) {
-      this.compraService.buscarPorId(compra.id).subscribe({
-        next: (detalleCompleto) => {
-          this.compraSeleccionada = detalleCompleto;
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          console.error('ERROR CARGANDO DETALLE DE COMPRA:', error);
-        }
-      });
-    }
   }
 
   cerrarDetalleCompra(): void {
@@ -447,7 +331,6 @@ export class Balance implements OnInit {
           this.procesandoDevolucionCompra = false;
           this.cerrarDevolucionCompra();
           this.cargarCompras();
-          this.cargarDevoluciones();
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -588,8 +471,6 @@ export class Balance implements OnInit {
           this.cerrarDevolucion();
 
           this.cargarBalance();
-          this.cargarCaja();
-          this.cargarDevoluciones();
 
           this.cdr.detectChanges();
 
@@ -624,7 +505,6 @@ export class Balance implements OnInit {
 
   constructor(
     private ventaService: VentaService,
-    private cajaService: CajaService,
     private devolucionesVentaService: DevolucionesVentaService,
     private devolucionesCompraService: DevolucionesCompraService,
     private compraService: CompraService,
@@ -639,10 +519,8 @@ export class Balance implements OnInit {
 
   ngOnInit(): void {
     this.cargarBalance();
-    this.cargarCaja();
-    this.cargarHistorialCajas();
     this.cargarCompras();
-    this.cargarDevoluciones();
+    this.cargarDevolucionesCompra();
   }
 
 
@@ -671,44 +549,6 @@ export class Balance implements OnInit {
     );
   }
 
-  // Formato colombiano para los campos editables:
-  // 1000 -> 1.000
-  // 1250000 -> 1.250.000
-  formatearMonto(valor: number | null | undefined): string {
-
-    const numero = Number(valor || 0);
-
-    if (!numero) {
-      return '';
-    }
-
-    return new Intl.NumberFormat('es-CO', {
-      maximumFractionDigits: 0
-    }).format(numero);
-  }
-
-  actualizarMontoInicial(event: Event): void {
-
-    const input = event.target as HTMLInputElement;
-
-    const digitos = input.value.replace(/\D/g, '');
-
-    this.montoInicial = digitos
-      ? Number(digitos)
-      : 0;
-  }
-
-  actualizarMontoFinal(event: Event): void {
-
-    const input = event.target as HTMLInputElement;
-
-    const digitos = input.value.replace(/\D/g, '');
-
-    this.montoFinal = digitos
-      ? Number(digitos)
-      : 0;
-  }
-
   // =========================
   // BALANCE
   // =========================
@@ -726,7 +566,6 @@ export class Balance implements OnInit {
         const todasLasVentas = ventas || [];
 
         // El Balance trabaja únicamente con las ventas del día actual.
-        // Las cajas cerradas siguen conservándose en el historial.
         this.ventas = todasLasVentas.filter(
           venta => this.esVentaDeHoy(venta.fecha)
         );
@@ -814,478 +653,25 @@ export class Balance implements OnInit {
   }
 
 
-  //cargar historial
-
-  cargarHistorialCajas(): void {
-
-    this.cargandoHistorialCajas = true;
-
-    this.cajaService.listar().subscribe({
-
-      next: (cajas) => {
-
-        this.historialCajas = cajas || [];
-        this.cajasPaginaActual = 1;
-
-        this.cargandoHistorialCajas = false;
-
-        this.cdr.detectChanges();
-      },
-
-      error: (error) => {
-
-        console.error(
-          'ERROR CARGANDO HISTORIAL DE CAJAS:',
-          error
-        );
-
-        this.historialCajas = [];
-
-        this.cargandoHistorialCajas = false;
-
-        this.cdr.detectChanges();
-      }
-
-    });
-  }
-
-  verDetalleCaja(id: number): void {
-
-    this.cajaSeleccionada = null;
-
-    this.cargandoDetalleCaja = true;
-
-    this.cajaService.obtenerDetalle(id).subscribe({
-
-      next: (detalle) => {
-
-        console.log(
-          'DETALLE CAJA:',
-          detalle
-        );
-
-        this.cajaSeleccionada = detalle;
-
-        this.cargandoDetalleCaja = false;
-
-        this.cdr.detectChanges();
-      },
-
-      error: (error) => {
-
-        console.error(
-          'ERROR CARGANDO DETALLE DE CAJA:',
-          error
-        );
-
-        this.cargandoDetalleCaja = false;
-
-        this.cdr.detectChanges();
-      }
-
-    });
-  }
-
-
   // =========================
-  // DEVOLUCIONES REGISTRADAS
+  // DEVOLUCIONES DE COMPRA
   // =========================
 
-  cargarDevoluciones(): void {
-
-    this.cargandoDevoluciones = true;
-    this.errorDevoluciones = '';
-
-    this.devolucionesVentaService.listar().subscribe({
-
+  cargarDevolucionesCompra(): void {
+    this.devolucionesCompraService.listar().subscribe({
       next: (devoluciones) => {
-
-        this.devolucionesVenta = devoluciones || [];
-
-        this.devolucionesCompraService.listar().subscribe({
-
-          next: (devolucionesCompra) => {
-
-            this.devolucionesCompra =
-              devolucionesCompra || [];
-
-            this.cargandoDevoluciones = false;
-
-            this.cdr.detectChanges();
-          },
-
-          error: (error) => {
-
-            console.error(
-              'ERROR CARGANDO DEVOLUCIONES DE COMPRA:',
-              error
-            );
-
-            this.devolucionesCompra = [];
-            this.cargandoDevoluciones = false;
-            this.errorDevoluciones =
-              'No se pudieron cargar las devoluciones de compra.';
-
-            this.cdr.detectChanges();
-          }
-
-        });
-
+        this.devolucionesCompra = devoluciones || [];
+        this.cdr.detectChanges();
       },
-
       error: (error) => {
-
         console.error(
-          'ERROR CARGANDO DEVOLUCIONES DE VENTA:',
+          'ERROR CARGANDO DEVOLUCIONES DE COMPRA:',
           error
         );
-
-        this.devolucionesVenta = [];
         this.devolucionesCompra = [];
-        this.cargandoDevoluciones = false;
-        this.errorDevoluciones =
-          'No se pudieron cargar las devoluciones.';
-
         this.cdr.detectChanges();
       }
-
     });
-
-  }
-
-  seleccionarTipoDevolucion(
-    tipo: 'VENTA' | 'COMPRA'
-  ): void {
-
-    this.tipoDevolucionListado = tipo;
-  }
-
-
-  // =========================
-  // CAJA
-  // =========================
-
-  cargarCaja(): void {
-
-    this.cargandoCaja = true;
-    this.errorCaja = '';
-
-    this.cajaService.obtenerActual().subscribe({
-
-      next: (caja) => {
-
-        console.log('CAJA ACTUAL:', caja);
-
-        this.caja = caja;
-
-        this.cargarResumenCaja();
-
-      },
-
-      error: (error) => {
-
-        console.log(
-          'NO HAY CAJA ABIERTA:',
-          error
-        );
-
-        this.caja = null;
-        this.resumenCaja = null;
-
-        this.cargandoCaja = false;
-
-        this.cdr.detectChanges();
-
-      }
-
-    });
-
-  }
-
-  cerrarDetalleCaja(): void {
-    this.cajaSeleccionada = null;
-  }
-
-
-
-  cargarResumenCaja(): void {
-
-    this.cajaService.obtenerResumenHoy().subscribe({
-
-      next: (resumen) => {
-
-        console.log(
-          'RESUMEN CAJA:',
-          resumen
-        );
-
-        this.resumenCaja = resumen;
-
-        this.cargandoCaja = false;
-
-        this.cdr.detectChanges();
-
-      },
-
-      error: (error) => {
-
-        console.error(
-          'ERROR CARGANDO RESUMEN CAJA:',
-          error
-        );
-
-        this.resumenCaja = null;
-
-        this.cargandoCaja = false;
-
-        this.cdr.detectChanges();
-
-      }
-
-    });
-
-  }
-
-  // =========================
-// MODAL CONFIRMACIÓN CAJA
-// =========================
-
-  solicitarAbrirCaja(): void {
-    console.log('🟡 1. solicitarAbrirCaja()');
-
-    const monto = Number(this.montoInicial || 0);
-
-    console.log('🟡 2. monto:', monto);
-
-    if (monto < 0) {
-      console.log('🔴 monto negativo');
-      this.errorCaja = 'El monto inicial no puede ser negativo.';
-      return;
-    }
-
-    console.log('🟡 3. antes de mostrar modal');
-
-    this.tipoConfirmacionCaja = 'ABRIR';
-    this.mostrarConfirmacionCaja = true;
-
-    console.log('🟢 4. estado modal:', this.mostrarConfirmacionCaja);
-    console.log('🟢 5. tipo:', this.tipoConfirmacionCaja);
-  }
-
-  solicitarCerrarCaja(): void {
-    if (!this.caja) {
-      return;
-    }
-
-    const monto = Number(this.montoFinal || 0);
-
-    if (monto < 0) {
-      this.errorCaja =
-        'El monto final no puede ser negativo.';
-      return;
-    }
-
-    this.tipoConfirmacionCaja = 'CERRAR';
-    this.mostrarConfirmacionCaja = true;
-  }
-
-  cancelarConfirmacionCaja(): void {
-    this.mostrarConfirmacionCaja = false;
-    this.tipoConfirmacionCaja = null;
-  }
-
-  confirmarAccionCaja(): void {
-
-    console.log('🟡 4. CONFIRMANDO CAJA:', {
-      tipo: this.tipoConfirmacionCaja
-    });
-
-    if (this.tipoConfirmacionCaja === 'ABRIR') {
-
-      console.log('🟢 5. EJECUTANDO APERTURA');
-
-      this.mostrarConfirmacionCaja = false;
-      this.tipoConfirmacionCaja = null;
-
-      this.ejecutarAbrirCaja();
-
-      return;
-    }
-
-    if (this.tipoConfirmacionCaja === 'CERRAR') {
-
-      this.mostrarConfirmacionCaja = false;
-      this.tipoConfirmacionCaja = null;
-
-      this.ejecutarCerrarCaja();
-    }
-  }
-
-
-
-
-  // =========================
-  // ABRIR CAJA
-  // =========================
-
-  abrirCaja(): void {
-    this.solicitarAbrirCaja();
-  }
-
-  ejecutarAbrirCaja(): void {
-
-    const monto = Number(this.montoInicial || 0);
-    console.log('🔵 6. ENVIANDO APERTURA AL BACKEND:', monto);
-
-    this.procesandoCaja = true;
-    this.errorCaja = '';
-    this.mensajeCaja = '';
-
-    this.cajaService.abrirCaja(monto).subscribe({
-
-      next: (caja) => {
-
-        console.log('CAJA ABIERTA:', caja);
-
-        this.montoInicial = 0;
-
-        this.procesandoCaja = false;
-
-        this.mensajeCaja =
-          'Caja abierta correctamente.';
-
-        this.cargarCaja();
-
-        this.cdr.detectChanges();
-      },
-
-      error: (error) => {
-
-        console.error(
-          'ERROR ABRIENDO CAJA:',
-          error
-        );
-
-        this.procesandoCaja = false;
-
-        this.errorCaja =
-          error?.error?.message ||
-          'No fue posible abrir la caja.';
-
-        this.cdr.detectChanges();
-      }
-
-    });
-  }
-
-
-  // =========================
-  // CERRAR CAJA
-  // =========================
-
-  cerrarCaja(): void {
-    this.solicitarCerrarCaja();
-  }
-
-  ejecutarCerrarCaja(): void {
-
-    if (!this.caja) {
-      return;
-    }
-
-    const monto = Number(this.montoFinal || 0);
-
-    this.procesandoCaja = true;
-    this.errorCaja = '';
-    this.mensajeCaja = '';
-
-    this.cajaService.cerrarCaja(monto).subscribe({
-
-      next: (cajaCerrada) => {
-
-        console.log('CAJA CERRADA:', cajaCerrada);
-
-        this.procesandoCaja = false;
-
-        this.caja = null;
-
-        this.resumenCaja = null;
-
-        this.montoFinal = 0;
-
-        this.mensajeCaja =
-          'Caja cerrada correctamente.';
-
-        this.cargarHistorialCajas();
-
-        this.cdr.detectChanges();
-      },
-
-      error: (error) => {
-
-        console.error(
-          'ERROR CERRANDO CAJA:',
-          error
-        );
-
-        this.procesandoCaja = false;
-
-        this.errorCaja =
-          error?.error?.message ||
-          'No fue posible cerrar la caja.';
-
-        this.cdr.detectChanges();
-      }
-
-    });
-  }
-
-
-
-  obtenerClaseDiferencia(): string {
-    if (!this.cajaSeleccionada?.diferencia) {
-      return 'detalle-cuadrada';
-    }
-
-    if (this.cajaSeleccionada.diferencia > 0) {
-      return 'detalle-sobrante';
-    }
-
-    if (this.cajaSeleccionada.diferencia < 0) {
-      return 'detalle-faltante';
-    }
-
-    return 'detalle-cuadrada';
-  }
-
-
-  // =========================
-  // TOTAL ESPERADO
-  // =========================
-
-  obtenerMontoEsperado(): number {
-
-    if (!this.caja) {
-
-      return 0;
-
-    }
-
-    const inicial =
-      Number(this.caja.montoInicial || 0);
-
-    const contado =
-      Number(
-        this.resumenCaja?.ventasContado || 0
-      );
-
-    const abonos =
-      Number(
-        this.resumenCaja?.abonosFiados || 0
-      );
-
-    return inicial + contado + abonos;
-
   }
 
 
