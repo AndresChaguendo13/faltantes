@@ -166,6 +166,7 @@
       <a
         class="erp-menu-item"
         routerLink="/dashboard"
+        data-tooltip="Inicio"
         routerLinkActive="active"
         [routerLinkActiveOptions]="{ exact: true }"
       >
@@ -183,6 +184,7 @@
       <a
         class="erp-menu-item"
         routerLink="/productos"
+        data-tooltip="Productos"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -195,6 +197,7 @@
       <a
         class="erp-menu-item"
         routerLink="/categorias"
+        data-tooltip="Categorías"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -206,6 +209,7 @@
       <a
         class="erp-menu-item"
         routerLink="/proveedores"
+        data-tooltip="Proveedores"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -217,6 +221,7 @@
       <a
         class="erp-menu-item"
         routerLink="/clientes"
+        data-tooltip="Clientes"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -233,6 +238,7 @@
       <a
         class="erp-menu-item"
         routerLink="/compras"
+        data-tooltip="Compras"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -244,6 +250,7 @@
       <a
         class="erp-menu-item"
         routerLink="/ventas"
+        data-tooltip="Vender"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -255,6 +262,7 @@
       <a
         class="erp-menu-item"
         routerLink="/balance"
+        data-tooltip="Balance"
         routerLinkActive="active"
       >
   <span class="erp-menu-icon">
@@ -263,12 +271,14 @@
         <span>Balance</span>
       </a>
 
-      <!-- Estos módulos se dejan visualmente preparados.
-           Se conectan cuando sus rutas/componentes estén creados. -->
+      <!-- =====================================================
+           MÓDULOS YA FUNCIONALES
+           ====================================================== -->
 
       <a
         class="erp-menu-item"
         routerLink="/devoluciones"
+        data-tooltip="Devoluciones"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -280,6 +290,7 @@
       <a
         class="erp-menu-item"
         routerLink="/transferencias"
+        data-tooltip="Transferencias"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -291,25 +302,24 @@
       <a
         class="erp-menu-item"
         routerLink="/fiados"
+        data-tooltip="Fiados"
         routerLinkActive="active"
       >
-  <span class="erp-menu-icon">
-    <svg><use href="#icon-credit"></use></svg>
-  </span>
+        <span class="erp-menu-icon">
+          <svg><use href="#icon-credit"></use></svg>
+        </span>
         <span>Fiados</span>
       </a>
 
       <a
         class="erp-menu-item"
         routerLink="/caja"
+        data-tooltip="Caja"
         routerLinkActive="active"
       >
-  <span class="erp-menu-icon">
-    <svg>
-      <use href="#icon-cash"></use>
-    </svg>
-  </span>
-
+        <span class="erp-menu-icon">
+          <svg><use href="#icon-cash"></use></svg>
+        </span>
         <span>Caja</span>
       </a>
 
@@ -321,6 +331,7 @@
       <a
         class="erp-menu-item"
         routerLink="/usuarios"
+        data-tooltip="Usuarios"
         routerLinkActive="active"
       >
         <span class="erp-menu-icon">
@@ -329,14 +340,16 @@
         <span>Usuarios</span>
       </a>
 
-      <a class="erp-menu-item erp-menu-disabled">
+      <a class="erp-menu-item erp-menu-disabled"
+         data-tooltip="Reportes">
         <span class="erp-menu-icon">
           <svg><use href="#icon-report"></use></svg>
         </span>
         <span>Reportes</span>
       </a>
 
-      <a class="erp-menu-item erp-menu-disabled">
+      <a class="erp-menu-item erp-menu-disabled"
+         data-tooltip="Configuración">
         <span class="erp-menu-icon">
           <svg><use href="#icon-settings"></use></svg>
         </span>
@@ -385,6 +398,12 @@
 
           <input
             type="text"
+            name="busqueda-producto-global"
+            id="busqueda-producto-global"
+            autocomplete="new-password"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
             placeholder="Buscar por código de barras..."
             #busquedaGlobal
             (keydown.enter)="buscarDesdeMenu(busquedaGlobal.value, busquedaGlobal)"

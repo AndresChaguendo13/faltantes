@@ -115,4 +115,20 @@ public class UsuarioController {
         );
     }
 
+    // =====================================================
+    // ELIMINAR USUARIO — SOLO ADMIN
+    // =====================================================
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminar(
+            @PathVariable Long id) {
+
+        service.eliminar(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 }

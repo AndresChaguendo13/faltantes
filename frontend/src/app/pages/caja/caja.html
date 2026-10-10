@@ -151,6 +151,30 @@
         </div>
       </article>
 
+      <article class="metrica-card">
+        <div class="metrica-icono recibido">↗</div>
+        <div>
+          <span>Ventas libres</span>
+          <strong>${{ formatearMonto(totalVentasLibres) }}</strong>
+        </div>
+      </article>
+
+      <article class="metrica-card">
+        <div class="metrica-icono recibido">＋</div>
+        <div>
+          <span>Otros ingresos</span>
+          <strong>${{ formatearMonto(totalOtrosIngresos) }}</strong>
+        </div>
+      </article>
+
+      <article class="metrica-card">
+        <div class="metrica-icono abonos">↘</div>
+        <div>
+          <span>Retiros / compras</span>
+          <strong>${{ formatearMonto(totalRetirosMovimientos) }}</strong>
+        </div>
+      </article>
+
       <article class="metrica-card metrica-destacada">
         <div class="metrica-icono esperado">≡</div>
         <div>
@@ -183,6 +207,84 @@
       <span>+</span>
       Abrir caja
     </button>
+  </section>
+
+  <!-- MOVIMIENTOS DE LA CAJA ACTUAL -->
+  <section
+    *ngIf="cajaActual"
+    class="movimientos-section"
+  >
+    <div class="section-heading">
+      <div>
+        <span class="section-kicker">MOVIMIENTOS</span>
+        <h2>Movimientos de la caja</h2>
+        <p>Detalle de cada ingreso y retiro registrado en la jornada actual.</p>
+      </div>
+
+      <span class="contador">
+        {{ movimientosCaja.length }} movimiento(s)
+      </span>
+    </div>
+
+    <div
+      *ngIf="movimientosCaja.length === 0"
+      class="tabla-vacia movimientos-vacios"
+    >
+      <div class="tabla-vacia-icono">↔</div>
+      <h3>No hay movimientos adicionales</h3>
+      <p>Los movimientos libres, ingresos y retiros aparecerán aquí.</p>
+    </div>
+
+    <div
+      *ngIf="movimientosCaja.length > 0"
+      class="tabla-wrapper"
+    >
+      <table class="movimientos-table">
+        <thead>
+        <tr>
+          <th>TIPO</th>
+          <th>FECHA</th>
+          <th>CONCEPTO</th>
+          <th>VALOR</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let movimiento of movimientosCaja">
+          <td>
+              <span
+                class="movimiento-badge"
+                [ngClass]="movimiento.tipo === 'INGRESO'
+                  ? 'movimiento-ingreso'
+                  : 'movimiento-retiro'"
+              >
+                {{ obtenerTipoMovimiento(movimiento) }}
+              </span>
+          </td>
+
+          <td>
+            {{ movimiento.fecha | date:'dd/MM/yyyy HH:mm' }}
+          </td>
+
+          <td>
+            {{ obtenerConceptoMovimiento(movimiento) }}
+          </td>
+
+          <td>
+            <strong
+              [ngClass]="movimiento.tipo === 'INGRESO'
+                  ? 'valor-ingreso'
+                  : 'valor-retiro'"
+            >
+              {{ movimiento.tipo === 'INGRESO' ? '+' : '-' }}${{
+              formatearMonto(movimiento.monto)
+              }}
+            </strong>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <!-- HISTORIAL -->
@@ -451,6 +553,11 @@
           <span>Abonos fiados</span>
           <strong>${{ formatearMonto(resumen?.abonosFiados) }}</strong>
         </div>
+      </div>
+
+      <div class="cierre-total-esperado">
+        <span>Efectivo esperado</span>
+        <strong>${{ formatearMonto(montoEsperadoActual) }}</strong>
       </div>
 
       <p class="modal-ayuda">

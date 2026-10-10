@@ -10,6 +10,7 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 import {
   Producto,
@@ -148,7 +149,8 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
     private categoriaService: CategoriaService,
     private proveedorService: ProveedorService,
     private cdr: ChangeDetectorRef,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private route: ActivatedRoute
   ) {}
 
 
@@ -157,6 +159,14 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
   // =====================================================
 
   ngOnInit(): void {
+    this.route.queryParamMap.subscribe(params => {
+      const filtroEstado = params.get('filtroEstado');
+
+      if (filtroEstado === 'bajo' || filtroEstado === 'normal') {
+        this.filtroEstado = filtroEstado;
+      }
+    });
+
     this.cargarProductos();
     this.cargarCategorias();
     this.cargarProveedores();
@@ -297,8 +307,7 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
           respuesta.content || [];
 
 
-        this.productosVisibles =
-          [...this.productos];
+        this.filtrarProductos();
 
 
         this.cargando = false;
@@ -1043,7 +1052,7 @@ export class Productos implements OnInit, AfterViewInit, OnDestroy {
               'Producto duplicado'
             );
           }
-            else if (error.status === 401) {
+          else if (error.status === 401) {
             this.error =
               'Sesión expirada. Inicia sesión nuevamente.';
           } else if (error.status === 403) {

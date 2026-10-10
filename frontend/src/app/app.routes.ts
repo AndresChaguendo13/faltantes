@@ -18,6 +18,7 @@ import { Devoluciones } from './pages/devoluciones/devoluciones';
 import { Fiados } from './pages/fiados/fiados';
 import { CajaComponent } from './pages/caja/caja';
 import { Transferencias } from './pages/transferencias/transferencias';
+import { AcercaDelSistema } from './pages/acerca-del-sistema/acerca-del-sistema';
 
 export const routes: Routes = [
 
@@ -115,6 +116,11 @@ export const routes: Routes = [
       {
         path: 'cambiar-contrasena',
         component: CambiarContrasena
+      },
+
+      {
+        path: 'acerca-del-sistema',
+        component: AcercaDelSistema
       },
 
       /*

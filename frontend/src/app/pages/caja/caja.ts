@@ -7,7 +7,8 @@ import {
   CajaResumen,
   CajaDetalle
 } from '../../services/caja.service';
-import { VentaService, VentaResponse  } from '../../services/ventas';
+import { VentaService, VentaResponse } from '../../services/ventas';
+import { MovimientoCajaService, MovimientoCajaResponse } from '../../services/movimiento-caja.service';
 
 @Component({
   selector: 'app-caja',
@@ -26,6 +27,11 @@ export class CajaComponent implements OnInit {
   ventasContado = 0;
   ventasFiado = 0;
   ventasTransferencia = 0;
+  movimientosCaja: MovimientoCajaResponse[] = [];
+  totalIngresosMovimientos = 0;
+  totalVentasLibres = 0;
+  totalOtrosIngresos = 0;
+  totalRetirosMovimientos = 0;
   historial: Caja[] = [];
 
   cajaSeleccionada: CajaDetalle | null = null;
@@ -50,6 +56,7 @@ export class CajaComponent implements OnInit {
   constructor(
     private cajaService: CajaService,
     private ventaService: VentaService,
+    private movimientoCajaService: MovimientoCajaService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -139,6 +146,7 @@ export class CajaComponent implements OnInit {
       next: (caja) => {
         this.cajaActual = caja;
         this.cargarResumen();
+        this.cargarMovimientosCaja();
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -147,6 +155,59 @@ export class CajaComponent implements OnInit {
         this.resumen = null;
         this.cargando = false;
         this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cargarMovimientosCaja(): void {
+    if (!this.cajaActual) {
+      this.movimientosCaja = [];
+      this.totalIngresosMovimientos = 0;
+      this.totalVentasLibres = 0;
+      this.totalOtrosIngresos = 0;
+      this.totalRetirosMovimientos = 0;
+      return;
+    }
+
+    this.movimientoCajaService.listarPorCaja(this.cajaActual.id).subscribe({
+      next: (movimientos) => {
+        this.movimientosCaja = movimientos || [];
+        const ingresos = this.movimientosCaja.filter(
+          m => m.tipo === 'INGRESO'
+        );
+
+        this.totalIngresosMovimientos = ingresos.reduce(
+          (total, m) => total + Number(m.monto || 0),
+          0
+        );
+
+        this.totalVentasLibres = ingresos
+          .filter(m =>
+            (m.motivo || '').toUpperCase().startsWith('VENTA LIBRE:')
+          )
+          .reduce(
+            (total, m) => total + Number(m.monto || 0),
+            0
+          );
+
+        this.totalOtrosIngresos =
+          this.totalIngresosMovimientos - this.totalVentasLibres;
+
+        this.totalRetirosMovimientos = this.movimientosCaja
+          .filter(m => m.tipo === 'RETIRO')
+          .reduce(
+            (total, m) => total + Number(m.monto || 0),
+            0
+          );
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('ERROR CARGANDO MOVIMIENTOS DE CAJA:', error);
+        this.movimientosCaja = [];
+        this.totalIngresosMovimientos = 0;
+        this.totalVentasLibres = 0;
+        this.totalOtrosIngresos = 0;
+        this.totalRetirosMovimientos = 0;
       }
     });
   }
@@ -301,6 +362,18 @@ export class CajaComponent implements OnInit {
     this.cargarHistorial();
   }
 
+  obtenerTipoMovimiento(movimiento: MovimientoCajaResponse): string {
+    return movimiento.tipo === 'INGRESO' ? 'INGRESO' : 'RETIRO';
+  }
+
+  obtenerConceptoMovimiento(movimiento: MovimientoCajaResponse): string {
+    const motivo = movimiento.motivo || 'Movimiento de caja';
+
+    return motivo
+      .replace(/^VENTA LIBRE:\s*/i, 'Venta libre: ')
+      .replace(/^COMPRA LIBRE:\s*/i, 'Compra libre: ');
+  }
+
   formatearMonto(valor: number | null | undefined): string {
     const numero = Number(valor || 0);
 
@@ -322,7 +395,11 @@ export class CajaComponent implements OnInit {
   }
 
   get totalRecibido(): number {
-    return Number(this.resumen?.totalRecibido || 0);
+    return (
+      Number(this.resumen?.ventasContado || 0) +
+      Number(this.resumen?.abonosFiados || 0) +
+      Number(this.totalIngresosMovimientos || 0)
+    );
   }
 
   get montoEsperadoActual(): number {
@@ -331,7 +408,9 @@ export class CajaComponent implements OnInit {
     return (
       Number(this.cajaActual.montoInicial || 0) +
       Number(this.resumen?.ventasContado || 0) +
-      Number(this.resumen?.abonosFiados || 0)
+      Number(this.resumen?.abonosFiados || 0) +
+      Number(this.totalIngresosMovimientos || 0) -
+      Number(this.totalRetirosMovimientos || 0)
     );
   }
 

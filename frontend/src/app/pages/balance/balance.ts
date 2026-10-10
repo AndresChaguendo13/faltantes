@@ -6,7 +6,6 @@ import {
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 
 import {
   VentaService,
@@ -20,8 +19,7 @@ import {
 
 import {
   DevolucionesCompraService,
-  DevolucionCompraRequest,
-  DevolucionCompraResponse
+  DevolucionCompraRequest
 } from '../../services/devoluciones-compra';
 
 import {
@@ -29,15 +27,13 @@ import {
   CompraResponse
 } from '../../services/compra.service';
 
-
-
+import { MovimientoCajaService, MovimientoCajaResponse } from '../../services/movimiento-caja.service';
 @Component({
   selector: 'app-balance',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    RouterLink
+    FormsModule
   ],
   templateUrl: './balance.html',
   styleUrl: './balance.css'
@@ -75,6 +71,9 @@ export class Balance implements OnInit {
   procesandoDevolucion = false;
   errorDevolucion = '';
 
+  ventasLibres: MovimientoCajaResponse[] = [];
+  comprasLibres: MovimientoCajaResponse[] = [];
+
 
   // =========================
   // COMPRAS DEL DÍA
@@ -83,10 +82,6 @@ export class Balance implements OnInit {
   compras: CompraResponse[] = [];
   comprasPaginaActual = 1;
   comprasPorPagina = 10;
-
-  // Devoluciones de compra ya registradas.
-  // Se usan para calcular las unidades que todavía pueden devolverse.
-  devolucionesCompra: DevolucionCompraResponse[] = [];
 
   compraSeleccionada: CompraResponse | null = null;
   mostrarDetalleCompra = false;
@@ -98,11 +93,15 @@ export class Balance implements OnInit {
   procesandoDevolucionCompra = false;
   errorDevolucionCompra = '';
 
+  // Devoluciones de compra registradas.
+  devolucionesCompra: any[] = [];
+
 
 // =========================
 // PAGINACIÓN VENTAS
 // =========================
 
+  // Paginación de ventas
   ventasPaginaActual = 1;
   ventasPorPagina = 10;
 
@@ -215,6 +214,55 @@ export class Balance implements OnInit {
       (total, detalle) => total + Number(detalle.cantidad || 0),
       0
     );
+  }
+
+  // =========================
+  // TOTALES NORMALES + LIBRES
+  // =========================
+
+  get cantidadVentasLibres(): number {
+    return this.ventasLibres.length;
+  }
+
+  get totalVentasLibres(): number {
+    return this.ventasLibres.reduce(
+      (total, movimiento) => total + Number(movimiento.monto || 0),
+      0
+    );
+  }
+
+  get cantidadVentasTotales(): number {
+    return this.ventas.length + this.cantidadVentasLibres;
+  }
+
+  get totalVentasTotales(): number {
+    return Number(this.totalVentas || 0) + this.totalVentasLibres;
+  }
+
+  get totalComprasNormales(): number {
+    return this.compras.reduce(
+      (total, compra) => total + this.obtenerTotalCompra(compra),
+      0
+    );
+  }
+
+  get cantidadComprasLibres(): number {
+    return this.comprasLibres.length;
+  }
+
+  get totalComprasLibres(): number {
+    return this.comprasLibres.reduce(
+      (total, movimiento) => total + Number(movimiento.monto || 0),
+      0
+    );
+  }
+
+  get cantidadComprasTotales(): number {
+    return this.compras.length + this.cantidadComprasLibres;
+  }
+
+  get totalComprasTotales(): number {
+    return this.totalComprasNormales + this.totalComprasLibres;
   }
 
   verDetalleCompra(compra: CompraResponse): void {
@@ -331,6 +379,7 @@ export class Balance implements OnInit {
           this.procesandoDevolucionCompra = false;
           this.cerrarDevolucionCompra();
           this.cargarCompras();
+          this.cargarDevolucionesCompra();
           this.cdr.detectChanges();
         },
         error: (error) => {
@@ -508,6 +557,7 @@ export class Balance implements OnInit {
     private devolucionesVentaService: DevolucionesVentaService,
     private devolucionesCompraService: DevolucionesCompraService,
     private compraService: CompraService,
+    private movimientoCajaService: MovimientoCajaService,
 
     private cdr: ChangeDetectorRef
   ) {}
@@ -520,7 +570,7 @@ export class Balance implements OnInit {
   ngOnInit(): void {
     this.cargarBalance();
     this.cargarCompras();
-    this.cargarDevolucionesCompra();
+    this.cargarMovimientosLibres();
   }
 
 
@@ -549,6 +599,77 @@ export class Balance implements OnInit {
     );
   }
 
+  // Formato colombiano para los campos editables:
+  // 1000 -> 1.000
+  // 1250000 -> 1.250.000
+  formatearMonto(valor: number | null | undefined): string {
+
+    const numero = Number(valor || 0);
+
+    if (!numero) {
+      return '';
+    }
+
+    return new Intl.NumberFormat('es-CO', {
+      maximumFractionDigits: 0
+    }).format(numero);
+  }
+
+
+
+  cargarMovimientosLibres(): void {
+    // Balance no administra la caja. Solo consulta las operaciones libres
+    // registradas durante el día mediante el endpoint de movimientos de hoy.
+    this.movimientoCajaService.listarHoy().subscribe({
+      next: (movimientos) => {
+        const lista = movimientos || [];
+
+        this.ventasLibres = lista.filter(
+          movimiento =>
+            movimiento.tipo === 'INGRESO' &&
+            this.esDeHoy(movimiento.fecha) &&
+            (movimiento.motivo || '')
+              .toUpperCase()
+              .startsWith('VENTA LIBRE:')
+        );
+
+        this.comprasLibres = lista.filter(
+          movimiento =>
+            movimiento.tipo === 'RETIRO' &&
+            this.esDeHoy(movimiento.fecha) &&
+            (movimiento.motivo || '')
+              .toUpperCase()
+              .startsWith('COMPRA LIBRE:')
+        );
+
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('ERROR CARGANDO MOVIMIENTOS LIBRES:', error);
+        this.ventasLibres = [];
+        this.comprasLibres = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  esDeHoy(fecha: any): boolean {
+    if (!fecha) return false;
+    const valor = new Date(fecha);
+    if (Number.isNaN(valor.getTime())) return false;
+    const hoy = new Date();
+    return valor.getFullYear() === hoy.getFullYear() &&
+      valor.getMonth() === hoy.getMonth() &&
+      valor.getDate() === hoy.getDate();
+  }
+
+  obtenerConceptoMovimiento(movimiento: MovimientoCajaResponse): string {
+    const partes = (movimiento.motivo || '').split(' | ');
+    return (partes[0] || movimiento.motivo || '')
+      .replace(/^VENTA LIBRE:\s*/i, '')
+      .replace(/^COMPRA LIBRE:\s*/i, '');
+  }
+
   // =========================
   // BALANCE
   // =========================
@@ -566,6 +687,7 @@ export class Balance implements OnInit {
         const todasLasVentas = ventas || [];
 
         // El Balance trabaja únicamente con las ventas del día actual.
+        // Las cajas cerradas siguen conservándose en el historial.
         this.ventas = todasLasVentas.filter(
           venta => this.esVentaDeHoy(venta.fecha)
         );
@@ -631,6 +753,19 @@ export class Balance implements OnInit {
   // COMPRAS DEL DÍA
   // =========================
 
+  cargarDevolucionesCompra(): void {
+    this.devolucionesCompraService.listar().subscribe({
+      next: (devoluciones) => {
+        this.devolucionesCompra = devoluciones || [];
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('ERROR CARGANDO DEVOLUCIONES DE COMPRA:', error);
+        this.devolucionesCompra = [];
+      }
+    });
+  }
+
   cargarCompras(): void {
     this.compraService.listar().subscribe({
       next: (compras) => {
@@ -647,28 +782,6 @@ export class Balance implements OnInit {
           error
         );
         this.compras = [];
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-
-  // =========================
-  // DEVOLUCIONES DE COMPRA
-  // =========================
-
-  cargarDevolucionesCompra(): void {
-    this.devolucionesCompraService.listar().subscribe({
-      next: (devoluciones) => {
-        this.devolucionesCompra = devoluciones || [];
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        console.error(
-          'ERROR CARGANDO DEVOLUCIONES DE COMPRA:',
-          error
-        );
-        this.devolucionesCompra = [];
         this.cdr.detectChanges();
       }
     });

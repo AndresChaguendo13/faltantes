@@ -1,0 +1,702 @@
+/* =====================================================
+   CONTENEDOR PRINCIPAL
+   ===================================================== */
+
+.acerca-page {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 28px 32px 40px;
+  box-sizing: border-box;
+  color: #0f172a;
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.acerca-header {
+  margin-bottom: 22px;
+}
+
+.acerca-kicker {
+  display: block;
+  margin-bottom: 6px;
+  color: #0b7acb;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.acerca-header h1 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.acerca-header p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+
+/* =====================================================
+   HERO
+   ===================================================== */
+
+.sistema-hero {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 330px;
+  align-items: center;
+  gap: 28px;
+
+  min-height: 205px;
+  padding: 30px 34px;
+
+  background:
+    linear-gradient(
+      110deg,
+      #ffffff 0%,
+      #f8fbff 65%,
+      #eef6ff 100%
+    );
+
+  border: 1px solid #dbe7f2;
+  border-radius: 14px;
+
+  box-shadow:
+    0 5px 18px rgba(15, 23, 42, 0.05);
+
+  box-sizing: border-box;
+}
+
+
+/* ICONO */
+
+.hero-icon {
+  width: 92px;
+  height: 92px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #0b7acb;
+  color: white;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 10px 25px rgba(11, 122, 203, 0.22);
+}
+
+.hero-icon svg {
+  width: 50px;
+  height: 50px;
+}
+
+
+/* CONTENIDO */
+
+.hero-content {
+  min-width: 0;
+}
+
+.hero-label {
+  display: block;
+  margin-bottom: 5px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.hero-content h2 {
+  margin: 0;
+
+  color: #0f1f45;
+
+  font-size: 31px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.version-badge {
+  display: inline-flex;
+  margin-top: 9px;
+  padding: 5px 11px;
+
+  color: #0b63a4;
+  background: #e8f3ff;
+
+  border-radius: 20px;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hero-content p {
+  max-width: 650px;
+  margin: 13px 0 0;
+
+  color: #52627a;
+
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+
+/* DESARROLLADORES HERO */
+
+.hero-developers {
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding-left: 28px;
+
+  border-left: 1px solid #dbe7f2;
+}
+
+.hero-developers > span {
+  margin-bottom: 13px;
+
+  color: #0b7acb;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.hero-developers strong {
+  margin-bottom: 11px;
+
+  color: #172554;
+
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+
+/* =====================================================
+   GRID
+   ===================================================== */
+
+.acerca-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+
+  margin-top: 18px;
+}
+
+.segunda-fila {
+  align-items: stretch;
+}
+
+
+/* =====================================================
+   TARJETAS
+   ===================================================== */
+
+.acerca-card {
+  padding: 22px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 15px rgba(15, 23, 42, 0.035);
+
+  box-sizing: border-box;
+}
+
+
+/* TITULO */
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 19px;
+}
+
+.title-icon {
+  width: 39px;
+  height: 39px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  color: #0b7acb;
+  background: #edf6ff;
+
+  border-radius: 10px;
+}
+
+.title-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.card-title h3 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.card-title p {
+  margin: 3px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+
+/* =====================================================
+   INFORMACIÓN
+   ===================================================== */
+
+.info-list {
+  border-top: 1px solid #edf1f5;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 125px 1fr;
+  gap: 15px;
+
+  min-height: 43px;
+
+  align-items: center;
+
+  border-bottom: 1px solid #edf1f5;
+}
+
+.info-row span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.info-row strong {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ESTADO */
+
+.estado-activo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  color: #15803d !important;
+}
+
+.estado-activo span {
+  width: 7px;
+  height: 7px;
+
+  display: inline-block;
+
+  background: #22c55e;
+
+  border-radius: 50%;
+}
+
+
+/* =====================================================
+   DESARROLLADORES
+   ===================================================== */
+
+.developers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.developer {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  padding: 13px;
+
+  background: #f8fafc;
+
+  border: 1px solid #edf1f5;
+  border-radius: 10px;
+}
+
+.developer-avatar {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  background: #e8f3ff;
+  color: #0b7acb;
+
+  border-radius: 50%;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.developer strong {
+  display: block;
+
+  color: #1e293b;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.developer span {
+  display: block;
+
+  margin-top: 3px;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+
+/* =====================================================
+   MÓDULOS
+   ===================================================== */
+
+.modulos-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.modulo {
+  min-height: 61px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  color: #334155;
+  background: #f8fafc;
+
+  border: 1px solid #edf1f5;
+  border-radius: 9px;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.modulo span {
+  color: #0b7acb;
+  font-size: 16px;
+}
+
+.modulo:hover {
+  background: #f1f7fd;
+  border-color: #c9e2f7;
+  transform: translateY(-1px);
+}
+
+
+/* =====================================================
+   TECNOLOGÍAS
+   ===================================================== */
+
+.tecnologias-list {
+  border-top: 1px solid #edf1f5;
+}
+
+.tecnologia {
+  min-height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid #edf1f5;
+}
+
+.tecnologia strong {
+  color: #334155;
+  font-size: 12px;
+}
+
+.tecnologia span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+
+/* =====================================================
+   SOPORTE
+   ===================================================== */
+
+.soporte-card {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  align-items: center;
+  gap: 18px;
+
+  margin-top: 18px;
+  padding: 21px 24px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 15px rgba(15, 23, 42, 0.035);
+
+  box-sizing: border-box;
+}
+
+.soporte-icon {
+  width: 54px;
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #0b7acb;
+  background: #edf6ff;
+
+  border-radius: 50%;
+}
+
+.soporte-icon svg {
+  width: 27px;
+  height: 27px;
+}
+
+.soporte-content h3 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 16px;
+}
+
+.soporte-content p {
+  margin: 5px 0 2px;
+
+  color: #52627a;
+
+  font-size: 12px;
+}
+
+.soporte-content span {
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+
+/* =====================================================
+   WHATSAPP
+   ===================================================== */
+
+.whatsapp-button {
+  min-width: 255px;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  padding: 12px 15px;
+
+  color: #ffffff;
+  background: #16a34a;
+
+  border-radius: 9px;
+
+  text-decoration: none;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.whatsapp-button:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.whatsapp-icon {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+}
+
+.whatsapp-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.whatsapp-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.whatsapp-text strong {
+  font-size: 12px;
+}
+
+.whatsapp-text small {
+  margin-top: 2px;
+
+  font-size: 10px;
+
+  opacity: 0.9;
+}
+
+.whatsapp-arrow {
+  font-size: 20px;
+}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+.acerca-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+
+  margin-top: 21px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+
+  .sistema-hero {
+    grid-template-columns: 90px 1fr;
+  }
+
+  .hero-developers {
+    grid-column: 2;
+
+    height: auto;
+
+    padding-left: 0;
+    padding-top: 15px;
+
+    border-left: 0;
+    border-top: 1px solid #dbe7f2;
+  }
+
+}
+
+
+@media (max-width: 850px) {
+
+  .acerca-page {
+    padding: 20px;
+  }
+
+  .acerca-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sistema-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .hero-developers {
+    grid-column: auto;
+  }
+
+  .soporte-card {
+    grid-template-columns: 50px 1fr;
+  }
+
+  .whatsapp-button {
+    grid-column: 1 / -1;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+}
+
+
+@media (max-width: 550px) {
+
+  .acerca-page {
+    padding: 16px;
+  }
+
+  .acerca-header h1 {
+    font-size: 23px;
+  }
+
+  .hero-content h2 {
+    font-size: 25px;
+  }
+
+  .modulos-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .info-row {
+    grid-template-columns: 105px 1fr;
+  }
+
+}

@@ -1069,6 +1069,34 @@
 }
 
 
+
+.btn-venta-libre {
+  border: 0; border-radius: 10px; padding: 10px 14px; background: #111827; color: #fff;
+  font-weight: 700; cursor: pointer; margin-right: 10px;
+}
+.venta-libre-overlay { position: fixed; inset: 0; z-index: 1000; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(15,23,42,.58); }
+.venta-libre-modal { width:min(570px,100%); background:#fff; border-radius:18px; padding:24px; box-shadow:0 24px 70px rgba(15,23,42,.28); }
+.venta-libre-header { display:flex; justify-content:space-between; gap:18px; }
+.venta-libre-header span { font-size:11px; font-weight:800; letter-spacing:.08em; opacity:.6; }
+.venta-libre-header h2 { margin:4px 0 6px; }
+.venta-libre-header p { margin:0; opacity:.7; }
+.venta-libre-header button { border:0; background:transparent; font-size:30px; cursor:pointer; }
+.venta-libre-info { margin:20px 0; padding:14px 16px; border-radius:12px; background:#f3f4f6; display:grid; gap:4px; }
+.venta-libre-info span { font-size:13px; opacity:.7; }
+.venta-libre-form { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.venta-libre-form label { display:grid; gap:7px; font-weight:700; font-size:13px; }
+.venta-libre-form label span { color:#dc2626; }
+.venta-libre-form input, .venta-libre-form textarea { width:100%; box-sizing:border-box; border:1px solid #d1d5db; border-radius:10px; padding:11px 12px; font:inherit; }
+.venta-libre-form small { font-size:11px; opacity:.6; font-weight:400; }
+.venta-libre-full { grid-column:1 / -1; }
+.venta-libre-error { margin-top:15px; padding:11px 13px; background:#fef2f2; color:#b91c1c; border-radius:10px; font-size:13px; }
+.venta-libre-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
+.venta-libre-cancel, .venta-libre-save { border:0; border-radius:10px; padding:11px 16px; font-weight:700; cursor:pointer; }
+.venta-libre-cancel { background:#eef0f3; }
+.venta-libre-save { background:#111827; color:#fff; }
+@media (max-width:700px) { .venta-libre-form { grid-template-columns:1fr; } .venta-libre-full { grid-column:auto; } .btn-venta-libre { margin-bottom:8px; } }
+
+
 /* =========================================================
    DETALLE DEL PAGO
    ========================================================= */

@@ -2,7 +2,10 @@ import {
   Component,
   OnInit,
   OnDestroy,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  ElementRef,
+  ViewChild,
+  HostListener
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -34,6 +37,9 @@ import { ProductoService }
 })
 export class AppLayout implements OnInit, OnDestroy {
 
+  @ViewChild('busquedaGlobal')
+  busquedaGlobal?: ElementRef<HTMLInputElement>;
+
   menuUsuarioAbierto = false;
   sidebarAbierto = true;
 // =====================================================
@@ -45,6 +51,11 @@ export class AppLayout implements OnInit, OnDestroy {
 
   private reloj!: ReturnType<typeof setInterval>;
   ngOnInit(): void {
+    // Algunos navegadores restauran el último texto de un input
+    // después de que Angular termina de renderizar el layout.
+    setTimeout(() => this.limpiarBusquedaGlobal(), 50);
+    setTimeout(() => this.limpiarBusquedaGlobal(), 300);
+
     this.actualizarFechaHora();
 
     this.reloj = setInterval(() => {
@@ -54,6 +65,72 @@ export class AppLayout implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     clearInterval(this.reloj);
+  }
+
+  // =====================================================
+  // CIERRE GLOBAL DE MODALES CON ESCAPE
+  // =====================================================
+
+  @HostListener('document:keydown.escape', ['$event'])
+  cerrarModalConEscape(event: Event): void {
+    event.preventDefault();
+
+    const selectoresCierre = [
+      '.modal-close',
+      '.btn-modal-cerrar',
+      '.lookup-close',
+      '.quick-note-modal-close',
+      '.modal-cerrar',
+      '[aria-label*="Cerrar" i]',
+      '[title*="Cerrar" i]'
+    ];
+
+    const candidatos: HTMLElement[] = [];
+
+    for (const selector of selectoresCierre) {
+      document.querySelectorAll<HTMLElement>(selector).forEach(elemento => {
+        const estilo = window.getComputedStyle(elemento);
+
+        if (
+          estilo.display !== 'none' &&
+          estilo.visibility !== 'hidden' &&
+          elemento.offsetParent !== null
+        ) {
+          candidatos.push(elemento);
+        }
+      });
+    }
+
+    // Cierra el modal visible más reciente.
+    for (let i = candidatos.length - 1; i >= 0; i--) {
+      const boton = candidatos[i];
+
+      if (!boton.hasAttribute('disabled')) {
+        boton.click();
+        return;
+      }
+    }
+
+    // Respaldo para modales cuyo overlay ya tiene su propio cierre por clic.
+    const overlays = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.modal-overlay, .erp-modal-backdrop, .product-modal-overlay, .quick-note-modal-overlay, .product-lookup-overlay, .usuario-modal-overlay'
+      )
+    ).filter(overlay => {
+      const estilo = window.getComputedStyle(overlay);
+
+      return (
+        estilo.display !== 'none' &&
+        estilo.visibility !== 'hidden' &&
+        overlay.offsetParent !== null
+      );
+    });
+
+    const overlay = overlays[overlays.length - 1];
+
+    if (overlay) {
+      overlay.click();
+    }
   }
 
   actualizarFechaHora(): void {
@@ -82,6 +159,17 @@ export class AppLayout implements OnInit, OnDestroy {
 
   cerrarMenuUsuario(): void {
     this.menuUsuarioAbierto = false;
+  }
+
+  limpiarBusquedaGlobal(): void {
+    const input = this.busquedaGlobal?.nativeElement;
+
+    if (!input) {
+      return;
+    }
+
+    input.value = '';
+    input.blur();
   }
 
   buscarDesdeMenu(

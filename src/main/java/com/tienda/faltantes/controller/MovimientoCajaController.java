@@ -27,6 +27,12 @@ public class MovimientoCajaController {
         return service.registrar(request);
     }
 
+    @GetMapping("/hoy")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
+    public List<MovimientoCajaResponseDTO> listarHoy() {
+        return service.listarHoy();
+    }
+
     @GetMapping("/caja/{cajaId}")
     @PreAuthorize("hasAnyRole('ADMIN','EMPLEADO','CAJERO')")
     public List<MovimientoCajaResponseDTO> listarPorCaja(

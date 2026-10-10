@@ -66,7 +66,7 @@
         <div class="stat-icon">
 
           <svg>
-            <use href="#icon-money"></use>
+            <use href="#icon-product"></use>
           </svg>
 
         </div>
@@ -148,11 +148,11 @@
         <div class="stat-content">
 
             <span>
-              Total de Compras
+              Compras de Hoy
             </span>
 
           <strong>
-            {{ totalCompras }}S
+            {{ comprasHoy | currency:'$ ':'symbol':'1.0-0' }}
           </strong>
 
           <small>
@@ -163,7 +163,7 @@
         </div>
 
         <a
-          [routerLink]="['/compras']"
+          [routerLink]="['/balance']"
           class="stat-details-link"
         >
           Ver detalles →
@@ -176,8 +176,18 @@
 
         <div class="stat-icon">
 
-          <svg>
-            <use href="#icon-alert"></use>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M10.3 3.7 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"></path>
+            <path d="M12 9v4"></path>
+            <path d="M12 17h.01"></path>
           </svg>
 
         </div>
@@ -201,6 +211,7 @@
 
         <a
           [routerLink]="['/productos']"
+          [queryParams]="{ filtroEstado: 'bajo' }"
           class="stat-details-link"
         >
           Ver detalles →
@@ -214,7 +225,7 @@
         <div class="stat-icon">
 
           <svg>
-            <use href="#icon-warehouse"></use>
+            <use href="#icon-credit"></use>
           </svg>
 
         </div>
@@ -237,7 +248,7 @@
         </div>
 
         <a
-          [routerLink]="['/balance']"
+          [routerLink]="['/fiados']"
           class="stat-details-link"
         >
           Ver detalles →

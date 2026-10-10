@@ -17,6 +17,30 @@ import java.util.List;
 @Service
 public class UsuarioService {
 
+
+
+    // =====================================================
+    // USUARIOS PROTEGIDOS
+    // =====================================================
+
+    private static final String USUARIO_PROTEGIDO_1 = "luisfelipe";
+    private static final String USUARIO_PROTEGIDO_2 = "rafaelandres";
+
+    private boolean esUsuarioProtegido(Usuario usuario) {
+
+        if (usuario == null || usuario.getUsername() == null) {
+            return false;
+        }
+
+        String username =
+                usuario.getUsername().trim().toLowerCase();
+
+        return USUARIO_PROTEGIDO_1.equals(username)
+                || USUARIO_PROTEGIDO_2.equals(username);
+    }
+
+
+
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -62,52 +86,97 @@ public class UsuarioService {
         return response;
     }
 
-    public UsuarioResponseDTO actualizar(Long id, UsuarioUpdateRequestDTO dto) {
+
+
+
+    public UsuarioResponseDTO actualizar(
+            Long id,
+            UsuarioUpdateRequestDTO dto) {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() ->
-                        new RecursoNoEncontradoException("Usuario no encontrado"));
+                        new RecursoNoEncontradoException(
+                                "Usuario no encontrado"
+                        )
+                );
+
+        // =====================================================
+        // PROTEGER CUENTAS ESPECIALES
+        // =====================================================
+
+        if (esUsuarioProtegido(usuario)) {
+            throw new IllegalArgumentException(
+                    "Este usuario está protegido y no puede ser modificado."
+            );
+        }
 
         if (dto.getUsername() != null
                 && !dto.getUsername().equals(usuario.getUsername())
-                && usuarioRepository.existsByUsernameAndIdNot(dto.getUsername(), id)) {
+                && usuarioRepository.existsByUsernameAndIdNot(
+                dto.getUsername(),
+                id)) {
 
             throw new RecursoDuplicadoException(
-                    "El username ya está en uso");
+                    "El username ya está en uso"
+            );
         }
 
-        if (dto.getNombre() != null && !dto.getNombre().isBlank()) {
+        if (dto.getNombre() != null
+                && !dto.getNombre().isBlank()) {
+
             usuario.setNombre(dto.getNombre());
         }
 
-        if (dto.getUsername() != null && !dto.getUsername().isBlank()) {
+        if (dto.getUsername() != null
+                && !dto.getUsername().isBlank()) {
+
             usuario.setUsername(dto.getUsername());
         }
 
-        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            usuario.setPassword(passwordEncoder.encode(dto.getPassword()));
+        if (dto.getPassword() != null
+                && !dto.getPassword().isBlank()) {
+
+            usuario.setPassword(
+                    passwordEncoder.encode(
+                            dto.getPassword()
+                    )
+            );
         }
 
-        if (dto.getRol() != null && !dto.getRol().isBlank()) {
+        if (dto.getRol() != null
+                && !dto.getRol().isBlank()) {
 
-            Rol rol = rolRepository.findByNombre(dto.getRol())
+            Rol rol = rolRepository
+                    .findByNombre(dto.getRol())
                     .orElseThrow(() ->
-                            new RecursoNoEncontradoException("Rol no encontrado"));
+                            new RecursoNoEncontradoException(
+                                    "Rol no encontrado"
+                            )
+                    );
 
             usuario.setRol(rol);
         }
 
-        Usuario actualizado = usuarioRepository.save(usuario);
+        Usuario actualizado =
+                usuarioRepository.save(usuario);
 
-        UsuarioResponseDTO response = new UsuarioResponseDTO();
+        UsuarioResponseDTO response =
+                new UsuarioResponseDTO();
 
         response.setId(actualizado.getId());
         response.setNombre(actualizado.getNombre());
         response.setUsername(actualizado.getUsername());
-        response.setRol(actualizado.getRol().getNombre());
+        response.setRol(
+                actualizado.getRol().getNombre()
+        );
 
         return response;
     }
+
+
+
+
+
 
 
 
@@ -116,16 +185,27 @@ public class UsuarioService {
 
         return usuarioRepository.findAll()
                 .stream()
+
+                // No enviar cuentas protegidas al frontend
+                .filter(usuario ->
+                        !esUsuarioProtegido(usuario)
+                )
+
                 .map(usuario -> {
-                    UsuarioResponseDTO response = new UsuarioResponseDTO();
+
+                    UsuarioResponseDTO response =
+                            new UsuarioResponseDTO();
 
                     response.setId(usuario.getId());
                     response.setNombre(usuario.getNombre());
                     response.setUsername(usuario.getUsername());
-                    response.setRol(usuario.getRol().getNombre());
+                    response.setRol(
+                            usuario.getRol().getNombre()
+                    );
 
                     return response;
                 })
+
                 .toList();
     }
 
@@ -146,9 +226,19 @@ public class UsuarioService {
                         )
                 );
 
+        // =====================================================
+        // PROTEGER CUENTAS ESPECIALES
+        // =====================================================
+
+        if (esUsuarioProtegido(usuario)) {
+
+            throw new IllegalArgumentException(
+                    "Este usuario está protegido y no puede ser eliminado."
+            );
+        }
+
         usuarioRepository.delete(usuario);
     }
-
     // =====================================================
 // OBTENER PERFIL DEL USUARIO AUTENTICADO
 // =====================================================

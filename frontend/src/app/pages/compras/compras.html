@@ -29,6 +29,12 @@
 
     </div>
 
+    <div class="compras-hero-actions">
+      <button type="button" class="btn-compra-libre" (click)="abrirCompraLibre()">
+        <span>＋</span> Compra libre
+      </button>
+    </div>
+
     <div class="erp-hero-stats">
 
       <div class="erp-stat">
@@ -599,4 +605,57 @@
 
   }
 
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL COMPRA LIBRE -->
+<!-- ========================================================= -->
+<div *ngIf="mostrarCompraLibre" class="libre-overlay" (click)="cerrarCompraLibre()">
+  <div class="libre-modal" (click)="$event.stopPropagation()">
+    <div class="libre-header">
+      <div>
+        <span class="libre-kicker">Movimiento de caja</span>
+        <h2>Compra libre</h2>
+        <p>Registra compras como verdura, carne, huevos u otra mercancía que no manejarás por unidades.</p>
+      </div>
+      <button type="button" class="libre-close" (click)="cerrarCompraLibre()" [disabled]="guardandoCompraLibre">×</button>
+    </div>
+
+    <div class="libre-info">
+      <strong>Esta operación NO modifica el inventario.</strong>
+      <span>Solo registra un retiro para que el dinero salga correctamente de la caja.</span>
+    </div>
+
+    <div class="libre-form">
+      <div class="libre-field libre-field-full">
+        <label>¿Qué compraste? <span>*</span></label>
+        <input type="text" [(ngModel)]="conceptoCompraLibre" placeholder="Ej. Verdura, carne, huevos..." [disabled]="guardandoCompraLibre">
+      </div>
+
+      <div class="libre-field">
+        <label>Valor de la compra <span>*</span></label>
+        <input type="number" min="1" [(ngModel)]="montoCompraLibre" placeholder="1000000" [disabled]="guardandoCompraLibre">
+        <small>Se registra en pesos colombianos (COP).</small>
+      </div>
+
+      <div class="libre-field">
+        <label>Proveedor</label>
+        <input type="text" [(ngModel)]="proveedorCompraLibre" placeholder="Opcional" [disabled]="guardandoCompraLibre">
+      </div>
+
+      <div class="libre-field libre-field-full">
+        <label>Observación</label>
+        <textarea rows="3" [(ngModel)]="observacionCompraLibre" placeholder="Opcional" [disabled]="guardandoCompraLibre"></textarea>
+      </div>
+    </div>
+
+    <div *ngIf="errorCompraLibre" class="libre-error">{{ errorCompraLibre }}</div>
+
+    <div class="libre-footer">
+      <button type="button" class="libre-btn-secondary" (click)="cerrarCompraLibre()" [disabled]="guardandoCompraLibre">Cancelar</button>
+      <button type="button" class="libre-btn-primary" (click)="registrarCompraLibre()" [disabled]="guardandoCompraLibre">
+        {{ guardandoCompraLibre ? 'Registrando...' : 'Registrar compra' }}
+      </button>
+    </div>
+  </div>
 </div>

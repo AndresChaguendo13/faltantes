@@ -14,6 +14,7 @@ import {
 } from '../../services/producto';
 
 import { NotificationService } from '../../shared/services/notification.service';
+import { MovimientoCajaService } from '../../services/movimiento-caja.service';
 
 interface DetalleCompra {
   productoId: number;
@@ -53,12 +54,22 @@ export class Compras implements OnInit {
 
   error = '';
 
+  // COMPRA LIBRE: no modifica inventario; solo registra el egreso en la caja.
+  mostrarCompraLibre = false;
+  guardandoCompraLibre = false;
+  conceptoCompraLibre = '';
+  proveedorCompraLibre = '';
+  montoCompraLibre = 0;
+  observacionCompraLibre = '';
+  errorCompraLibre = '';
+
   constructor(
     private proveedorService: ProveedorService,
     private productoService: ProductoService,
     private http: HttpClient,
     private notification: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private movimientoCajaService: MovimientoCajaService
   ) {}
 
   ngOnInit(): void {
@@ -429,25 +440,61 @@ export class Compras implements OnInit {
       )
       .subscribe({
 
-        next: () => {
+        next: (respuesta: any) => {
 
-          this.guardando = false;
+          const total = this.totalCompra;
 
-          this.notification.success(
-            'La compra fue registrada correctamente y el inventario fue actualizado.',
-            'Compra registrada'
-          );
+          if (total <= 0) {
+            this.guardando = false;
+            this.notification.success(
+              'La compra fue registrada correctamente y el inventario fue actualizado.',
+              'Compra registrada'
+            );
+            this.detalles = [];
+            this.proveedorId = null;
+            this.busquedaProducto = '';
+            this.productosFiltrados = [...this.productos];
+            this.cdr.detectChanges();
+            return;
+          }
 
-          this.detalles = [];
+          this.movimientoCajaService.registrar({
+            tipo: 'RETIRO',
+            monto: total,
+            motivo: `Compra de inventario #${respuesta?.id || ''}`.trim()
+          }).subscribe({
+            next: () => {
+              this.guardando = false;
+              this.notification.success(
+                'La compra fue registrada correctamente y el dinero se descontó de la caja.',
+                'Compra registrada'
+              );
 
-          this.proveedorId = null;
+              this.detalles = [];
 
-          this.busquedaProducto = '';
+              this.proveedorId = null;
 
-          this.productosFiltrados =
-            [...this.productos];
+              this.busquedaProducto = '';
 
-          this.cdr.detectChanges();
+              this.productosFiltrados =
+                [...this.productos];
+
+              this.cdr.detectChanges();
+            },
+            error: (movementError) => {
+              console.error('ERROR REGISTRANDO RETIRO DE COMPRA:', movementError);
+              this.guardando = false;
+              this.notification.error(
+                'La compra se registró, pero no fue posible descontar el valor de la caja. Revisa la caja.',
+                'Advertencia de caja'
+              );
+              this.detalles = [];
+              this.proveedorId = null;
+              this.busquedaProducto = '';
+              this.productosFiltrados = [...this.productos];
+              this.cdr.detectChanges();
+            }
+          });
         },
 
         error: err => {
@@ -509,4 +556,63 @@ export class Compras implements OnInit {
 
     this.cdr.detectChanges();
   }
+  abrirCompraLibre(): void {
+    this.conceptoCompraLibre = '';
+    this.proveedorCompraLibre = '';
+    this.montoCompraLibre = 0;
+    this.observacionCompraLibre = '';
+    this.errorCompraLibre = '';
+    this.mostrarCompraLibre = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarCompraLibre(): void {
+    if (this.guardandoCompraLibre) return;
+    this.mostrarCompraLibre = false;
+  }
+
+  registrarCompraLibre(): void {
+    const concepto = this.conceptoCompraLibre.trim();
+    const monto = Number(this.montoCompraLibre || 0);
+
+    if (!concepto) {
+      this.errorCompraLibre = 'Escribe qué compraste.';
+      return;
+    }
+
+    if (monto <= 0) {
+      this.errorCompraLibre = 'El valor de la compra debe ser mayor que cero.';
+      return;
+    }
+
+    const partes = [`Compra libre: ${concepto}`];
+    if (this.proveedorCompraLibre.trim()) partes.push(`Proveedor: ${this.proveedorCompraLibre.trim()}`);
+    if (this.observacionCompraLibre.trim()) partes.push(this.observacionCompraLibre.trim());
+
+    this.guardandoCompraLibre = true;
+    this.errorCompraLibre = '';
+
+    this.movimientoCajaService.registrar({
+      tipo: 'RETIRO',
+      monto,
+      motivo: partes.join(' | ')
+    }).subscribe({
+      next: () => {
+        this.guardandoCompraLibre = false;
+        this.mostrarCompraLibre = false;
+        this.notification.success(
+          `${concepto} registrada por ${monto.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })}. Se descontó de la caja.`,
+          'Compra libre registrada'
+        );
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('ERROR REGISTRANDO COMPRA LIBRE:', err);
+        this.guardandoCompraLibre = false;
+        this.errorCompraLibre = err?.error?.message || 'No fue posible registrar la compra libre. Verifica que haya una caja abierta.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
 }

@@ -22,6 +22,10 @@
 
     <div class="ventas-pos-header-actions">
 
+      <button type="button" class="btn-venta-libre" (click)="abrirVentaLibre()">
+        ＋ Venta libre
+      </button>
+
       <a
         routerLink="/dashboard"
         class="ventas-pos-back"
@@ -890,4 +894,49 @@
   </div>
 
 
+</div>
+
+<!-- ========================================================= -->
+<!-- MODAL VENTA LIBRE -->
+<!-- ========================================================= -->
+<div *ngIf="mostrarVentaLibre" class="venta-libre-overlay" (click)="cerrarVentaLibre()">
+  <div class="venta-libre-modal" (click)="$event.stopPropagation()">
+    <div class="venta-libre-header">
+      <div>
+        <span>VENTA SIN INVENTARIO</span>
+        <h2>Venta libre</h2>
+        <p>Registra una venta por valor, sin descontar unidades de productos.</p>
+      </div>
+      <button type="button" (click)="cerrarVentaLibre()" [disabled]="guardandoVentaLibre">×</button>
+    </div>
+
+    <div class="venta-libre-info">
+      <strong>Ejemplo: Carne $30.000 · Verdura $20.000</strong>
+      <span>El valor se registra como ingreso en la caja. No modifica el inventario.</span>
+    </div>
+
+    <div class="venta-libre-form">
+      <label>¿Qué vendiste? <span>*</span>
+        <input type="text" [(ngModel)]="conceptoVentaLibre" placeholder="Ej. Carne, verdura, huevos..." [disabled]="guardandoVentaLibre">
+      </label>
+
+      <label>Valor de la venta <span>*</span>
+        <input type="number" min="1" [(ngModel)]="montoVentaLibre" placeholder="30000" [disabled]="guardandoVentaLibre">
+        <small>Pesos colombianos (COP).</small>
+      </label>
+
+      <label class="venta-libre-full">Observación
+        <textarea rows="3" [(ngModel)]="observacionVentaLibre" placeholder="Opcional" [disabled]="guardandoVentaLibre"></textarea>
+      </label>
+    </div>
+
+    <div *ngIf="errorVentaLibre" class="venta-libre-error">{{ errorVentaLibre }}</div>
+
+    <div class="venta-libre-footer">
+      <button type="button" class="venta-libre-cancel" (click)="cerrarVentaLibre()" [disabled]="guardandoVentaLibre">Cancelar</button>
+      <button type="button" class="venta-libre-save" (click)="registrarVentaLibre()" [disabled]="guardandoVentaLibre">
+        {{ guardandoVentaLibre ? 'Registrando...' : 'Registrar venta' }}
+      </button>
+    </div>
+  </div>
 </div>

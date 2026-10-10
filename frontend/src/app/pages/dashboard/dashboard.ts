@@ -9,6 +9,8 @@ import { FormsModule } from '@angular/forms';
 import { DashboardService, DashboardResponse } from '../../services/dashboard';
 import {Producto, ProductoService} from '../../services/producto';
 import { NotaRapida, NotaRapidaService } from '../../services/nota-rapida';
+import { CompraResponse, CompraService } from '../../services/compra.service';
+import { MovimientoCajaService, MovimientoCajaResponse } from '../../services/movimiento-caja.service';
 
 
 
@@ -46,7 +48,12 @@ export class Dashboard implements OnInit, OnDestroy {
   cuentasPorCobrar: number = 0;
 
   totalCompras: number = 0;
+  comprasHoy: number = 0;
   totalVentas: number = 0;
+  ventasLibresHoy: number = 0;
+  comprasLibresHoy: number = 0;
+  ventasNormalesHoy: number = 0;
+  comprasNormalesHoy: number = 0;
 
   productosProximosVencer: number = 0;
   productosVencidos: number = 0;
@@ -132,11 +139,15 @@ export class Dashboard implements OnInit, OnDestroy {
     private dashboardService: DashboardService,
     private productoService: ProductoService,
     private notaRapidaService: NotaRapidaService,
+    private compraService: CompraService,
+    private movimientoCajaService: MovimientoCajaService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.cargarDashboard();
+    this.cargarComprasHoy();
+    this.cargarMovimientosLibresHoy();
     this.iniciarReloj();
     this.cargarNotasRapidas();
     this.iniciarAlarmaNotas();
@@ -506,8 +517,11 @@ export class Dashboard implements OnInit, OnDestroy {
         this.valorInventario =
           respuesta.valorInventario || 0;
 
-        this.ventasHoy =
+        this.ventasNormalesHoy =
           respuesta.ventasHoy || 0;
+
+        this.ventasHoy =
+          this.ventasNormalesHoy + this.ventasLibresHoy;
 
         this.ventasContadoHoy =
           respuesta.ventasContadoHoy || 0;
@@ -572,6 +586,103 @@ export class Dashboard implements OnInit, OnDestroy {
 
     });
 
+  }
+
+  private cargarMovimientosLibresHoy(): void {
+
+    this.movimientoCajaService.listarHoy().subscribe({
+      next: (movimientos: MovimientoCajaResponse[]) => {
+        const lista = movimientos || [];
+
+        this.ventasLibresHoy = lista
+          .filter(movimiento =>
+            movimiento.tipo === 'INGRESO' &&
+            this.esDeHoy(movimiento.fecha) &&
+            (movimiento.motivo || '')
+              .toUpperCase()
+              .startsWith('VENTA LIBRE:')
+          )
+          .reduce(
+            (total, movimiento) => total + Number(movimiento.monto || 0),
+            0
+          );
+
+        this.comprasLibresHoy = lista
+          .filter(movimiento =>
+            movimiento.tipo === 'RETIRO' &&
+            this.esDeHoy(movimiento.fecha) &&
+            (movimiento.motivo || '')
+              .toUpperCase()
+              .startsWith('COMPRA LIBRE:')
+          )
+          .reduce(
+            (total, movimiento) => total + Number(movimiento.monto || 0),
+            0
+          );
+
+        // Las tarjetas del Dashboard muestran el total real del día:
+        // operaciones normales + operaciones libres.
+        this.ventasHoy = this.ventasNormalesHoy + this.ventasLibresHoy;
+        this.comprasHoy = this.comprasNormalesHoy + this.comprasLibresHoy;
+
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('ERROR AL CARGAR OPERACIONES LIBRES DE HOY:', error);
+      }
+    });
+
+  }
+
+  private cargarComprasHoy(): void {
+
+    this.compraService.listar().subscribe({
+      next: (compras: CompraResponse[]) => {
+        const comprasDelDia = (compras || []).filter(
+          compra => this.esDeHoy(compra.fecha)
+        );
+
+        this.comprasNormalesHoy = comprasDelDia.reduce((total, compra) => {
+          const totalCompra = (compra.detalles || []).reduce(
+            (subtotal, detalle) =>
+              subtotal +
+              Number(detalle.cantidad || 0) *
+              Number(detalle.precioCompra || 0),
+            0
+          );
+
+          return total + totalCompra;
+        }, 0);
+
+        this.comprasHoy = this.comprasNormalesHoy + this.comprasLibresHoy;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('ERROR AL CARGAR COMPRAS DE HOY:', error);
+        this.comprasNormalesHoy = 0;
+        this.comprasHoy = this.comprasLibresHoy;
+        this.cdr.detectChanges();
+      }
+    });
+
+  }
+
+  private esDeHoy(fecha: any): boolean {
+    if (!fecha) return false;
+
+    const fechaCompra = new Date(fecha);
+
+    if (Number.isNaN(fechaCompra.getTime())) {
+      return false;
+    }
+
+    const hoy = new Date();
+
+    return (
+      fechaCompra.getFullYear() === hoy.getFullYear() &&
+      fechaCompra.getMonth() === hoy.getMonth() &&
+      fechaCompra.getDate() === hoy.getDate()
+    );
   }
 
   buscarProductoDesdeDashboard(

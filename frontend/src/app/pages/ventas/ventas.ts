@@ -32,6 +32,7 @@ import {
 
 
 import { NotificationService } from '../../shared/services/notification.service';
+import { MovimientoCajaService } from '../../services/movimiento-caja.service';
 
 interface ProductoCarrito {
   producto: Producto;
@@ -96,13 +97,22 @@ export class Ventas implements OnInit {
 
   guardandoVenta = false;
 
+  // VENTA LIBRE: no modifica inventario; registra un ingreso en caja.
+  mostrarVentaLibre = false;
+  guardandoVentaLibre = false;
+  conceptoVentaLibre = '';
+  montoVentaLibre = 0;
+  observacionVentaLibre = '';
+  errorVentaLibre = '';
+
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
     private clienteService: ClienteService,
     private ventaService: VentaService,
     private notification: NotificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private movimientoCajaService: MovimientoCajaService
   ) {}
 
   ngOnInit(): void {
@@ -887,5 +897,62 @@ export class Ventas implements OnInit {
     });
   }
 
+
+  abrirVentaLibre(): void {
+    this.conceptoVentaLibre = '';
+    this.montoVentaLibre = 0;
+    this.observacionVentaLibre = '';
+    this.errorVentaLibre = '';
+    this.mostrarVentaLibre = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarVentaLibre(): void {
+    if (this.guardandoVentaLibre) return;
+    this.mostrarVentaLibre = false;
+  }
+
+  registrarVentaLibre(): void {
+    const concepto = this.conceptoVentaLibre.trim();
+    const monto = Number(this.montoVentaLibre || 0);
+
+    if (!concepto) {
+      this.errorVentaLibre = 'Escribe qué vendiste.';
+      return;
+    }
+
+    if (monto <= 0) {
+      this.errorVentaLibre = 'El valor de la venta debe ser mayor que cero.';
+      return;
+    }
+
+    const partes = [`Venta libre: ${concepto}`];
+    if (this.observacionVentaLibre.trim()) partes.push(this.observacionVentaLibre.trim());
+
+    this.guardandoVentaLibre = true;
+    this.errorVentaLibre = '';
+
+    this.movimientoCajaService.registrar({
+      tipo: 'INGRESO',
+      monto,
+      motivo: partes.join(' | ')
+    }).subscribe({
+      next: () => {
+        this.guardandoVentaLibre = false;
+        this.mostrarVentaLibre = false;
+        this.notification.success(
+          `${concepto} registrada por ${monto.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })}. Se sumó a la caja.`,
+          'Venta libre registrada'
+        );
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('ERROR REGISTRANDO VENTA LIBRE:', err);
+        this.guardandoVentaLibre = false;
+        this.errorVentaLibre = err?.error?.message || 'No fue posible registrar la venta libre. Verifica que haya una caja abierta.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
 }

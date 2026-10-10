@@ -625,3 +625,98 @@
     padding: 0;
   }
 }
+
+
+/* =====================================================
+   BÚSQUEDA GLOBAL — SIN AUTOCOMPLETADO VISUAL
+   ===================================================== */
+
+.erp-global-search input {
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+  text-decoration: none !important;
+}
+
+.erp-global-search input:-webkit-autofill,
+.erp-global-search input:-webkit-autofill:hover,
+.erp-global-search input:-webkit-autofill:focus,
+.erp-global-search input:-webkit-autofill:active {
+  -webkit-text-fill-color: #fff !important;
+  -webkit-box-shadow: 0 0 0 1000px #263746 inset !important;
+  box-shadow: 0 0 0 1000px #263746 inset !important;
+  background-color: #263746 !important;
+  color: #fff !important;
+}
+
+.erp-global-search input::-webkit-contacts-auto-fill-button,
+.erp-global-search input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  height: 0;
+  width: 0;
+  margin: 0;
+}
+
+/* ==========================================================
+   TOOLTIP DEL SIDEBAR CONTRAÍDO
+   Solo aparece cuando el sidebar está reducido.
+   ========================================================== */
+
+.erp-layout.sidebar-collapsed .erp-menu-item[data-tooltip] {
+  position: relative;
+}
+
+/* El nombre aparece ARRIBA del icono, centrado sobre él. */
+.erp-layout.sidebar-collapsed .erp-menu-item[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%) translateY(4px);
+  padding: 7px 10px;
+  border-radius: 6px;
+  background: #111317;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 5000;
+  box-shadow: 0 5px 14px rgba(0,0,0,.25);
+  transition: opacity .15s ease, visibility .15s ease, transform .15s ease;
+}
+
+/* Pequeña punta que señala directamente al icono. */
+.erp-layout.sidebar-collapsed .erp-menu-item[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  width: 7px;
+  height: 7px;
+  background: #111317;
+  transform: translateX(-50%) translateY(4px) rotate(45deg);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 4999;
+  transition: opacity .15s ease, visibility .15s ease, transform .15s ease;
+}
+
+.erp-layout.sidebar-collapsed .erp-menu-item[data-tooltip]:hover::after,
+.erp-layout.sidebar-collapsed .erp-menu-item[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+.erp-layout.sidebar-collapsed .erp-menu-item[data-tooltip]:hover::after {
+  transform: translateX(-50%) translateY(0);
+}
+
+.erp-layout.sidebar-collapsed .erp-menu-item[data-tooltip]:hover::before {
+  transform: translateX(-50%) translateY(0) rotate(45deg);
+}

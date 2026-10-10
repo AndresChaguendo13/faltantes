@@ -57,6 +57,28 @@ public class MovimientoCajaService {
                 .toList();
     }
 
+    public List<MovimientoCajaResponseDTO> listarDeCajaAbierta() {
+
+        Caja caja = cajaRepository.findByEstado(EstadoCaja.ABIERTA)
+                .orElseThrow(() -> new CajaNoAbiertaException(
+                        "No hay ninguna caja abierta"
+                ));
+
+        return listarPorCaja(caja.getId());
+    }
+
+    public List<MovimientoCajaResponseDTO> listarHoy() {
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        java.time.LocalDateTime inicio = hoy.atStartOfDay();
+        java.time.LocalDateTime fin = hoy.plusDays(1).atStartOfDay().minusNanos(1);
+
+        return movimientoCajaRepository
+                .findByFechaBetweenOrderByFechaDesc(inicio, fin)
+                .stream()
+                .map(this::convertirAResponse)
+                .toList();
+    }
+
     private MovimientoCajaResponseDTO convertirAResponse(
             MovimientoCaja movimiento) {
 

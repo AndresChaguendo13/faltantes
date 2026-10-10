@@ -14,6 +14,12 @@ public interface MovimientoCajaRepository extends JpaRepository<MovimientoCaja, 
 
     List<MovimientoCaja> findByCajaIdOrderByFechaDesc(Long cajaId);
 
+    List<MovimientoCaja> findByFechaBetweenOrderByFechaDesc(
+            LocalDateTime fechaInicio,
+            LocalDateTime fechaFin
+    );
+
+
     @Query("""
         SELECT COALESCE(SUM(m.monto), 0)
         FROM MovimientoCaja m
