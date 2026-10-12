@@ -79,109 +79,134 @@
       </div>
     </article>
 
+    <article class="metrica-card">
+      <div class="metrica-icono abonos">↘</div>
+      <div>
+        <span>Compras del día</span>
+        <strong>${{ formatearMonto(comprasGlobalesHoy) }}</strong>
+      </div>
+    </article>
+
   </section>
 
-  <!-- CAJA ABIERTA -->
+  <!-- CAJA ACTUAL -->
   <ng-container *ngIf="!cargando && cajaActual">
 
-    <section class="estado-caja-card">
-      <div class="estado-principal">
-        <div class="estado-icono">
-          $
-        </div>
+    <section class="caja-actual-panel">
 
-        <div>
-          <span class="estado-label">CAJA ACTUAL</span>
-          <h2>Caja #{{ cajaActual.id }}</h2>
-          <p>
-            Abierta desde
-            <strong>{{ cajaActual.fechaApertura | date:'dd/MM/yyyy HH:mm' }}</strong>
-          </p>
-        </div>
+      <div class="caja-actual-panel-title">
+        <span>RESUMEN DE CAJA</span>
+        <strong>Movimientos y valores de la caja actual</strong>
       </div>
 
-      <div class="estado-derecha">
+      <section class="estado-caja-card">
+        <div class="estado-principal">
+          <div class="estado-icono">
+            $
+          </div>
+
+          <div>
+            <span class="estado-label">CAJA ACTUAL</span>
+            <h2>Caja #{{ cajaActual.id }}</h2>
+            <p>
+              Abierta desde
+              <strong>{{ cajaActual.fechaApertura | date:'dd/MM/yyyy HH:mm' }}</strong>
+            </p>
+          </div>
+        </div>
+
+        <div class="estado-derecha">
         <span class="estado-badge estado-abierta">
           <span class="punto"></span>
           CAJA ABIERTA
         </span>
 
-        <button
-          type="button"
-          class="btn-cerrar-caja"
-          (click)="abrirModalCerrar()"
-        >
-          Cerrar caja
-        </button>
-      </div>
-    </section>
-
-    <!-- TARJETAS -->
-    <section class="metricas-grid">
-
-      <article class="metrica-card">
-        <div class="metrica-icono inicial">$</div>
-        <div>
-          <span>Saldo inicial</span>
-          <strong>${{ formatearMonto(cajaActual.montoInicial) }}</strong>
+          <button
+            type="button"
+            class="btn-cerrar-caja"
+            (click)="abrirModalCerrar()"
+          >
+            Cerrar caja
+          </button>
         </div>
-      </article>
+      </section>
 
-      <article class="metrica-card">
-        <div class="metrica-icono ventas">▣</div>
-        <div>
-          <span>Ventas contado</span>
-          <strong>${{ formatearMonto(resumen?.ventasContado) }}</strong>
-        </div>
-      </article>
+      <!-- TARJETAS -->
+      <section class="metricas-grid">
 
-      <article class="metrica-card">
-        <div class="metrica-icono abonos">↗</div>
-        <div>
-          <span>Abonos fiados</span>
-          <strong>${{ formatearMonto(resumen?.abonosFiados) }}</strong>
-        </div>
-      </article>
+        <article class="metrica-card">
+          <div class="metrica-icono inicial">$</div>
+          <div>
+            <span>Saldo inicial</span>
+            <strong>${{ formatearMonto(cajaActual.montoInicial) }}</strong>
+          </div>
+        </article>
 
-      <article class="metrica-card">
-        <div class="metrica-icono recibido">✓</div>
-        <div>
-          <span>Total recibido</span>
-          <strong>${{ formatearMonto(totalRecibido) }}</strong>
-        </div>
-      </article>
+        <article class="metrica-card">
+          <div class="metrica-icono ventas">▣</div>
+          <div>
+            <span>Ventas contado</span>
+            <strong>${{ formatearMonto(resumen?.ventasContado) }}</strong>
+          </div>
+        </article>
 
-      <article class="metrica-card">
-        <div class="metrica-icono recibido">↗</div>
-        <div>
-          <span>Ventas libres</span>
-          <strong>${{ formatearMonto(totalVentasLibres) }}</strong>
-        </div>
-      </article>
+        <article class="metrica-card metrica-transferencia-caja">
+          <div class="metrica-icono recibido">↔</div>
+          <div>
+            <span>Transferencias</span>
+            <strong>${{ formatearMonto(ventasTransferenciaCaja) }}</strong>
+          </div>
+        </article>
 
-      <article class="metrica-card">
-        <div class="metrica-icono recibido">＋</div>
-        <div>
-          <span>Otros ingresos</span>
-          <strong>${{ formatearMonto(totalOtrosIngresos) }}</strong>
-        </div>
-      </article>
+        <article class="metrica-card">
+          <div class="metrica-icono abonos">↗</div>
+          <div>
+            <span>Abonos fiados</span>
+            <strong>${{ formatearMonto(resumen?.abonosFiados) }}</strong>
+          </div>
+        </article>
 
-      <article class="metrica-card">
-        <div class="metrica-icono abonos">↘</div>
-        <div>
-          <span>Retiros / compras</span>
-          <strong>${{ formatearMonto(totalRetirosMovimientos) }}</strong>
-        </div>
-      </article>
+        <article class="metrica-card">
+          <div class="metrica-icono recibido">✓</div>
+          <div>
+            <span>Total recibido</span>
+            <strong>${{ formatearMonto(totalRecibido) }}</strong>
+          </div>
+        </article>
 
-      <article class="metrica-card metrica-destacada">
-        <div class="metrica-icono esperado">≡</div>
-        <div>
-          <span>Monto esperado</span>
-          <strong>${{ formatearMonto(montoEsperadoActual) }}</strong>
-        </div>
-      </article>
+        <article class="metrica-card">
+          <div class="metrica-icono recibido">↗</div>
+          <div>
+            <span>Ventas libres</span>
+            <strong>${{ formatearMonto(totalVentasLibres) }}</strong>
+          </div>
+        </article>
+
+        <article class="metrica-card">
+          <div class="metrica-icono recibido">＋</div>
+          <div>
+            <span>Otros ingresos</span>
+            <strong>${{ formatearMonto(totalOtrosIngresos) }}</strong>
+          </div>
+        </article>
+
+        <article class="metrica-card">
+          <div class="metrica-icono abonos">↘</div>
+          <div>
+            <span>Retiros / compras</span>
+            <strong>${{ formatearMonto(totalRetirosMovimientos) }}</strong>
+          </div>
+        </article>
+
+        <article class="metrica-card metrica-destacada">
+          <div class="metrica-icono esperado">≡</div>
+          <div>
+            <span>Monto esperado</span>
+            <strong>${{ formatearMonto(montoEsperadoActual) }}</strong>
+          </div>
+        </article>
+
+      </section>
 
     </section>
 
@@ -547,6 +572,21 @@
         <div>
           <span>Ventas contado</span>
           <strong>${{ formatearMonto(resumen?.ventasContado) }}</strong>
+        </div>
+
+        <div>
+          <span>Transferencias</span>
+          <strong>${{ formatearMonto(ventasTransferenciaCaja) }}</strong>
+        </div>
+
+        <div>
+          <span>Retiros / descuentos</span>
+          <strong>${{ formatearMonto(totalRetirosMovimientos) }}</strong>
+        </div>
+
+        <div>
+          <span>Total compras</span>
+          <strong>${{ formatearMonto(totalCompras) }}</strong>
         </div>
 
         <div>

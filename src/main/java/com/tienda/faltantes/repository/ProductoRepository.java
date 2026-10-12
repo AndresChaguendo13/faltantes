@@ -18,6 +18,12 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     boolean existsByCodigoBarras(String codigoBarras);
 
+    @Query("""
+    SELECT p
+    FROM Producto p
+    WHERE p.cantidad <= p.stockMinimo
+      AND (:cantidad IS NULL OR :cantidad IS NOT NULL)
+    """)
     List<Producto> findByCantidadLessThanEqual(Integer cantidad);
 
     Page<Producto> findAll(Pageable pageable);

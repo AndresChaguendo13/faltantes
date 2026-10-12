@@ -9,6 +9,7 @@ import {
 } from '../../services/caja.service';
 import { VentaService, VentaResponse } from '../../services/ventas';
 import { MovimientoCajaService, MovimientoCajaResponse } from '../../services/movimiento-caja.service';
+import { CompraService, CompraResponse } from '../../services/compra.service';
 
 @Component({
   selector: 'app-caja',
@@ -27,11 +28,16 @@ export class CajaComponent implements OnInit {
   ventasContado = 0;
   ventasFiado = 0;
   ventasTransferencia = 0;
+  ventasTransferenciaCaja = 0;
+  comprasGlobalesHoy = 0;
+  comprasNormalesGlobalesHoy = 0;
+  comprasLibresGlobalesHoy = 0;
   movimientosCaja: MovimientoCajaResponse[] = [];
   totalIngresosMovimientos = 0;
   totalVentasLibres = 0;
   totalOtrosIngresos = 0;
   totalRetirosMovimientos = 0;
+  totalCompras = 0;
   historial: Caja[] = [];
 
   cajaSeleccionada: CajaDetalle | null = null;
@@ -57,6 +63,7 @@ export class CajaComponent implements OnInit {
     private cajaService: CajaService,
     private ventaService: VentaService,
     private movimientoCajaService: MovimientoCajaService,
+    private compraService: CompraService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -64,9 +71,17 @@ export class CajaComponent implements OnInit {
     this.cargarCaja();
     this.cargarHistorial();
     this.cargarVentasDelDia();
+    this.cargarComprasGlobalesHoy();
   }
 
   cargarVentasDelDia(): void {
+    /*
+     * Estas tarjetas de la parte superior son GLOBALES DEL DÍA.
+     * No deben depender de la caja actualmente abierta.
+     *
+     * La separación de la caja actual se hace exclusivamente en
+     * cargarTransferenciasCajaActual() y en el resumen de caja.
+     */
     this.ventaService.listar().subscribe({
       next: (ventas: VentaResponse[]) => {
         const ventasDelDia = (ventas || []).filter(
@@ -82,32 +97,109 @@ export class CajaComponent implements OnInit {
 
         this.ventasContado = ventasDelDia
           .filter(venta => this.obtenerTipoPago(venta) === 'CONTADO')
-          .reduce((total, venta) => total + Number(venta.total || 0), 0);
+          .reduce(
+            (total, venta) => total + Number(venta.total || 0),
+            0
+          );
 
         this.ventasFiado = ventasDelDia
           .filter(venta => this.obtenerTipoPago(venta) === 'FIADO')
-          .reduce((total, venta) => total + Number(venta.total || 0), 0);
+          .reduce(
+            (total, venta) => total + Number(venta.total || 0),
+            0
+          );
 
         this.ventasTransferencia = ventasDelDia
           .filter(
-            venta =>
-              this.obtenerTipoPago(venta) === 'TRANSFERENCIA'
+            venta => this.obtenerTipoPago(venta) === 'TRANSFERENCIA'
           )
           .reduce(
-            (total, venta) =>
-              total + Number(venta.total || 0),
+            (total, venta) => total + Number(venta.total || 0),
             0
           );
 
         this.cdr.detectChanges();
       },
       error: (error) => {
-        console.error('ERROR CARGANDO VENTAS DEL DÍA:', error);
+        console.error('ERROR CARGANDO VENTAS GLOBALES DEL DÍA:', error);
         this.cantidadVentas = 0;
         this.totalVentas = 0;
         this.ventasContado = 0;
         this.ventasFiado = 0;
         this.ventasTransferencia = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cargarComprasGlobalesHoy(): void {
+    this.compraService.listar().subscribe({
+      next: (compras: CompraResponse[]) => {
+        const comprasDelDia = (compras || []).filter(
+          compra => this.esVentaDeHoy(compra.fecha)
+        );
+
+        this.comprasNormalesGlobalesHoy = comprasDelDia.reduce(
+          (total, compra) => {
+            const totalCompra = (compra.detalles || []).reduce(
+              (subtotal, detalle) =>
+                subtotal +
+                Number(detalle.cantidad || 0) *
+                Number(detalle.precioCompra || 0),
+              0
+            );
+
+            return total + totalCompra;
+          },
+          0
+        );
+
+        this.comprasGlobalesHoy =
+          this.comprasNormalesGlobalesHoy +
+          this.comprasLibresGlobalesHoy;
+
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('ERROR CARGANDO COMPRAS GLOBALES DEL DÍA:', error);
+        this.comprasNormalesGlobalesHoy = 0;
+        this.comprasGlobalesHoy = this.comprasLibresGlobalesHoy;
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.movimientoCajaService.listarHoy().subscribe({
+      next: (movimientos: MovimientoCajaResponse[]) => {
+        this.comprasLibresGlobalesHoy = (movimientos || [])
+          .filter(
+            movimiento =>
+              movimiento.tipo === 'RETIRO' &&
+              this.esVentaDeHoy(movimiento.fecha) &&
+              (movimiento.motivo || '')
+                .toUpperCase()
+                .startsWith('COMPRA LIBRE:')
+          )
+          .reduce(
+            (total, movimiento) =>
+              total + Number(movimiento.monto || 0),
+            0
+          );
+
+        this.comprasGlobalesHoy =
+          this.comprasNormalesGlobalesHoy +
+          this.comprasLibresGlobalesHoy;
+
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error(
+          'ERROR CARGANDO COMPRAS LIBRES GLOBALES DEL DÍA:',
+          error
+        );
+        this.comprasLibresGlobalesHoy = 0;
+        this.comprasGlobalesHoy =
+          this.comprasNormalesGlobalesHoy;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -145,15 +237,81 @@ export class CajaComponent implements OnInit {
     this.cajaService.obtenerActual().subscribe({
       next: (caja) => {
         this.cajaActual = caja;
+
+        // Datos exclusivos de la caja actualmente abierta.
         this.cargarResumen();
         this.cargarMovimientosCaja();
+        this.cargarTransferenciasCajaActual();
+
         this.cargando = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.cajaActual = null;
         this.resumen = null;
+
+        // Evita conservar datos de una caja anterior.
+        this.ventasTransferenciaCaja = 0;
+        this.movimientosCaja = [];
+        this.totalIngresosMovimientos = 0;
+        this.totalVentasLibres = 0;
+        this.totalOtrosIngresos = 0;
+        this.totalRetirosMovimientos = 0;
+        this.totalCompras = 0;
+
         this.cargando = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cargarTransferenciasCajaActual(): void {
+    if (!this.cajaActual) {
+      this.ventasTransferenciaCaja = 0;
+      return;
+    }
+
+    const fechaApertura = this.cajaActual.fechaApertura;
+    const inicioCaja = new Date(fechaApertura);
+
+    if (Number.isNaN(inicioCaja.getTime())) {
+      this.ventasTransferenciaCaja = 0;
+      return;
+    }
+
+    this.ventaService.listar().subscribe({
+      next: (ventas: VentaResponse[]) => {
+        const ahora = new Date();
+
+        this.ventasTransferenciaCaja = (ventas || [])
+          .filter(venta => {
+            if (!venta.fecha) return false;
+
+            const fechaVenta = new Date(venta.fecha);
+
+            if (Number.isNaN(fechaVenta.getTime())) {
+              return false;
+            }
+
+            return (
+              fechaVenta >= inicioCaja &&
+              fechaVenta <= ahora &&
+              this.obtenerTipoPago(venta) === 'TRANSFERENCIA'
+            );
+          })
+          .reduce(
+            (total, venta) => total + Number(venta.total || 0),
+            0
+          );
+
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error(
+          'ERROR CARGANDO TRANSFERENCIAS DE LA CAJA ACTUAL:',
+          error
+        );
+        this.ventasTransferenciaCaja = 0;
         this.cdr.detectChanges();
       }
     });
@@ -166,6 +324,7 @@ export class CajaComponent implements OnInit {
       this.totalVentasLibres = 0;
       this.totalOtrosIngresos = 0;
       this.totalRetirosMovimientos = 0;
+      this.totalCompras = 0;
       return;
     }
 
@@ -199,6 +358,24 @@ export class CajaComponent implements OnInit {
             (total, m) => total + Number(m.monto || 0),
             0
           );
+
+        this.totalCompras = this.movimientosCaja
+          .filter(m => {
+            if (m.tipo !== 'RETIRO') return false;
+
+            const motivo = (m.motivo || '').toUpperCase();
+
+            return (
+              motivo.startsWith('COMPRA DE INVENTARIO:') ||
+              motivo.startsWith('COMPRA DE INVENTARIO #') ||
+              motivo.startsWith('COMPRA LIBRE:')
+            );
+          })
+          .reduce(
+            (total, m) => total + Number(m.monto || 0),
+            0
+          );
+
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -208,6 +385,7 @@ export class CajaComponent implements OnInit {
         this.totalVentasLibres = 0;
         this.totalOtrosIngresos = 0;
         this.totalRetirosMovimientos = 0;
+        this.totalCompras = 0;
       }
     });
   }
@@ -291,8 +469,13 @@ export class CajaComponent implements OnInit {
         this.mostrarModalAbrir = false;
         this.procesando = false;
         this.mensaje = 'La caja fue abierta correctamente.';
+
+        // Cargar inmediatamente todos los datos de la nueva caja.
         this.cargarResumen();
+        this.cargarMovimientosCaja();
+        this.cargarTransferenciasCajaActual();
         this.cargarHistorial();
+
         this.cdr.detectChanges();
       },
       error: (error) => {
@@ -311,26 +494,123 @@ export class CajaComponent implements OnInit {
       return;
     }
 
+    const idCaja = this.cajaActual.id;
+
     this.procesando = true;
     this.error = '';
 
+    /*
+     * El cierre puede quedar guardado en el backend antes de que el POST
+     * termine de responder. Para evitar que el botón se quede eternamente
+     * en "Cerrando...", verificamos en paralelo si la caja sigue abierta.
+     */
     this.cajaService.cerrarCaja(this.montoFinal).subscribe({
       next: () => {
-        this.mostrarModalCerrar = false;
-        this.procesando = false;
-        this.mensaje = 'La caja fue cerrada correctamente.';
-
-        // Volvemos a consultar la caja actual para que la pantalla
-        // se actualice automáticamente, sin necesidad de pulsar "Actualizar".
-        this.cargarCaja();
-        this.cargarHistorial();
+        this.finalizarCierreCaja();
       },
       error: (error) => {
         console.error('ERROR CERRANDO CAJA:', error);
-        this.procesando = false;
-        this.error = this.obtenerMensajeError(error, 'No fue posible cerrar la caja.');
+
+        // Antes de mostrar error, comprobamos el estado real de la caja.
+        this.verificarCierreCaja(idCaja, error, 0);
       }
     });
+
+    // Primera comprobación independiente de la respuesta del POST.
+    setTimeout(() => {
+      this.verificarCierreCaja(idCaja, null, 0);
+    }, 700);
+  }
+
+  private verificarCierreCaja(
+    idCaja: number,
+    errorOriginal: any,
+    intento: number
+  ): void {
+    if (!this.procesando || !this.cajaActual || this.cajaActual.id !== idCaja) {
+      return;
+    }
+
+    this.cajaService.obtenerActual().subscribe({
+      next: (caja) => {
+        /*
+         * Si todavía está abierta, el backend aún puede estar terminando
+         * el cierre. Reintentamos durante unos segundos.
+         */
+        if (caja && caja.id === idCaja && caja.estado === 'ABIERTA') {
+          if (intento < 12) {
+            setTimeout(() => {
+              this.verificarCierreCaja(idCaja, errorOriginal, intento + 1);
+            }, 500);
+          } else if (errorOriginal) {
+            this.procesando = false;
+            this.error = this.obtenerMensajeError(
+              errorOriginal,
+              'No fue posible cerrar la caja.'
+            );
+            this.cdr.detectChanges();
+          }
+
+          return;
+        }
+
+        // Ya no existe una caja ABIERTA con ese ID: el cierre se realizó.
+        this.finalizarCierreCaja();
+      },
+      error: (errorActual) => {
+        /*
+         * /caja/actual devuelve 404 cuando ya no hay caja abierta.
+         * Eso confirma que la caja fue cerrada.
+         */
+        if (errorActual?.status === 404) {
+          this.finalizarCierreCaja();
+          return;
+        }
+
+        if (intento < 12) {
+          setTimeout(() => {
+            this.verificarCierreCaja(idCaja, errorOriginal, intento + 1);
+          }, 500);
+        } else {
+          this.procesando = false;
+          this.error = this.obtenerMensajeError(
+            errorOriginal || errorActual,
+            'No fue posible verificar el cierre de la caja.'
+          );
+          this.cdr.detectChanges();
+        }
+      }
+    });
+  }
+
+  private finalizarCierreCaja(): void {
+    if (!this.procesando) {
+      return;
+    }
+
+    this.mostrarModalCerrar = false;
+    this.procesando = false;
+
+    // La caja actual ya no está abierta.
+    this.cajaActual = null;
+    this.resumen = null;
+    this.ventasTransferenciaCaja = 0;
+    this.movimientosCaja = [];
+    this.totalIngresosMovimientos = 0;
+    this.totalVentasLibres = 0;
+    this.totalOtrosIngresos = 0;
+    this.totalRetirosMovimientos = 0;
+    this.totalCompras = 0;
+    this.montoFinal = 0;
+
+    this.mensaje = 'La caja fue cerrada correctamente.';
+
+    // Actualizamos el historial y las métricas globales sin bloquear la vista.
+    this.cargarHistorial();
+    this.cargarVentasDelDia();
+    this.cargarComprasGlobalesHoy();
+
+    this.cdr.detectChanges();
   }
 
   verDetalle(caja: Caja): void {
@@ -358,6 +638,9 @@ export class CajaComponent implements OnInit {
   }
 
   refrescar(): void {
+    // Actualiza tanto los datos globales del día como los de la caja actual.
+    this.cargarVentasDelDia();
+    this.cargarComprasGlobalesHoy();
     this.cargarCaja();
     this.cargarHistorial();
   }
@@ -405,9 +688,17 @@ export class CajaComponent implements OnInit {
   get montoEsperadoActual(): number {
     if (!this.cajaActual) return 0;
 
+    /*
+     * El monto esperado pertenece únicamente a la caja actual.
+     * Las transferencias globales NO se usan aquí.
+     *
+     * Sí se incluyen las transferencias realizadas desde la apertura
+     * de esta caja, porque forman parte del total de la jornada actual.
+     */
     return (
       Number(this.cajaActual.montoInicial || 0) +
       Number(this.resumen?.ventasContado || 0) +
+      Number(this.ventasTransferenciaCaja || 0) +
       Number(this.resumen?.abonosFiados || 0) +
       Number(this.totalIngresosMovimientos || 0) -
       Number(this.totalRetirosMovimientos || 0)
