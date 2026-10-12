@@ -29,6 +29,8 @@ import {
   Cliente
 } from '../../services/cliente.service';
 
+import { RouterLink } from '@angular/router';
+
 
 
 import { NotificationService } from '../../shared/services/notification.service';
@@ -46,7 +48,8 @@ interface ProductoCarrito {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterLink
   ],
   templateUrl: './ventas.html',
   styleUrl: './ventas.css'

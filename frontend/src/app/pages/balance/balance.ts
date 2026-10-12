@@ -22,6 +22,8 @@ import {
   DevolucionCompraRequest
 } from '../../services/devoluciones-compra';
 
+import { RouterLink } from '@angular/router';
+
 import {
   CompraService,
   CompraResponse
@@ -33,7 +35,8 @@ import { MovimientoCajaService, MovimientoCajaResponse } from '../../services/mo
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    RouterLink
   ],
   templateUrl: './balance.html',
   styleUrl: './balance.css'

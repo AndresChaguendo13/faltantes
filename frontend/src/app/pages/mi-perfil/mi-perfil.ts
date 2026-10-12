@@ -26,13 +26,16 @@ import {
   finalize
 } from 'rxjs';
 
+import { RouterLink } from '@angular/router';
+
 
 @Component({
   selector: 'app-mi-perfil',
   standalone: true,
 
   imports: [
-    CommonModule
+    CommonModule,
+    RouterLink
   ],
 
   templateUrl: './mi-perfil.html',
