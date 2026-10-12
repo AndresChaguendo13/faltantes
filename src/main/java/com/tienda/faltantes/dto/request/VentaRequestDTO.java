@@ -10,6 +10,7 @@ public class VentaRequestDTO {
     @NotEmpty
     @Valid
     private List<DetalleVentaRequestDTO> detalles;
+
     private Long clienteId;
 
     private String tipoPago;

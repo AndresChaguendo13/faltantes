@@ -4,6 +4,8 @@ public class DetalleVentaResponseDTO {
 
     private Long productoId;
     private String producto;
+    private String concepto;
+    private String observacion;
     private Integer cantidad;
     private Double precioUnitario;
     private Double subtotal;
@@ -22,6 +24,22 @@ public class DetalleVentaResponseDTO {
 
     public void setProducto(String producto) {
         this.producto = producto;
+    }
+
+    public String getConcepto() {
+        return concepto;
+    }
+
+    public void setConcepto(String concepto) {
+        this.concepto = concepto;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 
     public Integer getCantidad() {

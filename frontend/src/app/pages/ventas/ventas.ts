@@ -1,3 +1,4 @@
+
 import {
   Component,
   OnInit,
@@ -34,10 +35,12 @@ import { RouterLink } from '@angular/router';
 
 
 import { NotificationService } from '../../shared/services/notification.service';
-import { MovimientoCajaService } from '../../services/movimiento-caja.service';
 
 interface ProductoCarrito {
-  producto: Producto;
+  tipo: 'PRODUCTO' | 'LIBRE';
+  producto: Producto | null;
+  concepto?: string;
+  observacion?: string;
   cantidad: number;
   precioUnitario: number;
   subtotal: number;
@@ -100,7 +103,7 @@ export class Ventas implements OnInit {
 
   guardandoVenta = false;
 
-  // VENTA LIBRE: no modifica inventario; registra un ingreso en caja.
+  // VENTA LIBRE: se agrega al mismo carrito y se guarda junto con los productos.
   mostrarVentaLibre = false;
   guardandoVentaLibre = false;
   conceptoVentaLibre = '';
@@ -114,8 +117,7 @@ export class Ventas implements OnInit {
     private clienteService: ClienteService,
     private ventaService: VentaService,
     private notification: NotificationService,
-    private cdr: ChangeDetectorRef,
-    private movimientoCajaService: MovimientoCajaService
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -493,7 +495,10 @@ export class Ventas implements OnInit {
     }
 
     const existente = this.carrito.find(
-      item => item.producto.id === producto.id
+      item =>
+        item.tipo === 'PRODUCTO' &&
+        item.producto !== null &&
+        item.producto.id === producto.id
     );
 
     if (existente) {
@@ -523,6 +528,7 @@ export class Ventas implements OnInit {
         );
 
       this.carrito.push({
+        tipo: 'PRODUCTO',
         producto,
         cantidad: 1,
         precioUnitario: precio,
@@ -567,6 +573,10 @@ export class Ventas implements OnInit {
 
   aumentarCantidad(item: ProductoCarrito): void {
 
+    if (item.tipo === 'LIBRE' || !item.producto) {
+      return;
+    }
+
     if (item.cantidad >= item.producto.cantidad) {
 
       this.notification.warning(
@@ -585,6 +595,10 @@ export class Ventas implements OnInit {
 
   disminuirCantidad(item: ProductoCarrito): void {
 
+    if (item.tipo === 'LIBRE') {
+      return;
+    }
+
     if (item.cantidad <= 1) {
       return;
     }
@@ -598,10 +612,18 @@ export class Ventas implements OnInit {
 
   eliminarDelCarrito(item: ProductoCarrito): void {
 
-    this.carrito =
-      this.carrito.filter(
-        producto => producto.producto.id !== item.producto.id
-      );
+    if (item.tipo === 'LIBRE') {
+      const indice = this.carrito.indexOf(item);
+
+      if (indice >= 0) {
+        this.carrito.splice(indice, 1);
+      }
+    } else if (item.producto) {
+      this.carrito =
+        this.carrito.filter(
+          producto => producto !== item
+        );
+    }
 
     this.cdr.detectChanges();
   }
@@ -835,8 +857,23 @@ export class Ventas implements OnInit {
           : null,
 
       detalles: this.carrito.map(item => ({
-        productoId: item.producto.id,
-        cantidad: item.cantidad
+        productoId:
+          item.tipo === 'PRODUCTO' && item.producto
+            ? item.producto.id
+            : null,
+        cantidad: item.cantidad,
+        concepto:
+          item.tipo === 'LIBRE'
+            ? item.concepto
+            : null,
+        precioUnitario:
+          item.tipo === 'LIBRE'
+            ? item.precioUnitario
+            : null,
+        observacion:
+          item.tipo === 'LIBRE'
+            ? item.observacion || null
+            : null
       }))
     };
 
@@ -918,6 +955,7 @@ export class Ventas implements OnInit {
   registrarVentaLibre(): void {
     const concepto = this.conceptoVentaLibre.trim();
     const monto = Number(this.montoVentaLibre || 0);
+    const observacion = this.observacionVentaLibre.trim();
 
     if (!concepto) {
       this.errorVentaLibre = 'Escribe qué vendiste.';
@@ -929,33 +967,32 @@ export class Ventas implements OnInit {
       return;
     }
 
-    const partes = [`Venta libre: ${concepto}`];
-    if (this.observacionVentaLibre.trim()) partes.push(this.observacionVentaLibre.trim());
-
     this.guardandoVentaLibre = true;
     this.errorVentaLibre = '';
 
-    this.movimientoCajaService.registrar({
-      tipo: 'INGRESO',
-      monto,
-      motivo: partes.join(' | ')
-    }).subscribe({
-      next: () => {
-        this.guardandoVentaLibre = false;
-        this.mostrarVentaLibre = false;
-        this.notification.success(
-          `${concepto} registrada por ${monto.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })}. Se sumó a la caja.`,
-          'Venta libre registrada'
-        );
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('ERROR REGISTRANDO VENTA LIBRE:', err);
-        this.guardandoVentaLibre = false;
-        this.errorVentaLibre = err?.error?.message || 'No fue posible registrar la venta libre. Verifica que haya una caja abierta.';
-        this.cdr.detectChanges();
-      }
+    this.carrito.push({
+      tipo: 'LIBRE',
+      producto: null,
+      concepto,
+      observacion: observacion || undefined,
+      cantidad: 1,
+      precioUnitario: monto,
+      subtotal: monto
     });
+
+    this.guardandoVentaLibre = false;
+    this.mostrarVentaLibre = false;
+
+    this.notification.success(
+      `${concepto} se agregó al carrito por ${monto.toLocaleString('es-CO', {
+        style: 'currency',
+        currency: 'COP',
+        maximumFractionDigits: 0
+      })}.`,
+      'Venta libre agregada'
+    );
+
+    this.cdr.detectChanges();
   }
 
 }

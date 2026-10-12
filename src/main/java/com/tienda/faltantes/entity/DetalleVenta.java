@@ -15,8 +15,14 @@ public class DetalleVenta {
     private Venta venta;
 
     @ManyToOne
-    @JoinColumn(name = "producto_id")
+    @JoinColumn(name = "producto_id", nullable = true)
     private Producto producto;
+
+    @Column(length = 200)
+    private String concepto;
+
+    @Column(length = 500)
+    private String observacion;
 
     private Integer cantidad;
 
@@ -56,6 +62,22 @@ public class DetalleVenta {
 
     public void setProducto(Producto producto) {
         this.producto = producto;
+    }
+
+    public String getConcepto() {
+        return concepto;
+    }
+
+    public void setConcepto(String concepto) {
+        this.concepto = concepto;
+    }
+
+    public String getObservacion() {
+        return observacion;
+    }
+
+    public void setObservacion(String observacion) {
+        this.observacion = observacion;
     }
 
     public Integer getCantidad() {

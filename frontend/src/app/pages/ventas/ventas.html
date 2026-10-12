@@ -353,13 +353,16 @@
           *ngFor="let item of carrito"
         >
 
-
           <div class="pos-cart-item-main">
 
             <div class="pos-cart-item-info">
 
               <strong>
-                {{ item.producto.nombre }}
+                {{
+                item.tipo === 'LIBRE'
+                ? 'Venta libre · ' + item.concepto
+                : item.producto?.nombre
+                }}
               </strong>
 
               <span>
@@ -367,11 +370,14 @@
                   item.precioUnitario
                   | currency:'COP':'symbol':'1.0-0'
                 }}
-                unidad
+                {{ item.tipo === 'LIBRE' ? 'valor' : 'unidad' }}
               </span>
 
-            </div>
+              <small *ngIf="item.tipo === 'LIBRE' && item.observacion">
+                {{ item.observacion }}
+              </small>
 
+            </div>
 
             <button
               type="button"
@@ -384,14 +390,16 @@
 
           </div>
 
-
           <!-- =============================================
                CANTIDAD
                ============================================= -->
 
           <div class="pos-cart-item-bottom">
 
-            <div class="pos-quantity">
+            <div
+              class="pos-quantity"
+              *ngIf="item.tipo === 'PRODUCTO'"
+            >
 
               <button
                 type="button"
@@ -400,11 +408,9 @@
                 −
               </button>
 
-
               <strong>
                 {{ item.cantidad }}
               </strong>
-
 
               <button
                 type="button"
@@ -415,6 +421,12 @@
 
             </div>
 
+            <div
+              class="pos-quantity"
+              *ngIf="item.tipo === 'LIBRE'"
+            >
+              <strong>1</strong>
+            </div>
 
             <strong class="pos-item-subtotal">
 
@@ -898,16 +910,16 @@
   <div class="venta-libre-modal" (click)="$event.stopPropagation()">
     <div class="venta-libre-header">
       <div>
-        <span>VENTA SIN INVENTARIO</span>
+        <span>AGREGAR AL CARRITO</span>
         <h2>Venta libre</h2>
-        <p>Registra una venta por valor, sin descontar unidades de productos.</p>
+        <p>Agrega un concepto que no pertenece al inventario.</p>
       </div>
       <button type="button" (click)="cerrarVentaLibre()" [disabled]="guardandoVentaLibre">×</button>
     </div>
 
     <div class="venta-libre-info">
       <strong>Ejemplo: Carne $30.000 · Verdura $20.000</strong>
-      <span>El valor se registra como ingreso en la caja. No modifica el inventario.</span>
+      <span>Se agregará al carrito y se guardará junto con los demás productos en una sola venta.</span>
     </div>
 
     <div class="venta-libre-form">
@@ -930,7 +942,7 @@
     <div class="venta-libre-footer">
       <button type="button" class="venta-libre-cancel" (click)="cerrarVentaLibre()" [disabled]="guardandoVentaLibre">Cancelar</button>
       <button type="button" class="venta-libre-save" (click)="registrarVentaLibre()" [disabled]="guardandoVentaLibre">
-        {{ guardandoVentaLibre ? 'Registrando...' : 'Registrar venta' }}
+        {{ guardandoVentaLibre ? 'Agregando...' : 'Agregar al carrito' }}
       </button>
     </div>
   </div>

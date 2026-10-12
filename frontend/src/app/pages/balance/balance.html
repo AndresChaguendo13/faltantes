@@ -12,44 +12,7 @@
         Resumen de las ventas del
         <strong>{{ fechaBalance | date:'dd/MM/yyyy' }}</strong>.
       </p>
-      <!-- =============================
-       COMPRAS LIBRES DEL DÍA
-  ============================= -->
 
-      <section class="balance-table-card">
-        <div class="balance-table-header">
-          <div>
-            <h2>Compras libres del día</h2>
-            <span>{{ comprasLibres.length }} operación(es)</span>
-          </div>
-        </div>
-
-        <div *ngIf="comprasLibres.length === 0" class="balance-empty">
-          <strong>No hay compras libres registradas hoy</strong>
-          <span>Las compras libres aparecerán aquí.</span>
-        </div>
-
-        <div *ngIf="comprasLibres.length > 0" class="balance-table-wrapper">
-          <table>
-            <thead>
-            <tr>
-              <th>ID</th>
-              <th>Fecha</th>
-              <th>Concepto</th>
-              <th>Valor</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let compraLibre of comprasLibres">
-              <td>#{{ compraLibre.id }}</td>
-              <td>{{ compraLibre.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td>{{ obtenerConceptoMovimiento(compraLibre) }}</td>
-              <td class="money">{{ compraLibre.monto | currency:'COP':'symbol':'1.0-0' }}</td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
 
     </div>
 
@@ -74,9 +37,8 @@
         </h2>
 
         <span>
-            {{ cantidadVentas }} normales + {{ cantidadVentasLibres }} libres =
-            <strong>{{ cantidadVentasTotales }}</strong> operaciones del {{ fechaBalance | date:'dd/MM/yyyy' }}
-            · Total: <strong>{{ totalVentasTotales | currency:'COP':'symbol':'1.0-0' }}</strong>
+            {{ cantidadVentas }} operación(es) del {{ fechaBalance | date:'dd/MM/yyyy' }}
+            · Total: <strong>{{ totalVentas | currency:'COP':'symbol':'1.0-0' }}</strong>
           </span>
 
       </div>
@@ -293,45 +255,6 @@
 
 
   <!-- =============================
-       VENTAS LIBRES DEL DÍA
-  ============================= -->
-
-  <section class="balance-table-card">
-    <div class="balance-table-header">
-      <div>
-        <h2>Ventas libres del día</h2>
-        <span>{{ ventasLibres.length }} operación(es)</span>
-      </div>
-    </div>
-
-    <div *ngIf="ventasLibres.length === 0" class="balance-empty">
-      <strong>No hay ventas libres registradas hoy</strong>
-      <span>Las ventas libres aparecerán aquí.</span>
-    </div>
-
-    <div *ngIf="ventasLibres.length > 0" class="balance-table-wrapper">
-      <table>
-        <thead>
-        <tr>
-          <th>ID</th>
-          <th>Fecha</th>
-          <th>Concepto</th>
-          <th>Valor</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let ventaLibre of ventasLibres">
-          <td>#{{ ventaLibre.id }}</td>
-          <td>{{ ventaLibre.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td>{{ obtenerConceptoMovimiento(ventaLibre) }}</td>
-          <td class="money">{{ ventaLibre.monto | currency:'COP':'symbol':'1.0-0' }}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <!-- =============================
        COMPRAS DEL DÍA
   ============================= -->
 
@@ -429,6 +352,45 @@
       </div>
     </div>
 
+  </section>
+
+  <!-- =============================
+   COMPRAS LIBRES DEL DÍA
+  ============================= -->
+
+  <section class="balance-table-card">
+    <div class="balance-table-header">
+      <div>
+        <h2>Compras libres del día</h2>
+        <span>{{ comprasLibres.length }} operación(es)</span>
+      </div>
+    </div>
+
+    <div *ngIf="comprasLibres.length === 0" class="balance-empty">
+      <strong>No hay compras libres registradas hoy</strong>
+      <span>Las compras libres aparecerán aquí.</span>
+    </div>
+
+    <div *ngIf="comprasLibres.length > 0" class="balance-table-wrapper">
+      <table>
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Concepto</th>
+          <th>Valor</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let compraLibre of comprasLibres">
+          <td>#{{ compraLibre.id }}</td>
+          <td>{{ compraLibre.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ obtenerConceptoMovimiento(compraLibre) }}</td>
+          <td class="money">{{ compraLibre.monto | currency:'COP':'symbol':'1.0-0' }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
 

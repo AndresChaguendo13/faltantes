@@ -3,8 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface DetalleVentaRequest {
-  productoId: number;
+  productoId: number | null;
   cantidad: number;
+  concepto?: string | null;
+  precioUnitario?: number | null;
+  observacion?: string | null;
 }
 
 export interface VentaRequest {
@@ -15,7 +18,10 @@ export interface VentaRequest {
 }
 
 export interface DetalleVentaResponse {
+  productoId?: number | null;
   producto: string;
+  concepto?: string | null;
+  observacion?: string | null;
   cantidad: number;
   precioUnitario: number;
   subtotal: number;
@@ -76,7 +82,4 @@ export class VentaService {
       `${this.apiUrl}/total-fiado-hoy`
     );
   }
-
-
-
 }

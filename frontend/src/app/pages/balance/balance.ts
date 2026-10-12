@@ -74,7 +74,6 @@ export class Balance implements OnInit {
   procesandoDevolucion = false;
   errorDevolucion = '';
 
-  ventasLibres: MovimientoCajaResponse[] = [];
   comprasLibres: MovimientoCajaResponse[] = [];
 
 
@@ -220,27 +219,8 @@ export class Balance implements OnInit {
   }
 
   // =========================
-  // TOTALES NORMALES + LIBRES
+  // TOTALES DE COMPRAS
   // =========================
-
-  get cantidadVentasLibres(): number {
-    return this.ventasLibres.length;
-  }
-
-  get totalVentasLibres(): number {
-    return this.ventasLibres.reduce(
-      (total, movimiento) => total + Number(movimiento.monto || 0),
-      0
-    );
-  }
-
-  get cantidadVentasTotales(): number {
-    return this.ventas.length + this.cantidadVentasLibres;
-  }
-
-  get totalVentasTotales(): number {
-    return Number(this.totalVentas || 0) + this.totalVentasLibres;
-  }
 
   get totalComprasNormales(): number {
     return this.compras.reduce(
@@ -627,15 +607,6 @@ export class Balance implements OnInit {
       next: (movimientos) => {
         const lista = movimientos || [];
 
-        this.ventasLibres = lista.filter(
-          movimiento =>
-            movimiento.tipo === 'INGRESO' &&
-            this.esDeHoy(movimiento.fecha) &&
-            (movimiento.motivo || '')
-              .toUpperCase()
-              .startsWith('VENTA LIBRE:')
-        );
-
         this.comprasLibres = lista.filter(
           movimiento =>
             movimiento.tipo === 'RETIRO' &&
@@ -649,7 +620,6 @@ export class Balance implements OnInit {
       },
       error: (error) => {
         console.error('ERROR CARGANDO MOVIMIENTOS LIBRES:', error);
-        this.ventasLibres = [];
         this.comprasLibres = [];
         this.cdr.detectChanges();
       }

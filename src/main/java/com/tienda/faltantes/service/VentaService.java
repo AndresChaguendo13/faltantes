@@ -101,13 +101,22 @@ public class VentaService {
                             DetalleVentaResponseDTO detalleDTO =
                                     new DetalleVentaResponseDTO();
 
-                            detalleDTO.setProductoId(
-                                    detalle.getProducto().getId()
-                            );
+                            if (detalle.getProducto() != null) {
+                                detalleDTO.setProductoId(
+                                        detalle.getProducto().getId()
+                                );
+                                detalleDTO.setProducto(
+                                        detalle.getProducto().getNombre()
+                                );
+                            } else {
+                                detalleDTO.setProductoId(null);
+                                detalleDTO.setProducto(
+                                        detalle.getConcepto()
+                                );
+                            }
 
-                            detalleDTO.setProducto(
-                                    detalle.getProducto().getNombre()
-                            );
+                            detalleDTO.setConcepto(detalle.getConcepto());
+                            detalleDTO.setObservacion(detalle.getObservacion());
 
                             detalleDTO.setCantidad(
                                     detalle.getCantidad()
@@ -168,12 +177,28 @@ public class VentaService {
                                         DetalleVentaResponseDTO detalleDTO =
                                                 new DetalleVentaResponseDTO();
 
-                                        detalleDTO.setProductoId(
-                                                detalle.getProducto().getId()
+                                        if (detalle.getProducto() != null) {
+                                            detalleDTO.setProductoId(
+                                                    detalle.getProducto().getId()
+                                            );
+
+                                            detalleDTO.setProducto(
+                                                    detalle.getProducto().getNombre()
+                                            );
+                                        } else {
+                                            // Venta libre: no tiene producto de inventario.
+                                            detalleDTO.setProductoId(null);
+                                            detalleDTO.setProducto(
+                                                    detalle.getConcepto()
+                                            );
+                                        }
+
+                                        detalleDTO.setConcepto(
+                                                detalle.getConcepto()
                                         );
 
-                                        detalleDTO.setProducto(
-                                                detalle.getProducto().getNombre()
+                                        detalleDTO.setObservacion(
+                                                detalle.getObservacion()
                                         );
 
                                         detalleDTO.setCantidad(
@@ -263,6 +288,56 @@ public class VentaService {
 
         for (DetalleVentaRequestDTO detalleDTO : dto.getDetalles()) {
 
+            /*
+             * VENTA LIBRE:
+             * No tiene productoId, no modifica inventario y forma parte
+             * de la misma venta que los productos normales.
+             */
+            if (detalleDTO.getProductoId() == null) {
+
+                String concepto = detalleDTO.getConcepto() != null
+                        ? detalleDTO.getConcepto().trim()
+                        : "";
+
+                Double precioLibre = detalleDTO.getPrecioUnitario();
+
+                if (concepto.isBlank()) {
+                    throw new IllegalArgumentException(
+                            "La venta libre requiere un concepto"
+                    );
+                }
+
+                if (precioLibre == null || precioLibre <= 0) {
+                    throw new IllegalArgumentException(
+                            "El valor de la venta libre debe ser mayor que cero"
+                    );
+                }
+
+                DetalleVenta detalle = new DetalleVenta();
+
+                detalle.setVenta(venta);
+                detalle.setProducto(null);
+                detalle.setConcepto(concepto);
+                detalle.setObservacion(detalleDTO.getObservacion());
+                detalle.setCantidad(detalleDTO.getCantidad());
+                detalle.setPrecioUnitario(precioLibre);
+                detalle.setCostoUnitario(0.0);
+                detalle.setSubtotal(
+                        detalleDTO.getCantidad() * precioLibre
+                );
+
+                total += detalle.getSubtotal();
+
+                venta.getDetalles().add(detalle);
+
+                continue;
+            }
+
+            /*
+             * VENTA NORMAL:
+             * Mantiene exactamente la lógica existente de inventario,
+             * precio y costo del producto.
+             */
             Producto producto = productoRepository.findById(detalleDTO.getProductoId())
                     .orElseThrow(() ->
                             new RecursoNoEncontradoException("Producto no encontrado"));
@@ -294,6 +369,8 @@ public class VentaService {
 
             detalle.setVenta(venta);
             detalle.setProducto(producto);
+            detalle.setConcepto(null);
+            detalle.setObservacion(null);
             detalle.setCantidad(detalleDTO.getCantidad());
 
             detalle.setPrecioUnitario(producto.getPrecioVenta());
@@ -363,8 +440,16 @@ public class VentaService {
                 .map(detalle -> {
                     DetalleVentaResponseDTO detalleDTO = new DetalleVentaResponseDTO();
 
-                    detalleDTO.setProductoId(detalle.getProducto().getId());
-                    detalleDTO.setProducto(detalle.getProducto().getNombre());
+                    if (detalle.getProducto() != null) {
+                        detalleDTO.setProductoId(detalle.getProducto().getId());
+                        detalleDTO.setProducto(detalle.getProducto().getNombre());
+                    } else {
+                        detalleDTO.setProductoId(null);
+                        detalleDTO.setProducto(detalle.getConcepto());
+                    }
+
+                    detalleDTO.setConcepto(detalle.getConcepto());
+                    detalleDTO.setObservacion(detalle.getObservacion());
                     detalleDTO.setCantidad(detalle.getCantidad());
                     detalleDTO.setPrecioUnitario(detalle.getPrecioUnitario());
                     detalleDTO.setSubtotal(detalle.getSubtotal());
