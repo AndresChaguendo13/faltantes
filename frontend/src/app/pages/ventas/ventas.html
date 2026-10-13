@@ -1,3 +1,4 @@
+
 <div class="ventas-pos-page">
 
   <!-- =====================================================
@@ -914,7 +915,7 @@
         <h2>Venta libre</h2>
         <p>Agrega un concepto que no pertenece al inventario.</p>
       </div>
-      <button type="button" (click)="cerrarVentaLibre()" [disabled]="guardandoVentaLibre">×</button>
+      <button type="button" aria-label="Cerrar modal" (click)="cerrarVentaLibre()" [disabled]="guardandoVentaLibre">×</button>
     </div>
 
     <div class="venta-libre-info">
@@ -923,17 +924,39 @@
     </div>
 
     <div class="venta-libre-form">
-      <label>¿Qué vendiste? <span>*</span>
-        <input type="text" [(ngModel)]="conceptoVentaLibre" placeholder="Ej. Carne, verdura, huevos..." [disabled]="guardandoVentaLibre">
+      <label for="conceptoVentaLibre">¿Qué vendiste? <span>*</span>
+        <input
+          id="conceptoVentaLibre"
+          type="text"
+          [(ngModel)]="conceptoVentaLibre"
+          placeholder="Ej. Carne, verdura, huevos..."
+          autocomplete="off"
+          [disabled]="guardandoVentaLibre">
       </label>
 
-      <label>Valor de la venta <span>*</span>
-        <input type="number" min="1" [(ngModel)]="montoVentaLibre" placeholder="30000" [disabled]="guardandoVentaLibre">
+      <label for="montoVentaLibre">Valor de la venta <span>*</span>
+        <div class="venta-libre-money">
+          <span>$</span>
+          <input
+            id="montoVentaLibre"
+            type="number"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            [(ngModel)]="montoVentaLibre"
+            placeholder="Ej. 30000"
+            [disabled]="guardandoVentaLibre">
+        </div>
         <small>Pesos colombianos (COP).</small>
       </label>
 
-      <label class="venta-libre-full">Observación
-        <textarea rows="3" [(ngModel)]="observacionVentaLibre" placeholder="Opcional" [disabled]="guardandoVentaLibre"></textarea>
+      <label class="venta-libre-full" for="observacionVentaLibre">Observación
+        <textarea
+          id="observacionVentaLibre"
+          rows="3"
+          [(ngModel)]="observacionVentaLibre"
+          placeholder="Opcional"
+          [disabled]="guardandoVentaLibre"></textarea>
       </label>
     </div>
 

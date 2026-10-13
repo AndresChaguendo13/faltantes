@@ -633,9 +633,21 @@
       </div>
 
       <div class="libre-field">
-        <label>Valor de la compra <span>*</span></label>
-        <input type="number" min="1" [(ngModel)]="montoCompraLibre" placeholder="1000000" [disabled]="guardandoCompraLibre">
-        <small>Se registra en pesos colombianos (COP).</small>
+        <label for="montoCompraLibre">Valor de la compra <span>*</span></label>
+        <div class="libre-money-input">
+          <span aria-hidden="true">$</span>
+          <input
+            id="montoCompraLibre"
+            type="number"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            [(ngModel)]="montoCompraLibre"
+            placeholder="Ej. 150000"
+            [disabled]="guardandoCompraLibre"
+          >
+        </div>
+        <small>Valor en pesos colombianos (COP), sin decimales.</small>
       </div>
 
       <div class="libre-field">

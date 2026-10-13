@@ -59,7 +59,7 @@ export class Compras implements OnInit {
   guardandoCompraLibre = false;
   conceptoCompraLibre = '';
   proveedorCompraLibre = '';
-  montoCompraLibre = 0;
+  montoCompraLibre: number | null = null;
   observacionCompraLibre = '';
   errorCompraLibre = '';
 
@@ -559,7 +559,7 @@ export class Compras implements OnInit {
   abrirCompraLibre(): void {
     this.conceptoCompraLibre = '';
     this.proveedorCompraLibre = '';
-    this.montoCompraLibre = 0;
+    this.montoCompraLibre = null;
     this.observacionCompraLibre = '';
     this.errorCompraLibre = '';
     this.mostrarCompraLibre = true;
@@ -573,7 +573,7 @@ export class Compras implements OnInit {
 
   registrarCompraLibre(): void {
     const concepto = this.conceptoCompraLibre.trim();
-    const monto = Number(this.montoCompraLibre || 0);
+    const monto = Number(this.montoCompraLibre ?? 0);
 
     if (!concepto) {
       this.errorCompraLibre = 'Escribe qué compraste.';

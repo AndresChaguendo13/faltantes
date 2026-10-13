@@ -107,7 +107,7 @@ export class Ventas implements OnInit {
   mostrarVentaLibre = false;
   guardandoVentaLibre = false;
   conceptoVentaLibre = '';
-  montoVentaLibre = 0;
+  montoVentaLibre: number | null = null;
   observacionVentaLibre = '';
   errorVentaLibre = '';
 
@@ -940,7 +940,7 @@ export class Ventas implements OnInit {
 
   abrirVentaLibre(): void {
     this.conceptoVentaLibre = '';
-    this.montoVentaLibre = 0;
+    this.montoVentaLibre = null;
     this.observacionVentaLibre = '';
     this.errorVentaLibre = '';
     this.mostrarVentaLibre = true;
@@ -954,7 +954,7 @@ export class Ventas implements OnInit {
 
   registrarVentaLibre(): void {
     const concepto = this.conceptoVentaLibre.trim();
-    const monto = Number(this.montoVentaLibre || 0);
+    const monto = Number(this.montoVentaLibre ?? 0);
     const observacion = this.observacionVentaLibre.trim();
 
     if (!concepto) {
