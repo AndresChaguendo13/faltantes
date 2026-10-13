@@ -70,6 +70,11 @@ public class ProveedorService {
         proveedor.setCorreo(dto.getCorreo());
         proveedor.setDireccion(dto.getDireccion());
 
+// Actualizar el estado del proveedor
+        if (dto.getActivo() != null) {
+            proveedor.setActivo(dto.getActivo());
+        }
+
         Proveedor actualizado = repository.save(proveedor);
 
         return mapper.toResponseDTO(actualizado);

@@ -50,6 +50,7 @@ export class ClienteService {
       documento: string;
       telefono: string;
       direccion: string;
+      activo: boolean;
     }
   ): Observable<Cliente> {
     return this.http.put<Cliente>(

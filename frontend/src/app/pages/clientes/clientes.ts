@@ -176,7 +176,8 @@ export class ClientesComponent implements OnInit {
       nombre: this.clienteNuevo.nombre.trim(),
       documento: this.clienteNuevo.documento.trim(),
       telefono: this.clienteNuevo.telefono.trim(),
-      direccion: this.clienteNuevo.direccion.trim()
+      direccion: this.clienteNuevo.direccion.trim(),
+      activo: this.clienteNuevo.activo
     };
 
     if (

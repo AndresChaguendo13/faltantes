@@ -58,5 +58,15 @@ public class ProveedorRequestDTO {
 
     private String direccion;
 
+    private Boolean activo;
+
     // Getters y Setters
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 }

@@ -97,6 +97,11 @@ public class ClienteService {
         cliente.setTelefono(dto.getTelefono());
         cliente.setDireccion(dto.getDireccion());
 
+// Actualizar el estado del cliente
+        if (dto.getActivo() != null) {
+            cliente.setActivo(dto.getActivo());
+        }
+
         Cliente actualizado = repository.save(cliente);
 
         return mapper.toResponseDTO(actualizado);

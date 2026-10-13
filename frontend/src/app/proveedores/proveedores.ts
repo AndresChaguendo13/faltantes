@@ -186,7 +186,8 @@ export class ProveedoresComponent implements OnInit {
       nit: this.proveedorNuevo.nit.trim(),
       telefono: this.proveedorNuevo.telefono.trim(),
       correo: this.proveedorNuevo.correo.trim(),
-      direccion: this.proveedorNuevo.direccion.trim()
+      direccion: this.proveedorNuevo.direccion.trim(),
+      activo: this.proveedorNuevo.activo
     };
 
     if (this.modoEdicion && this.proveedorEditandoId !== null) {

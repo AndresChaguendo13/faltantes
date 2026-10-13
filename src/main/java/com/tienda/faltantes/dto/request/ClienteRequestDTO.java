@@ -1,3 +1,4 @@
+
 package com.tienda.faltantes.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
@@ -13,6 +14,8 @@ public class ClienteRequestDTO {
     private String telefono;
 
     private String direccion;
+
+    private Boolean activo = true;
 
     public ClienteRequestDTO() {
     }
@@ -47,5 +50,13 @@ public class ClienteRequestDTO {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
+    }
+
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
     }
 }
